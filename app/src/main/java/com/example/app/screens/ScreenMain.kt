@@ -15,5 +15,13 @@ fun ScreenMain(){
         composable(Routes.Login.route) {
             LoginScreen(navController = navController)
         }
+
+        composable(Routes.SignUp.route) {
+            SignUpScreen(navController = navController)
+        }
+
+        composable(Routes.Profile.route) {
+            ProfileScreen(navController = navController)
+        }
     }
 }

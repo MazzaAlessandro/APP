@@ -36,27 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
+import com.example.app.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavHostController) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        ClickableText(
-            text = AnnotatedString("Create a new Account"),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(20.dp),
-            onClick = {
-                //here we should implement the navigation to the Sign Up Screen
-            },
-            style = TextStyle(
-                fontSize = 16.sp,
-                fontFamily = FontFamily.Default,
-                textDecoration = TextDecoration.Underline,
-                color = Color.Blue
-            )
-        )
-    }
+
     Column(
         modifier = Modifier.padding(20.dp),
         verticalArrangement = Arrangement.Center,
@@ -91,7 +77,13 @@ fun LoginScreen(navController: NavHostController) {
                 onClick = {
                           //checks if the credentials are right.
                           //if yes, takes to profile page
+                          //if not an error should appear
+                    if(password.value.text == "PASSWORD" && username.value.text == "USERNAME"){
+                        navController.navigate(Routes.Profile.route)
+                    }
+
                 },
+                enabled = !password.value.text.isBlank() && !username.value.text.isBlank(),
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,5 +122,26 @@ fun LoginScreen(navController: NavHostController) {
                 thickness = 1.dp
             )
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        ClickableText(
+            text = AnnotatedString("Create a new Account"),
+            modifier = Modifier
+                .padding(10.dp),
+            onClick = {
+                //here we should implement the navigation to the Sign Up Screen
+                      navController.navigate(Routes.SignUp.route)
+            },
+            style = TextStyle(
+                fontSize = 16.sp,
+                fontFamily = FontFamily.Default,
+                textDecoration = TextDecoration.Underline,
+                color = Color.Blue
+            )
+        )
     }
+
+
 }
+
