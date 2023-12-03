@@ -16,7 +16,7 @@ import com.example.app.bottomNavigation.BottomNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavHostController){
+fun CreateScreen(navController: NavHostController){
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController = navController)
@@ -31,11 +31,14 @@ fun ProfileScreen(navController: NavHostController){
                 modifier = Modifier.padding(8.dp),
                 text =
                 """
-                    Profile Page
+                    Create Page
                 """.trimIndent(),
             )
         }
 
     }
 
+    BackHandler {
+        navController.navigate(Routes.Profile.route)
+    }
 }

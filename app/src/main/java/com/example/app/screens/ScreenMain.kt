@@ -23,5 +23,13 @@ fun ScreenMain(){
         composable(Routes.Profile.route) {
             ProfileScreen(navController = navController)
         }
+
+        composable(Routes.Search.route) {
+            SearchScreen(navController = navController)
+        }
+
+        composable(Routes.Create.route) {
+            CreateScreen(navController = navController)
+        }
     }
 }
