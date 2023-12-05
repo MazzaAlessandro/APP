@@ -29,10 +29,9 @@ data class ArcData(
 @Composable
 fun AnimatedPieChart(
     modifier: Modifier = Modifier,
-    pieDataPoints : List<PieChartData>,
-    content : @Composable (modifier : Modifier) -> Unit,
+    pieDataPoints : List<PieChartData>
 ){
-    val localModifier = modifier.size(180.dp)
+    val localModifier = modifier.size(120.dp)
     val total = pieDataPoints.fold(0f){ acc, pieData ->
         acc + pieData.value
     }.div(360)
@@ -73,5 +72,4 @@ fun AnimatedPieChart(
             )
         }
     }
-    content(modifier = localModifier)
 }

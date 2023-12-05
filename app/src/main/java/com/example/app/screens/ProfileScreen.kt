@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,8 +27,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.scrollingBanner.AnimatedPieChart
@@ -85,10 +88,10 @@ fun ProfileScreen(navController: NavHostController){
                                         ProfileBanner()
                                     }
                                     "Badges" -> {
-                                        BadgeBanner()
+                                        BadgeBanner(12, 9, 8)
                                     }
                                     "Pie" -> {
-                                        PieBanner()
+                                        PieBanner(10, 5, 3)
                                     }
                                 }
                             }
@@ -147,11 +150,11 @@ fun ProfileScreen(navController: NavHostController){
 }
 
 @Composable
-private fun BadgeBanner(){
+private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp)
+            .padding(5.dp)
             .height(250.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(Color(0xFFD0BCFF)),
@@ -162,7 +165,9 @@ private fun BadgeBanner(){
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Text(text = "Badges earned", fontWeight = FontWeight.W600)
+            Text(text = "Badges earned", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+
+            Spacer(modifier = Modifier.height(5.dp))
 
             Row (modifier = Modifier
                 .fillMaxWidth()
@@ -171,23 +176,65 @@ private fun BadgeBanner(){
             ) {
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
                     Box(
-                        modifier = Modifier.size(100.dp).clip(CircleShape).background(Color(0xFFCD7F32))
-                    )
-                    Text(text = "12", fontWeight = FontWeight.W600)
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF6650a4).copy(alpha = 0.75f))
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(2.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFCD7F32))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Text(text = bronze.toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
                     Box(
-                        modifier = Modifier.size(100.dp).clip(CircleShape).background(Color(0xFFC0C0C0))
-                    )
-                    Text(text = "10", fontWeight = FontWeight.W600)
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF6650a4).copy(alpha = 0.75f))
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(2.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFC0C0C0))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Text(text = silver.toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
                     Box(
-                        modifier = Modifier.size(100.dp).clip(CircleShape).background(Color(0xFFFFD700))
-                    )
-                    Text(text = "9", fontWeight = FontWeight.W600)
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF6650a4).copy(alpha = 0.75f))
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(2.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFFFD700))
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    Text(text = gold.toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                 }
             }
         }
@@ -212,12 +259,12 @@ private fun ProfileBanner(){
 }
 
 @Composable
-private fun PieBanner(){
+private fun PieBanner(completed : Int, inProgress : Int, toDo : Int){
 
     val pieData = listOf(
-        PieChartData("Completed", 10, color = Color.Red),
-        PieChartData("In progress", 20, color = Color.Red.copy(alpha = 0.5f)),
-        PieChartData("To Do", 15, color = Color.Gray)
+        PieChartData("Completed Skills: ", completed, color = Color(0xFF6650a4)),
+        PieChartData("Skills In progress: ", inProgress, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
+        PieChartData("Unstarted Skills: ", toDo, color = Color.White)
     )
 
     Box(
@@ -229,26 +276,47 @@ private fun PieBanner(){
             .background(Color(0xFFD0BCFF)),
         contentAlignment = Alignment.Center,
     ){
-        AnimatedPieChart(
-            modifier = Modifier
-                .padding(32.dp),
-            pieDataPoints = pieData,
-            content = {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceAround,
-                    modifier = it.padding(16.dp)
+        Column (modifier = Modifier
+            .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Current Progress", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+
+            Row (modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                AnimatedPieChart(
+                    modifier = Modifier
+                        .padding(10.dp),
+                    pieDataPoints = pieData
+                )
+
+                Column (
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.SpaceEvenly
                 ){
                     pieData.map{
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
+                            Box(modifier = Modifier
+                                .size(15.dp)
+                                .clip(RoundedCornerShape(5.dp))
+                                .background(it.color))
                             Text(text = it.label, fontWeight = FontWeight.W600)
                             Text(text = it.value.toString())
                         }
+                        Spacer(modifier = Modifier.height(10.dp))
                     }
                 }
             }
-        )
+        }
+
     }
 }
