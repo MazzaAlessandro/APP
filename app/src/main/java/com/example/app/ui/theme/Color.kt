@@ -14,3 +14,7 @@ val greenColor = Color(0xFF0F9D58)
 val blueColor = Color(0xFF2196F3)
 val yellowColor = Color(0xFFFFC107)
 val redColor = Color(0xFFF44336)
+
+val Bronze = Color(0xFFCD7F32)
+val Silver = Color(0xFFC0C0C0)
+val Gold = Color(0xFFFFD700)

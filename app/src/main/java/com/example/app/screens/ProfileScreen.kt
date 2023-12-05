@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -59,7 +60,7 @@ fun ProfileScreen(navController: NavHostController){
 
                 val list = listOf(
                     "Profile",
-                    "Bar",
+                    "Badges",
                     "Pie"
                 )
                 val dotCount = 3
@@ -83,8 +84,8 @@ fun ProfileScreen(navController: NavHostController){
                                     "Profile" -> {
                                         ProfileBanner()
                                     }
-                                    "Bar" -> {
-                                        BarBanner()
+                                    "Badges" -> {
+                                        BadgeBanner()
                                     }
                                     "Pie" -> {
                                         PieBanner()
@@ -96,7 +97,7 @@ fun ProfileScreen(navController: NavHostController){
 
                         Row(
                             Modifier
-                                .height(20.dp)
+                                .height(25.dp)
                                 .fillMaxWidth()
                                 .align(Alignment.BottomCenter),
                             horizontalArrangement = Arrangement.Center
@@ -146,15 +147,51 @@ fun ProfileScreen(navController: NavHostController){
 }
 
 @Composable
-private fun BarBanner(){
+private fun BadgeBanner(){
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(4.dp)
             .height(250.dp)
+            .clip(RoundedCornerShape(10.dp))
             .background(Color(0xFFD0BCFF)),
         contentAlignment = Alignment.Center,
     ){
-        Text(text = "Bar banner here")
+        Column (modifier = Modifier
+            .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Text(text = "Badges earned", fontWeight = FontWeight.W600)
+
+            Row (modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column (horizontalAlignment = Alignment.CenterHorizontally){
+                    Box(
+                        modifier = Modifier.size(100.dp).clip(CircleShape).background(Color(0xFFCD7F32))
+                    )
+                    Text(text = "12", fontWeight = FontWeight.W600)
+                }
+
+                Column (horizontalAlignment = Alignment.CenterHorizontally){
+                    Box(
+                        modifier = Modifier.size(100.dp).clip(CircleShape).background(Color(0xFFC0C0C0))
+                    )
+                    Text(text = "10", fontWeight = FontWeight.W600)
+                }
+
+                Column (horizontalAlignment = Alignment.CenterHorizontally){
+                    Box(
+                        modifier = Modifier.size(100.dp).clip(CircleShape).background(Color(0xFFFFD700))
+                    )
+                    Text(text = "9", fontWeight = FontWeight.W600)
+                }
+            }
+        }
+
     }
 }
 
@@ -163,7 +200,9 @@ private fun ProfileBanner(){
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(4.dp)
             .height(250.dp)
+            .clip(RoundedCornerShape(10.dp))
             .background(Color(0xFFD0BCFF)),
         contentAlignment = Alignment.Center,
     ){
@@ -184,7 +223,9 @@ private fun PieBanner(){
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(4.dp)
             .height(250.dp)
+            .clip(RoundedCornerShape(10.dp))
             .background(Color(0xFFD0BCFF)),
         contentAlignment = Alignment.Center,
     ){
