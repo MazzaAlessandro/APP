@@ -28,6 +28,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.app.ProfileImage
 import com.example.app.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +47,10 @@ fun SignUpScreen(navController: NavHostController){
         val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
 
         Text(text = "Registration", style = TextStyle(fontSize = 40.sp))
+
+        ProfileImage()
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         TextField(
             label = { Text(text = "Username") },

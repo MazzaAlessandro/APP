@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.app.ProfileImage
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.scrollingBanner.AnimatedPieChart
 import com.example.app.scrollingBanner.PieChartData
@@ -263,11 +264,7 @@ private fun ProfileBanner(username : String, days : Int, skills : Int, badges : 
                 .padding(30.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Box(modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF6650a4).copy(alpha = 0.5f))
-                )
+                ProfileImage()
 
                 Column (
                     horizontalAlignment = Alignment.CenterHorizontally,
