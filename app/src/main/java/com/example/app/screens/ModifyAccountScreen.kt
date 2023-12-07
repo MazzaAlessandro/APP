@@ -32,7 +32,7 @@ import com.example.app.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(navController: NavHostController){
+fun ModifyAccountScreen(navController: NavHostController){
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -45,7 +45,7 @@ fun SignUpScreen(navController: NavHostController){
         val password = remember { mutableStateOf(TextFieldValue()) }
         val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
 
-        Text(text = "Registration", style = TextStyle(fontSize = 40.sp))
+        Text(text = "Update account info", style = TextStyle(fontSize = 40.sp))
 
         TextField(
             label = { Text(text = "Username") },
@@ -84,7 +84,7 @@ fun SignUpScreen(navController: NavHostController){
                 onClick = {
                     //checks if password and password check match.
                     //if yes, takes checks if username isn't already used
-                          // if it's unique, registers the user and takes him to his new profile page
+                    // if it's unique, registers the user and takes him to his new profile page
                 },
                 enabled = !password.value.text.isBlank()
                         && !username.value.text.isBlank()
@@ -95,12 +95,12 @@ fun SignUpScreen(navController: NavHostController){
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text(text = "Register")
+                Text(text = "Update info")
             }
         }
     }
 
     BackHandler {
-        navController.navigate(Routes.Login.route)
+        navController.navigate(Routes.Profile.route)
     }
 }

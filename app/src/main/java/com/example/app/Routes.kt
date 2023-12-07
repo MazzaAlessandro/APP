@@ -6,4 +6,5 @@ sealed class Routes(val route: String) {
     object Profile : Routes("Profile")
     object Search : Routes("Search")
     object Create : Routes("Create")
+    object Update : Routes("Update")
 }

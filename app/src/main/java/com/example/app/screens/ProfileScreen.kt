@@ -85,7 +85,7 @@ fun ProfileScreen(navController: NavHostController){
                             )?.let{content ->
                                 when (content) {
                                     "Profile" -> {
-                                        ProfileBanner()
+                                        ProfileBanner("Username", 7, 5, 9)
                                     }
                                     "Badges" -> {
                                         BadgeBanner(12, 9, 8)
@@ -106,7 +106,7 @@ fun ProfileScreen(navController: NavHostController){
                             horizontalArrangement = Arrangement.Center
                         ){
                             repeat(dotCount) { iteration ->
-                                val color = if (pagerState.currentPage % dotCount == iteration) Color.DarkGray else Color.LightGray
+                                val color = if (pagerState.currentPage % dotCount == iteration) Color(0xFF6650a4) else Color.White
                                 Box(
                                     modifier = Modifier
                                         .padding(4.dp)
@@ -243,7 +243,7 @@ private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
 }
 
 @Composable
-private fun ProfileBanner(){
+private fun ProfileBanner(username : String, days : Int, skills : Int, badges : Int){
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -253,9 +253,50 @@ private fun ProfileBanner(){
             .background(Color(0xFFD0BCFF)),
         contentAlignment = Alignment.Center,
     ){
-        Text(text = "Profile banner here")
-    }
+        Column (modifier = Modifier
+            .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Row (modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box(modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF6650a4).copy(alpha = 0.5f))
+                )
 
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceEvenly)
+                {
+                    Text(text = username, fontWeight = FontWeight.W600, style = TextStyle(fontSize = 35.sp))
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Column (
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ){
+                        Text("Days using the app: ${days.toString()}", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 15.sp))
+
+                        Spacer(modifier = Modifier.height(5.dp))
+
+                        Text("Total Skills learned: ${skills.toString()}", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 15.sp))
+
+                        Spacer(modifier = Modifier.height(5.dp))
+
+                        Text("Total Badges earned: ${badges.toString()}", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 15.sp))
+                    }
+
+                }
+            }
+        }
+
+    }
 }
 
 @Composable
