@@ -48,7 +48,7 @@ fun ModifyAccountScreen(navController: NavHostController){
 
         Text(text = "Update account info", style = TextStyle(fontSize = 40.sp))
 
-        ProfileImage()
+        ProfileImage("")
 
         Spacer(modifier = Modifier.height(20.dp))
 

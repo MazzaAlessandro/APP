@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,8 +20,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -34,6 +37,11 @@ import com.example.app.Routes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavHostController){
+    val notification = rememberSaveable { mutableStateOf("") }
+    if(notification.value.isNotEmpty()){
+        Toast.makeText(LocalContext.current, notification.value, Toast.LENGTH_LONG).show()
+    }
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -48,7 +56,7 @@ fun SignUpScreen(navController: NavHostController){
 
         Text(text = "Registration", style = TextStyle(fontSize = 40.sp))
 
-        ProfileImage()
+        ProfileImage("")
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -90,6 +98,14 @@ fun SignUpScreen(navController: NavHostController){
                     //checks if password and password check match.
                     //if yes, takes checks if username isn't already used
                           // if it's unique, registers the user and takes him to his new profile page
+                    if(password.value.text == passwordCheck.value.text)
+                    {
+                        notification.value = "Please verify that the password match"
+                    }
+                    else
+                    {
+
+                    }
                 },
                 enabled = !password.value.text.isBlank()
                         && !username.value.text.isBlank()

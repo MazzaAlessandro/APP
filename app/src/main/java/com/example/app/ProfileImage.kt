@@ -19,9 +19,16 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 
 @Composable
-fun ProfileImage(){
+fun ProfileImage(
+    uri : String
+){
 
     val imageUri = rememberSaveable { mutableStateOf("")}
+
+    if (uri.isNullOrBlank())
+        imageUri.value = ""
+    else
+        imageUri.value
 
     val painter = rememberImagePainter(
         if(imageUri.value.isEmpty())

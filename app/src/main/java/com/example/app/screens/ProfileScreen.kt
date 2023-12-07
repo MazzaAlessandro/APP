@@ -264,7 +264,7 @@ private fun ProfileBanner(username : String, days : Int, skills : Int, badges : 
                 .padding(30.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ProfileImage()
+                ProfileImage("")
 
                 Column (
                     horizontalAlignment = Alignment.CenterHorizontally,
