@@ -89,7 +89,7 @@ fun LoginScreen(navController: NavHostController) {
                         navController.navigate(Routes.Profile.route)
                     }
                     else{
-                        notification.value = "Username or Password is incorrect"
+                        notification.value = "Either Username or Password is incorrect"
                     }
 
                 },

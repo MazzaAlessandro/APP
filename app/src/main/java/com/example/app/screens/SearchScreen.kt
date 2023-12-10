@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.app.Routes
+import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 
 
@@ -43,6 +44,7 @@ fun SearchScreen(navController: NavHostController){
 
 
     Scaffold(
+        topBar = { AppToolBar(title = "Search a Skill") },
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }

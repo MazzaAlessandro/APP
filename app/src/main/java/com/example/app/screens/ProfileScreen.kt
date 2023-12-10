@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
+import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.scrollingBanner.AnimatedPieChart
 import com.example.app.scrollingBanner.PieChartData
@@ -45,6 +46,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ProfileScreen(navController: NavHostController){
     Scaffold(
+        topBar = { AppToolBar(title = "Profile") },
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }
