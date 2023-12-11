@@ -15,10 +15,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.app.Routes
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppToolBar(title : String){
+fun AppToolBar(title : String, navController: NavHostController){
     TopAppBar(
         title = {
             Text(
@@ -33,7 +37,16 @@ fun AppToolBar(title : String){
         },
         actions = {
             IconButton(onClick = {
-                println("logout")
+                val firebaseAuth = FirebaseAuth.getInstance()
+                firebaseAuth.signOut()
+
+                val authStateListener = AuthStateListener{
+                    if(it.currentUser == null){
+                        navController.navigate(Routes.Login.route)
+                    }
+                }
+
+                firebaseAuth.addAuthStateListener(authStateListener)
             }) {
                 Icon(
                     imageVector = Icons.Filled.Logout,

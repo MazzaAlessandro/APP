@@ -44,7 +44,7 @@ fun SearchScreen(navController: NavHostController){
 
 
     Scaffold(
-        topBar = { AppToolBar(title = "Search a Skill") },
+        topBar = { AppToolBar(title = "Search a Skill", navController) },
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }

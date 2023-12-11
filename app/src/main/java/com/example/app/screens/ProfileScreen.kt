@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ProfileScreen(navController: NavHostController){
     Scaffold(
-        topBar = { AppToolBar(title = "Profile") },
+        topBar = { AppToolBar(title = "Profile", navController) },
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }
