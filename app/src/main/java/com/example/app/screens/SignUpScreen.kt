@@ -13,8 +13,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -25,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -63,14 +69,23 @@ fun SignUpScreen(navController: NavHostController){
         TextField(
             label = { Text(text = "Username") },
             value = username.value,
-            onValueChange = { username.value = it })
+            onValueChange = { username.value = it },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            singleLine = true,
+            maxLines = 1,
+            leadingIcon = {Icon(imageVector = Icons.Default.Person, contentDescription = "username")},
+            )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         TextField(
             label = { Text(text = "Email") },
             value = mail.value,
-            onValueChange = { mail.value = it })
+            onValueChange = { mail.value = it },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            singleLine = true,
+            maxLines = 1,
+            leadingIcon = {Icon(imageVector = Icons.Default.Mail, contentDescription = "email")},)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -78,7 +93,10 @@ fun SignUpScreen(navController: NavHostController){
             label = { Text(text = "Password") },
             value = password.value,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+            singleLine = true,
+            maxLines = 1,
+            leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "password")},
             onValueChange = { password.value = it })
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -87,7 +105,10 @@ fun SignUpScreen(navController: NavHostController){
             label = { Text(text = "Confirm Password") },
             value = passwordCheck.value,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            singleLine = true,
+            maxLines = 1,
+            leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "checkPassword")},
             onValueChange = { passwordCheck.value = it })
 
         Spacer(modifier = Modifier.height(20.dp))
