@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,9 @@ import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.scrollingBanner.AnimatedPieChart
 import com.example.app.scrollingBanner.PieChartData
+import com.example.app.util.SharedViewModel
+import com.example.app.util.UserData
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -44,9 +48,32 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ProfileScreen(navController: NavHostController){
+fun ProfileScreen(navController: NavHostController,
+                  sharedViewModel: SharedViewModel
+){
+    val context = LocalContext.current
+
+    val userData = UserData()
+
+    if(FirebaseAuth.getInstance().currentUser != null && sharedViewModel.getCurrentUserMail().isBlank()){
+        val currMail = FirebaseAuth.getInstance().currentUser?.email
+        if (currMail!=null){
+            sharedViewModel.setCurrentUserMail(currMail)
+        }
+    }
+
+    val mail = sharedViewModel.getCurrentUserMail()
+
+    sharedViewModel.retrieveData(
+        mail,
+        context
+    ){
+        data ->
+        userData.username = data.username
+    }
+
     Scaffold(
-        topBar = { AppToolBar(title = "Profile", navController) },
+        topBar = { AppToolBar(title = "Profile", navController, sharedViewModel) },
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }
@@ -65,9 +92,9 @@ fun ProfileScreen(navController: NavHostController){
             ){
 
                 val list = listOf(
+                    "Pie",
                     "Profile",
-                    "Badges",
-                    "Pie"
+                    "Badges"
                 )
                 val dotCount = 3
                 val pageCount = Int.MAX_VALUE
@@ -88,7 +115,7 @@ fun ProfileScreen(navController: NavHostController){
                             )?.let{content ->
                                 when (content) {
                                     "Profile" -> {
-                                        ProfileBanner("Username", 7, 5, 9)
+                                        ProfileBanner(userData.username, 7, 5, 9)
                                     }
                                     "Badges" -> {
                                         BadgeBanner(12, 9, 8)

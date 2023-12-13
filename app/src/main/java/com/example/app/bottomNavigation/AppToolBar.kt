@@ -17,12 +17,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.Routes
+import com.example.app.util.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppToolBar(title : String, navController: NavHostController){
+fun AppToolBar(
+    title : String,
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel
+){
     TopAppBar(
         title = {
             Text(
@@ -42,6 +47,7 @@ fun AppToolBar(title : String, navController: NavHostController){
 
                 val authStateListener = AuthStateListener{
                     if(it.currentUser == null){
+                        sharedViewModel.resetCurrentUserMail()
                         navController.navigate(Routes.Login.route)
                     }
                 }

@@ -45,22 +45,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.Routes
+import com.example.app.util.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel
+) {
 
-    val authenticating = remember { mutableStateOf(false) }
+    val authenticating = remember { mutableStateOf(true) }
 
     val notification = rememberSaveable { mutableStateOf("") }
     if(notification.value.isNotEmpty()){
         Toast.makeText(LocalContext.current, notification.value, Toast.LENGTH_LONG).show()
     }
 
+    if(FirebaseAuth.getInstance().currentUser != null){
+        navController.navigate(Routes.Profile.route)
+    }
+    else
+        authenticating.value = false
+
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
+
     ) {
         Column(
             modifier = Modifier
@@ -135,8 +146,8 @@ fun LoginScreen(navController: NavHostController) {
                             .signInWithEmailAndPassword(email.value.text, password.value.text)
                             .addOnCompleteListener {
                                 if(it.isSuccessful){
+                                    sharedViewModel.setCurrentUserMail(email.value.text)
                                     authenticating.value = false
-
                                     navController.navigate(Routes.Profile.route)
                                 }
                             }

@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -43,12 +42,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
+import com.example.app.util.SharedViewModel
+import com.example.app.util.UserData
 import com.google.firebase.auth.FirebaseAuth
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(navController: NavHostController){
+fun SignUpScreen(navController: NavHostController,
+                 sharedViewModel: SharedViewModel
+){
     val authenticating = remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     val notification = rememberSaveable { mutableStateOf("") }
     if(notification.value.isNotEmpty()){
@@ -151,6 +155,14 @@ fun SignUpScreen(navController: NavHostController){
                                     Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
 
                                     if(it.isSuccessful){
+                                        sharedViewModel.saveData(
+                                            userData = UserData(
+                                                FirebaseAuth.getInstance().currentUser!!.uid,
+                                                username.value.text,
+                                                mail.value.text),
+                                            context
+                                        )
+                                        sharedViewModel.setCurrentUserMail(mail.value.text)
                                         authenticating.value = false
                                         navController.navigate(Routes.Profile.route)
                                     }
@@ -164,10 +176,10 @@ fun SignUpScreen(navController: NavHostController){
                                 }
                         }
                     },
-                    enabled = !password.value.text.isBlank()
-                            && !username.value.text.isBlank()
-                            && !mail.value.text.isBlank()
-                            && !passwordCheck.value.text.isBlank()
+                    enabled = password.value.text.isNotBlank()
+                            && username.value.text.isNotBlank()
+                            && mail.value.text.isNotBlank()
+                            && passwordCheck.value.text.isNotBlank()
                             && !authenticating.value,
                     shape = RoundedCornerShape(50.dp),
                     modifier = Modifier
@@ -186,20 +198,4 @@ fun SignUpScreen(navController: NavHostController){
     BackHandler {
         navController.navigate(Routes.Login.route)
     }
-}
-
-fun createUserInFirebase(username : String, email : String, password : String){
-    FirebaseAuth
-        .getInstance()
-        .createUserWithEmailAndPassword(email, password)
-        .addOnCompleteListener {
-            Log.d(TAG, "Inside OnCompleteListener")
-            Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
-        }
-        .addOnFailureListener {
-            Log.d(TAG, "Inside OnFailureListener")
-            Log.d(TAG, "Exception = ${it.message}")
-            Log.d(TAG, "Exception = ${it.localizedMessage}")
-        }
-
 }

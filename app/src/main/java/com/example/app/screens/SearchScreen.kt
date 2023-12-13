@@ -28,11 +28,14 @@ import androidx.navigation.NavHostController
 import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
+import com.example.app.util.SharedViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavHostController){
+fun SearchScreen(navController: NavHostController,
+                 sharedViewModel: SharedViewModel
+){
     var text by remember {mutableStateOf("")}
     var active by remember {mutableStateOf(false)}
     var items = remember {
@@ -44,7 +47,7 @@ fun SearchScreen(navController: NavHostController){
 
 
     Scaffold(
-        topBar = { AppToolBar(title = "Search a Skill", navController) },
+        topBar = { AppToolBar(title = "Search a Skill", navController, sharedViewModel) },
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }

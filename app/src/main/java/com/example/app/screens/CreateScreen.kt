@@ -13,12 +13,16 @@ import androidx.navigation.NavHostController
 import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
+import com.example.app.util.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateScreen(navController: NavHostController){
+fun CreateScreen(
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel
+){
     Scaffold(
-        topBar = { AppToolBar(title = "Create a new Skill", navController) },
+        topBar = { AppToolBar(title = "Create a new Skill", navController, sharedViewModel) },
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }

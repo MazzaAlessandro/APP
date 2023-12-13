@@ -30,10 +30,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
+import com.example.app.util.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ModifyAccountScreen(navController: NavHostController){
+fun ModifyAccountScreen(navController: NavHostController,
+                        sharedViewModel: SharedViewModel
+){
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
