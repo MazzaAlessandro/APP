@@ -16,19 +16,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun ProfileImage(
-    uri : String
+    uri : String,
+    clickable : Boolean = true,
+    selected : (String) -> Unit
 ){
 
     val imageUri = rememberSaveable { mutableStateOf("")}
 
-    if (uri.isNullOrBlank())
-        imageUri.value = ""
-    else
-        imageUri.value
+    if (uri.isNotBlank())
+        imageUri.value = uri
 
     val painter = rememberImagePainter(
         if(imageUri.value.isEmpty())
@@ -40,7 +42,9 @@ fun ProfileImage(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ){ uri: Uri? ->
-        uri?.let { imageUri.value = it.toString()}
+        uri?.let {
+            imageUri.value = it.toString()
+        }
     }
 
     Card(shape = CircleShape,
@@ -52,8 +56,10 @@ fun ProfileImage(
                 contentDescription = null,
                 modifier = Modifier
                     .wrapContentSize()
-                    .clickable { launcher.launch("image/*")},
+                    .clickable { if(clickable)launcher.launch("image/*")},
                 contentScale = ContentScale.Crop)
     }
+
+    selected(imageUri.value)
 
 }

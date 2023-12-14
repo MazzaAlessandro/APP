@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.util.SharedViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,10 +49,13 @@ fun ModifyAccountScreen(navController: NavHostController,
         val mail = remember { mutableStateOf(TextFieldValue()) }
         val password = remember { mutableStateOf(TextFieldValue()) }
         val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
+        val pfpUri = remember { MutableStateFlow("") }
 
         Text(text = "Update account info", style = TextStyle(fontSize = 40.sp))
 
-        ProfileImage("")
+        ProfileImage(""){uri ->
+            pfpUri.value = uri
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -59,13 +63,6 @@ fun ModifyAccountScreen(navController: NavHostController,
             label = { Text(text = "Username") },
             value = username.value,
             onValueChange = { username.value = it })
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        TextField(
-            label = { Text(text = "Email") },
-            value = mail.value,
-            onValueChange = { mail.value = it })
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -94,10 +91,10 @@ fun ModifyAccountScreen(navController: NavHostController,
                     //if yes, takes checks if username isn't already used
                     // if it's unique, registers the user and takes him to his new profile page
                 },
-                enabled = !password.value.text.isBlank()
-                        && !username.value.text.isBlank()
-                        && !mail.value.text.isBlank()
-                        && !passwordCheck.value.text.isBlank(),
+                enabled = password.value.text.isNotBlank()
+                        && username.value.text.isNotBlank()
+                        && mail.value.text.isNotBlank()
+                        && passwordCheck.value.text.isNotBlank(),
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
                     .fillMaxWidth()

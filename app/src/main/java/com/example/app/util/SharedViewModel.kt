@@ -15,18 +15,29 @@ class SharedViewModel(): ViewModel() {
 
     private val currentUserMail = MutableStateFlow("")
 
+    private val currentUserData = MutableStateFlow(UserData())
+
     fun setCurrentUserMail(
         mail : String
     ){
         currentUserMail.value = mail
     }
 
-    fun resetCurrentUserMail(){
+    fun resetSession(){
         setCurrentUserMail("")
+        currentUserData.value
     }
 
     fun getCurrentUserMail(): String {
         return currentUserMail.value
+    }
+
+    fun getCurrentUsername(): String {
+        return currentUserData.value.username
+    }
+
+    fun getCurrentUserPfpUri(): String {
+        return  currentUserData.value.pfpUri
     }
 
     fun saveData(
@@ -66,6 +77,7 @@ class SharedViewModel(): ViewModel() {
                     if (it.exists()){
                         val userData = it.toObject<UserData>()!!
                         data(userData)
+                        currentUserData.value = userData
                     } else {
                         Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }

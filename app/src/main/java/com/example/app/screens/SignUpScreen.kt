@@ -45,6 +45,7 @@ import com.example.app.Routes
 import com.example.app.util.SharedViewModel
 import com.example.app.util.UserData
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun SignUpScreen(navController: NavHostController,
@@ -74,10 +75,13 @@ fun SignUpScreen(navController: NavHostController,
             val mail = remember { mutableStateOf(TextFieldValue()) }
             val password = remember { mutableStateOf(TextFieldValue()) }
             val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
+            val pfpUri = remember { MutableStateFlow("") }
 
             Text(text = "Registration", style = TextStyle(fontSize = 40.sp))
 
-            ProfileImage("")
+            ProfileImage(""){uri->
+                pfpUri.value = uri
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -159,7 +163,8 @@ fun SignUpScreen(navController: NavHostController,
                                             userData = UserData(
                                                 FirebaseAuth.getInstance().currentUser!!.uid,
                                                 username.value.text,
-                                                mail.value.text),
+                                                mail.value.text,
+                                                pfpUri.value),
                                             context
                                         )
                                         sharedViewModel.setCurrentUserMail(mail.value.text)

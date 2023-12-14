@@ -47,7 +47,7 @@ fun AppToolBar(
 
                 val authStateListener = AuthStateListener{
                     if(it.currentUser == null){
-                        sharedViewModel.resetCurrentUserMail()
+                        sharedViewModel.resetSession()
                         navController.navigate(Routes.Login.route)
                     }
                 }

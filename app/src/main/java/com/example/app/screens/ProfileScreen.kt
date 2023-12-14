@@ -115,7 +115,12 @@ fun ProfileScreen(navController: NavHostController,
                             )?.let{content ->
                                 when (content) {
                                     "Profile" -> {
-                                        ProfileBanner(userData.username, 7, 5, 9)
+                                        ProfileBanner(
+                                            sharedViewModel.getCurrentUsername(),
+                                            7,
+                                            5,
+                                            9,
+                                            sharedViewModel.getCurrentUserPfpUri())
                                     }
                                     "Badges" -> {
                                         BadgeBanner(12, 9, 8)
@@ -273,7 +278,7 @@ private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
 }
 
 @Composable
-private fun ProfileBanner(username : String, days : Int, skills : Int, badges : Int){
+private fun ProfileBanner(username : String, days : Int, skills : Int, badges : Int, pfpUri : String){
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -293,7 +298,8 @@ private fun ProfileBanner(username : String, days : Int, skills : Int, badges : 
                 .padding(30.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                ProfileImage("")
+                ProfileImage(pfpUri, false){
+                }
 
                 Column (
                     horizontalAlignment = Alignment.CenterHorizontally,
