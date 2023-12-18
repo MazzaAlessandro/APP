@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,16 +13,24 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -30,7 +39,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
+import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.util.SharedViewModel
+import com.example.app.util.UserData
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,10 +50,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun ModifyAccountScreen(navController: NavHostController,
                         sharedViewModel: SharedViewModel
 ){
-    Column(
+    val updating = remember { mutableStateOf(false) }
+
+    val notification = rememberSaveable { mutableStateOf("") }
+    if(notification.value.isNotEmpty()){
+        Toast.makeText(LocalContext.current, notification.value, Toast.LENGTH_LONG).show()
+    }
+
+    val context = LocalContext.current
+
+    Scaffold (
+        topBar = { AppToolBar(title = "Update Profile", navController, sharedViewModel, true, Routes.Profile.route) }
+    ){ innerPadding ->
+        Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
-            .padding(20.dp),
+            .padding(innerPadding),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -49,11 +73,11 @@ fun ModifyAccountScreen(navController: NavHostController,
         val mail = remember { mutableStateOf(TextFieldValue()) }
         val password = remember { mutableStateOf(TextFieldValue()) }
         val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
-        val pfpUri = remember { MutableStateFlow("") }
+        val pfpUri = remember { MutableStateFlow(sharedViewModel.getCurrentUserPfpUri()) }
 
         Text(text = "Update account info", style = TextStyle(fontSize = 40.sp))
 
-        ProfileImage(""){uri ->
+        ProfileImage(sharedViewModel.getCurrentUserPfpUri()){uri ->
             pfpUri.value = uri
         }
 
@@ -62,16 +86,26 @@ fun ModifyAccountScreen(navController: NavHostController,
         TextField(
             label = { Text(text = "Username") },
             value = username.value,
-            onValueChange = { username.value = it })
+            onValueChange = { username.value = it },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            singleLine = true,
+            maxLines = 1,
+            leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = "username") },
+            enabled = !updating.value
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 
         TextField(
-            label = { Text(text = "Password") },
+            label = { Text(text = "New Password") },
             value = password.value,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            onValueChange = { password.value = it })
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+            singleLine = true,
+            maxLines = 1,
+            leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "password")},
+            onValueChange = { password.value = it },
+            enabled = !updating.value)
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -79,22 +113,51 @@ fun ModifyAccountScreen(navController: NavHostController,
             label = { Text(text = "Confirm Password") },
             value = passwordCheck.value,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            onValueChange = { passwordCheck.value = it })
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            singleLine = true,
+            maxLines = 1,
+            leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "checkPassword")},
+            onValueChange = { passwordCheck.value = it },
+            enabled = !updating.value)
 
         Spacer(modifier = Modifier.height(20.dp))
 
         Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
             Button(
                 onClick = {
-                    //checks if password and password check match.
-                    //if yes, takes checks if username isn't already used
-                    // if it's unique, registers the user and takes him to his new profile page
+                    if(password.value.text != passwordCheck.value.text)
+                    {
+                        notification.value = "Please verify that the password match"
+                    }
+                    else
+                    {
+                        updating.value = true
+                        FirebaseAuth.getInstance().currentUser!!
+                            .updatePassword(password.value.text)
+                            .addOnCompleteListener {
+                                sharedViewModel.updateData(
+                                    sharedViewModel.getCurrentUserMail(),
+                                    context,
+                                    userData = UserData(
+                                        FirebaseAuth.getInstance().currentUser!!.uid,
+                                        username.value.text,
+                                        sharedViewModel.getCurrentUserMail(),
+                                        pfpUri.value),
+                                )
+                                updating.value = false
+                                navController.navigate(Routes.Profile.route)
+                            }
+                            .addOnFailureListener {
+                                updating.value = false
+                            }
+
+
+                    }
                 },
                 enabled = password.value.text.isNotBlank()
                         && username.value.text.isNotBlank()
-                        && mail.value.text.isNotBlank()
-                        && passwordCheck.value.text.isNotBlank(),
+                        && passwordCheck.value.text.isNotBlank()
+                        && !updating.value,
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -104,6 +167,8 @@ fun ModifyAccountScreen(navController: NavHostController,
             }
         }
     }
+    }
+
 
     BackHandler {
         navController.navigate(Routes.Profile.route)

@@ -17,7 +17,11 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
+import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.scrollingBanner.AnimatedPieChart
@@ -117,10 +122,10 @@ fun ProfileScreen(navController: NavHostController,
                                     "Profile" -> {
                                         ProfileBanner(
                                             sharedViewModel.getCurrentUsername(),
-                                            7,
                                             5,
                                             9,
-                                            sharedViewModel.getCurrentUserPfpUri())
+                                            sharedViewModel.getCurrentUserPfpUri(),
+                                            navController)
                                     }
                                     "Badges" -> {
                                         BadgeBanner(12, 9, 8)
@@ -278,7 +283,7 @@ private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
 }
 
 @Composable
-private fun ProfileBanner(username : String, days : Int, skills : Int, badges : Int, pfpUri : String){
+private fun ProfileBanner(username : String, skills : Int, badges : Int, pfpUri : String, navController: NavHostController){
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -300,12 +305,22 @@ private fun ProfileBanner(username : String, days : Int, skills : Int, badges : 
             ) {
                 ProfileImage(pfpUri, false){
                 }
-
                 Column (
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly)
                 {
-                    Text(text = username, fontWeight = FontWeight.W600, style = TextStyle(fontSize = 35.sp))
+                    Row(horizontalArrangement = Arrangement.SpaceBetween){
+                        Text(text = username, fontWeight = FontWeight.W600, style = TextStyle(fontSize = 35.sp))
+
+                        IconButton(
+                            onClick = { navController.navigate(Routes.Update.route) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = "Edit"
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(10.dp))
 
@@ -313,9 +328,6 @@ private fun ProfileBanner(username : String, days : Int, skills : Int, badges : 
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceEvenly
                     ){
-                        Text("Days using the app: ${days.toString()}", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 15.sp))
-
-                        Spacer(modifier = Modifier.height(5.dp))
 
                         Text("Total Skills learned: ${skills.toString()}", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 15.sp))
 

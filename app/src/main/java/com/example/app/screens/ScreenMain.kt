@@ -33,5 +33,9 @@ fun ScreenMain(){
         composable(Routes.Create.route) {
             CreateScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
+
+        composable(Routes.Update.route){
+            ModifyAccountScreen(navController = navController, sharedViewModel = sharedViewModel)
+        }
     }
 }

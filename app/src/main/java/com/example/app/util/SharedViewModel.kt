@@ -61,6 +61,25 @@ class SharedViewModel(): ViewModel() {
         }
     }
 
+    fun updateData(
+        mail : String,
+        context: Context,
+        userData: UserData
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("user")
+            .document(mail)
+
+        try{
+            fireStoreRef.set(userData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     fun retrieveData(
         mail : String,
         context : Context,
