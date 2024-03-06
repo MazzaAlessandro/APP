@@ -31,7 +31,7 @@ fun AnimatedPieChart(
     modifier: Modifier = Modifier,
     pieDataPoints : List<PieChartData>
 ){
-    val localModifier = modifier.size(120.dp)
+    val localModifier = modifier.size(100.dp)
     val total = pieDataPoints.fold(0f){ acc, pieData ->
         acc + pieData.value
     }.div(360)

@@ -1,7 +1,6 @@
 package com.example.app.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,20 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,15 +37,11 @@ import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
+import com.example.app.models.UserDataModel
 import com.example.app.scrollingBanner.AnimatedPieChart
 import com.example.app.scrollingBanner.PieChartData
 import com.example.app.util.SharedViewModel
-import com.example.app.models.UserDataModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -57,6 +49,12 @@ fun ProfileScreen(navController: NavHostController,
                   sharedViewModel: SharedViewModel
 ){
     val context = LocalContext.current
+
+    val pieData = listOf(
+        PieChartData("Completed Skills: ", 12, color = Color(0xFF6650a4)),
+        PieChartData("Skills In progress: ", 5, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
+        PieChartData("Unstarted Skills: ", 9, color = Color.Gray.copy(alpha = 0.5f))
+    )
 
     val userData = UserDataModel()
 
@@ -86,128 +84,38 @@ fun ProfileScreen(navController: NavHostController,
         Column(
             modifier = Modifier
                 .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Row (modifier = Modifier
+                .fillMaxWidth()
+                .padding(30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ProfileImage("", false, 90.dp){
+                }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White),
-                contentAlignment = Alignment.TopCenter
-            ){
+                Text(text = "Username", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 35.sp))
 
-                val list = listOf(
-                    "Pie",
-                    "Profile",
-                    "Badges"
-                )
-                val dotCount = 3
-                val pageCount = Int.MAX_VALUE
-                val pagerState = rememberPagerState(pageCount = {pageCount})
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                        .background(Color.White),
-                    contentAlignment = Alignment.TopCenter
-                ){
-                    CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-
-                        HorizontalPager(state = pagerState) { page ->
-                            list.getOrNull(
-                                page % (list.size)
-                            )?.let{content ->
-                                when (content) {
-                                    "Profile" -> {
-                                        ProfileBanner(
-                                            sharedViewModel.getCurrentUsername(),
-                                            5,
-                                            9,
-                                            sharedViewModel.getCurrentUserPfpUri(),
-                                            navController)
-                                    }
-                                    "Badges" -> {
-                                        BadgeBanner(12, 9, 8)
-                                    }
-                                    "Pie" -> {
-                                        PieBanner(10, 5, 3)
-                                    }
-                                }
-                            }
-
-                        }
-
-                        Row(
-                            Modifier
-                                .height(25.dp)
-                                .fillMaxWidth()
-                                .align(Alignment.BottomCenter),
-                            horizontalArrangement = Arrangement.Center
-                        ){
-                            repeat(dotCount) { iteration ->
-                                val color = if (pagerState.currentPage % dotCount == iteration) Color(0xFF6650a4) else Color.White
-                                Box(
-                                    modifier = Modifier
-                                        .padding(4.dp)
-                                        .clip(CircleShape)
-                                        .background(color)
-                                        .size(10.dp)
-
-                                )
-                            }
-                        }
-
-                    }
-
-                    //auto-scroll
-                    LaunchedEffect(key1 = pagerState.currentPage, block = {
-
-                        launch {
-                            while(true){
-
-                                delay(6000)
-
-                                withContext(NonCancellable){
-
-                                    if(pagerState.currentPage + 1 in 0..Int.MAX_VALUE){
-                                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                                    }
-                                    else{
-                                        pagerState.scrollToPage(0)
-                                    }
-                                }
-                            }
-                        }
-
-                    })
+                IconButton(
+                    onClick = { navController.navigate(Routes.Update.route) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "Edit"
+                    )
                 }
             }
 
+            Divider(
+                modifier = Modifier
+                    .padding(10.dp, 0.dp),
+                color = Color.Black,
+                thickness = 2.dp
+            )
 
-        }
-    }
-}
-
-@Composable
-private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(5.dp)
-            .height(250.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0xFFD0BCFF)),
-        contentAlignment = Alignment.Center,
-    ){
-        Column (modifier = Modifier
-            .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
             Text(text = "Badges earned", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
-
-            Spacer(modifier = Modifier.height(5.dp))
 
             Row (modifier = Modifier
                 .fillMaxWidth()
@@ -217,9 +125,9 @@ private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
                     Box(
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(75.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF6650a4).copy(alpha = 0.75f))
+                            .background(Color.Gray.copy(alpha = 0.75f))
                     ){
                         Box(
                             modifier = Modifier
@@ -232,15 +140,15 @@ private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    Text(text = bronze.toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                    Text(text = "34", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
                     Box(
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(75.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF6650a4).copy(alpha = 0.75f))
+                            .background(Color.Gray.copy(alpha = 0.75f))
                     ){
                         Box(
                             modifier = Modifier
@@ -253,15 +161,15 @@ private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    Text(text = silver.toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                    Text("25", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
                     Box(
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(75.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF6650a4).copy(alpha = 0.75f))
+                            .background(Color.Gray.copy(alpha = 0.75f))
                     ){
                         Box(
                             modifier = Modifier
@@ -274,99 +182,18 @@ private fun BadgeBanner(bronze: Int, silver: Int, gold: Int){
 
                     Spacer(modifier = Modifier.height(5.dp))
 
-                    Text(text = gold.toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                    Text("12", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                 }
             }
-        }
 
-    }
-}
+            Divider(
+                modifier = Modifier
+                    .padding(10.dp, 0.dp),
+                color = Color.Black,
+                thickness = 1.dp
+            )
 
-@Composable
-private fun ProfileBanner(username : String, skills : Int, badges : Int, pfpUri : String, navController: NavHostController){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .height(250.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0xFFD0BCFF)),
-        contentAlignment = Alignment.Center,
-    ){
-        Column (modifier = Modifier
-            .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Row (modifier = Modifier
-                .fillMaxWidth()
-                .padding(30.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                ProfileImage(pfpUri, false){
-                }
-                Column (
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly)
-                {
-                    Row(horizontalArrangement = Arrangement.SpaceBetween){
-                        Text(text = username, fontWeight = FontWeight.W600, style = TextStyle(fontSize = 35.sp))
-
-                        IconButton(
-                            onClick = { navController.navigate(Routes.Update.route) }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = "Edit"
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Column (
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ){
-
-                        Text("Total Skills learned: ${skills.toString()}", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 15.sp))
-
-                        Spacer(modifier = Modifier.height(5.dp))
-
-                        Text("Total Badges earned: ${badges.toString()}", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 15.sp))
-                    }
-
-                }
-            }
-        }
-
-    }
-}
-
-@Composable
-private fun PieBanner(completed : Int, inProgress : Int, toDo : Int){
-
-    val pieData = listOf(
-        PieChartData("Completed Skills: ", completed, color = Color(0xFF6650a4)),
-        PieChartData("Skills In progress: ", inProgress, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
-        PieChartData("Unstarted Skills: ", toDo, color = Color.White)
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-            .height(250.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0xFFD0BCFF)),
-        contentAlignment = Alignment.Center,
-    ){
-        Column (modifier = Modifier
-            .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Current Progress", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+            Text(text = "Current progression", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
 
             Row (modifier = Modifier
                 .fillMaxWidth()
@@ -397,11 +224,20 @@ private fun PieBanner(completed : Int, inProgress : Int, toDo : Int){
                             Text(text = it.label, fontWeight = FontWeight.W600)
                             Text(text = it.value.toString())
                         }
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                     }
                 }
             }
-        }
 
+            Divider(
+                modifier = Modifier
+                    .padding(10.dp, 0.dp),
+                color = Color.Black,
+                thickness = 1.dp
+            )
+
+            Text(text = "Statistics", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+
+        }
     }
 }
