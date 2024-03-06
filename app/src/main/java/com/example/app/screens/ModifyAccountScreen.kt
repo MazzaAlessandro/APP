@@ -41,7 +41,7 @@ import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.util.SharedViewModel
-import com.example.app.util.UserData
+import com.example.app.models.UserDataModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -135,10 +135,10 @@ fun ModifyAccountScreen(navController: NavHostController,
                         FirebaseAuth.getInstance().currentUser!!
                             .updatePassword(password.value.text)
                             .addOnCompleteListener {
-                                sharedViewModel.updateData(
+                                sharedViewModel.updateUserData(
                                     sharedViewModel.getCurrentUserMail(),
                                     context,
-                                    userData = UserData(
+                                    userData = UserDataModel(
                                         FirebaseAuth.getInstance().currentUser!!.uid,
                                         username.value.text,
                                         sharedViewModel.getCurrentUserMail(),

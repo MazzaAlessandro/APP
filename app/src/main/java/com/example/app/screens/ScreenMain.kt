@@ -6,13 +6,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.app.Routes
 import com.example.app.util.SharedViewModel
+import com.example.app.util.UserRepository
 
 @Composable
 fun ScreenMain(){
     val navController = rememberNavController()
-    val sharedViewModel = SharedViewModel()
+    val sharedViewModel = SharedViewModel(UserRepository())
 
-    NavHost(navController = navController, startDestination = Routes.Login.route) {
+
+    NavHost(navController = navController, startDestination = "MySkills") {
 
         composable(Routes.Login.route) {
             LoginScreen(navController = navController, sharedViewModel = sharedViewModel)
@@ -37,5 +39,10 @@ fun ScreenMain(){
         composable(Routes.Update.route){
             ModifyAccountScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
+        
+        composable("MySkills"){
+            MySkillsScreen(navController = navController, sharedViewModel = sharedViewModel)
+        }
     }
+
 }

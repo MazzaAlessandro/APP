@@ -44,7 +44,7 @@ import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.scrollingBanner.AnimatedPieChart
 import com.example.app.scrollingBanner.PieChartData
 import com.example.app.util.SharedViewModel
-import com.example.app.util.UserData
+import com.example.app.models.UserDataModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
@@ -58,7 +58,7 @@ fun ProfileScreen(navController: NavHostController,
 ){
     val context = LocalContext.current
 
-    val userData = UserData()
+    val userData = UserDataModel()
 
     if(FirebaseAuth.getInstance().currentUser != null && sharedViewModel.getCurrentUserMail().isBlank()){
         val currMail = FirebaseAuth.getInstance().currentUser?.email
@@ -69,7 +69,7 @@ fun ProfileScreen(navController: NavHostController,
 
     val mail = sharedViewModel.getCurrentUserMail()
 
-    sharedViewModel.retrieveData(
+    sharedViewModel.retrieveUserData(
         mail,
         context
     ){
