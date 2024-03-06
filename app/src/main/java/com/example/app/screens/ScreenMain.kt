@@ -6,12 +6,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.app.Routes
 import com.example.app.util.SharedViewModel
+import com.example.app.util.SkillRepository
 import com.example.app.util.UserRepository
 
 @Composable
 fun ScreenMain(){
     val navController = rememberNavController()
-    val sharedViewModel = SharedViewModel(UserRepository())
+    val sharedViewModel = SharedViewModel(UserRepository(), SkillRepository())
 
 
     NavHost(navController = navController, startDestination = "Profile") {
