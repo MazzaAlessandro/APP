@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -24,6 +25,7 @@ import coil.compose.rememberImagePainter
 fun ProfileImage(
     uri : String,
     clickable : Boolean = true,
+    size : Dp = 120.dp,
     selected : (String) -> Unit
 ){
 
@@ -50,7 +52,7 @@ fun ProfileImage(
     Card(shape = CircleShape,
             modifier = Modifier
                 .padding(8.dp)
-                .size(120.dp))
+                .size(size))
     {
             Image(painter = painter,
                 contentDescription = null,
