@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.app.models.SkillStepModel
+import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SkillViewModel
 
@@ -36,8 +33,9 @@ fun SkillHeader(bitmap: Bitmap, skillTitle: String){
     }
 }
 
+/*
 @Composable
-fun StepSkill(skillStepModel : SkillStepModel){
+fun StepSkill(skillStepModel : SkillSectionModel){
     Column {
         Row {
 
@@ -54,7 +52,7 @@ fun StepSkill(skillStepModel : SkillStepModel){
             }
         }
     }
-}
+}*/
 
 @Composable
 fun SkillTaskItem(skillTaskModel: SkillTaskModel){

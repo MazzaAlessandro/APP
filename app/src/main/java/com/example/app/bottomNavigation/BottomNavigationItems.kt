@@ -15,4 +15,5 @@ sealed class BottomNavItem(var title:String, var selectedIcon:ImageVector, var u
     object Search : BottomNavItem("Search Skills", Icons.Filled.Search, Icons.Outlined.Search, Routes.Search.route)
     object Profile : BottomNavItem("Profile", Icons.Filled.AccountCircle, Icons.Outlined.AccountCircle, Routes.Profile.route)
     object Create : BottomNavItem("Create Skills", Icons.Filled.Edit, Icons.Outlined.Edit, Routes.Create.route)
+    object MySkills : BottomNavItem("My Skills", Icons.Filled.Edit, Icons.Outlined.Edit, Routes.Create.route)
 }

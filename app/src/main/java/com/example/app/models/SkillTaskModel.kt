@@ -1,11 +1,10 @@
 package com.example.app.models
 
-class SkillTaskModel {
+class SkillTaskModel (
+    var id: String = "",
+    var idSection: String = "",
+    var idSkill: String = "",
 
-    var requiredAmount:Int = 0
+    var requiredAmount:Int = 0,
     var currentAmount:Int = 0
-
-    fun isCompleted():Boolean{
-        return currentAmount <= requiredAmount
-    }
-}
+)
