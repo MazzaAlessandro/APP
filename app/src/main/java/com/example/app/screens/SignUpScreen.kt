@@ -43,7 +43,7 @@ import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.util.SharedViewModel
-import com.example.app.models.UserDataModel
+import com.example.app.util.UserData
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -159,8 +159,8 @@ fun SignUpScreen(navController: NavHostController,
                                     Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
 
                                     if(it.isSuccessful){
-                                        sharedViewModel.saveUserData(
-                                            userData = UserDataModel(
+                                        sharedViewModel.saveData(
+                                            userData = UserData(
                                                 FirebaseAuth.getInstance().currentUser!!.uid,
                                                 username.value.text,
                                                 mail.value.text,

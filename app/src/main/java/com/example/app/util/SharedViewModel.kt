@@ -1,29 +1,26 @@
 package com.example.app.util
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import com.example.app.models.SkillModel
-import com.example.app.models.UserDataModel
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SharedViewModel(private val userRepository: UserRepository): ViewModel() {
+class SharedViewModel(): ViewModel() {
 
-    private val currentUserMail: StateFlow<String> = userRepository.userMail;
-    private val currentUserData : StateFlow<UserDataModel> = userRepository.userData;
+    private val currentUserMail = MutableStateFlow("")
 
-    private var userData : MutableStateFlow<UserDataModel> = MutableStateFlow(UserDataModel());
-    private var userMail : MutableStateFlow<String> = MutableStateFlow("");
-
-    //private val currentUserSkills = MutableStateFlow(SkillModel())
+    private val currentUserData = MutableStateFlow(UserData())
 
     fun setCurrentUserMail(
         mail : String
     ){
-        userMail.value = mail
+        currentUserMail.value = mail
     }
 
     fun resetSession(){
@@ -32,7 +29,7 @@ class SharedViewModel(private val userRepository: UserRepository): ViewModel() {
     }
 
     fun getCurrentUserMail(): String {
-        return userMail.value
+        return currentUserMail.value
     }
 
     fun getCurrentUsername(): String {
@@ -43,33 +40,69 @@ class SharedViewModel(private val userRepository: UserRepository): ViewModel() {
         return  currentUserData.value.pfpUri
     }
 
-
-    fun saveUserData(
-        userData: UserDataModel,
+    fun saveData(
+        userData: UserData,
         context: Context,
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        userRepository.saveData(userData, context);
+        val fireStoreRef = Firebase.firestore
+            .collection("user")
+            .document(userData.mail)
 
+        try {
+
+            fireStoreRef.set(userData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
-    fun updateUserData(
+    fun updateData(
         mail : String,
         context: Context,
-        userData: UserDataModel
+        userData: UserData
     ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("user")
+            .document(mail)
 
-        userRepository.updateData(mail, context, userData);
-
+        try{
+            fireStoreRef.set(userData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // The result is in currentUserData
-    fun retrieveUserData(
+    fun retrieveData(
         mail : String,
         context : Context,
-        data: (UserDataModel) -> Unit
+        data: (UserData) -> Unit
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        userRepository.retrieveData(mail, context, data);
+        val fireStoreRef = Firebase.firestore
+            .collection("user")
+            .document(mail)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val userData = it.toObject<UserData>()!!
+                        data(userData)
+                        currentUserData.value = userData
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 }
