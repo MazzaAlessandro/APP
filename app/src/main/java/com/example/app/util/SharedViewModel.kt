@@ -3,6 +3,7 @@ package com.example.app.util
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.app.models.SkillModel
+import com.example.app.models.SkillProgressionModel
 import com.example.app.models.UserDataModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SharedViewModel(private val userRepository: UserRepository): ViewModel() {
+class SharedViewModel(private val userRepository: UserRepository, private val skillRepository: SkillRepository): ViewModel() {
 
     private val currentUserMail: StateFlow<String> = userRepository.userMail;
     private val currentUserData : StateFlow<UserDataModel> = userRepository.userData;
@@ -18,7 +19,7 @@ class SharedViewModel(private val userRepository: UserRepository): ViewModel() {
     private var userData : MutableStateFlow<UserDataModel> = MutableStateFlow(UserDataModel());
     private var userMail : MutableStateFlow<String> = MutableStateFlow("");
 
-    //private val currentUserSkills = MutableStateFlow(SkillModel())
+    private val currentUserSkillProgressions: StateFlow<List<SkillProgressionModel>> = skillRepository.skillListProgression;
 
     fun setCurrentUserMail(
         mail : String
@@ -42,7 +43,6 @@ class SharedViewModel(private val userRepository: UserRepository): ViewModel() {
     fun getCurrentUserPfpUri(): String {
         return  currentUserData.value.pfpUri
     }
-
 
     fun saveUserData(
         userData: UserDataModel,
@@ -71,5 +71,22 @@ class SharedViewModel(private val userRepository: UserRepository): ViewModel() {
     ) = CoroutineScope(Dispatchers.IO).launch{
 
         userRepository.retrieveData(mail, context, data);
+    }
+
+    fun retrieveUserSkillProgressionList(
+        userId: String,
+        context: Context,
+        data: (List<SkillProgressionModel>) -> Unit
+
+    ){
+        skillRepository.retrieveSkillPogressionList(userId, context, data)
+    }
+
+    fun retrieveSkill(
+        skillId: String,
+        context: Context,
+        data: (SkillModel) -> Unit
+    ){
+        skillRepository.retrieveSkill(skillId, context, data)
     }
 }

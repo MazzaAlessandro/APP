@@ -1,8 +1,13 @@
 package com.example.app.util
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.widget.Toast
+import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
+import com.example.app.models.SkillSectionModel
+import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -22,8 +27,120 @@ class SkillRepository {
     private var currentSkillListProgression: MutableStateFlow<List<SkillProgressionModel>> = MutableStateFlow(emptyList())
     var skillListProgression: StateFlow<List<SkillProgressionModel>> = currentSkillListProgression.asStateFlow();
 
+    private var currentSkill: MutableStateFlow<SkillModel> = MutableStateFlow(SkillModel())
+    var skill: StateFlow<SkillModel> = currentSkill.asStateFlow();
+
+    private var currentSection: MutableStateFlow<SkillSectionModel> = MutableStateFlow(SkillSectionModel())
+    var section: StateFlow<SkillSectionModel> = currentSection.asStateFlow();
+
+    private var currentTask: MutableStateFlow<SkillTaskModel> = MutableStateFlow(SkillTaskModel())
+    var task: StateFlow<SkillTaskModel> = currentTask.asStateFlow()
 
 
+    fun retrieveSkill(
+        skillId: String,
+        context: Context,
+        data: (SkillModel) -> Unit
+    )= CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("skill")
+            .document(skillId)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val skillModelData = it.toObject<SkillModel>()!!
+                        data(skillModelData)
+                        currentSkill.value = skillModelData
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception) {
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun retrieveSkillSection(
+        skillId: String,
+        sectionId: String,
+        context: Context,
+        data: (SkillSectionModel) -> Unit
+    )= CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("skillsection")
+            .document(sectionId + skillId)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val sectionModelData = it.toObject<SkillSectionModel>()!!
+                        data(sectionModelData)
+                        currentSection.value = sectionModelData
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception) {
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun retrieveSkillTask(
+        skillId: String,
+        sectionId: String,
+        taskId: String,
+        context: Context,
+        data: (SkillTaskModel) -> Unit
+    )= CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("skilltask")
+            .document(taskId + sectionId + skillId)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val taskModelData = it.toObject<SkillTaskModel>()!!
+                        data(taskModelData)
+                        currentTask.value = taskModelData
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception) {
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun retrieveSkillProgression(
+        skillId : String,
+        userId : String,
+        context : Context,
+        data: (SkillProgressionModel) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("skillprogression")
+            .document(userId + skillId)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val skillProgressionData = it.toObject<SkillProgressionModel>()!!
+                        data(skillProgressionData)
+                        currentSkillProgression.value = skillProgressionData
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     fun retrieveSkillPogressionList(
         userId : String,
@@ -105,32 +222,7 @@ class SkillRepository {
         }
     }*/
 
-    fun retrieveSkillProgression(
-        skillId : String,
-        userId : String,
-        context : Context,
-        data: (SkillProgressionModel) -> Unit
-    ) = CoroutineScope(Dispatchers.IO).launch{
 
-        val fireStoreRef = Firebase.firestore
-            .collection("skillprogression")
-            .document(userId + skillId)
-
-        try{
-            fireStoreRef.get()
-                .addOnSuccessListener {
-                    if (it.exists()){
-                        val skillProgressionData = it.toObject<SkillProgressionModel>()!!
-                        data(skillProgressionData)
-                        currentSkillProgression.value = skillProgressionData
-                    } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
-                    }
-                }
-        } catch (e: Exception){
-            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-        }
-    }
 
 
 
