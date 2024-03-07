@@ -41,7 +41,7 @@ fun ScreenMain(){
             ModifyAccountScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
         
-        composable("MySkills"){
+        composable(Routes.MySkills.route){
             MySkillsScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
     }
