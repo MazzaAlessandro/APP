@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
+import com.example.app.models.SkillSectionModel
+import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +54,35 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         userRepository.saveData(userData, context);
 
     }
+
+    fun saveSkill(
+        skillData: SkillModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        skillRepository.saveSkill(skillData, context);
+
+    }
+
+    fun saveSkillSection(
+        skillSectionData: SkillSectionModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        skillRepository.saveSkillSection(skillSectionData, context);
+
+    }
+
+
+    fun saveSkillTask(
+        skillTaskData: SkillTaskModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        skillRepository.saveSkillTask(skillTaskData, context);
+
+    }
+
 
     fun updateUserData(
         mail : String,

@@ -6,5 +6,4 @@ class SkillTaskModel (
     var idSkill: String = "",
 
     var requiredAmount:Int = 0,
-    var currentAmount:Int = 0
 )

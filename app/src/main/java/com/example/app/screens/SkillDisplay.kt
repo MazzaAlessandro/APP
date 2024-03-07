@@ -53,7 +53,7 @@ fun StepSkill(skillStepModel : SkillSectionModel){
         }
     }
 }*/
-
+/*
 @Composable
 fun SkillTaskItem(skillTaskModel: SkillTaskModel){
 
@@ -66,4 +66,4 @@ fun SkillTaskItem(skillTaskModel: SkillTaskModel){
             .height(20.dp))
     }
 
-}
+}*/

@@ -15,7 +15,7 @@ fun ScreenMain(){
     val sharedViewModel = SharedViewModel(UserRepository(), SkillRepository())
 
 
-    NavHost(navController = navController, startDestination = "Login") {
+    NavHost(navController = navController, startDestination = "MySkills") {
 
         composable(Routes.Login.route) {
             LoginScreen(navController = navController, sharedViewModel = sharedViewModel)

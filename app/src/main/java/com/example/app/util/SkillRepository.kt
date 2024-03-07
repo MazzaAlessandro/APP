@@ -181,6 +181,70 @@ class SkillRepository {
     }
 
 
+
+    fun saveSkill(
+        skillData: SkillModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("skill")
+            .document(skillData.id)
+
+        try {
+
+            fireStoreRef.set(skillData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun saveSkillSection(
+        skillSectionData: SkillSectionModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("skillsection")
+            .document(skillSectionData.id + skillSectionData.idSkill)
+
+        try {
+
+            fireStoreRef.set(skillSectionData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun saveSkillTask(
+        skillTaskData: SkillTaskModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("skilltask")
+            .document(skillTaskData.id + skillTaskData.idSection + skillTaskData.idSkill)
+
+        try {
+
+            fireStoreRef.set(skillTaskData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     fun saveSkillProgression(
         skillProgression: SkillProgressionModel,
         context: Context,

@@ -13,10 +13,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -26,11 +31,17 @@ import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
+import com.example.app.models.SkillSectionModel
+import com.example.app.models.SkillTaskModel
+import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
 @Composable
 fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillProgressionModel){
-    //var skillObject: SkillModel = sharedViewModel.retrieveSkill(skillProgression.skillId)
+    var skill : MutableState<SkillModel> = remember{mutableStateOf(SkillModel())};
+    sharedViewModel.retrieveSkill(skillProgression.skillId, LocalContext.current, ){data ->
+        skill.value = data
+    }
 
     Box(modifier = Modifier
         .clip(RoundedCornerShape(8))
@@ -39,7 +50,7 @@ fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillPr
         Row {
             Column {
                 Row {
-
+                    Text(text = skill.value.titleSkill)
                 }
             }
         }
@@ -48,6 +59,21 @@ fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillPr
 
 @Composable
 fun SkillListBlock(sharedViewModel: SharedViewModel){
+
+    var skill:SkillModel = SkillModel("aaaaaa", "firstSkill", mutableListOf("0"))
+    var skillSection:SkillSectionModel = SkillSectionModel("0", "aaaaaa", "my step title eat", "fjefjn", mutableListOf())
+    var skillTask0:SkillTaskModel = SkillTaskModel("0", "0", "aaaaaa", 2)
+    var skillTask1:SkillTaskModel = SkillTaskModel("1", "0", "aaaaaa", 1)
+
+    /*
+    //SAVE EVERYTHING
+    sharedViewModel.saveSkill(skill, LocalContext.current)
+    sharedViewModel.saveSkillSection(skillSection, LocalContext.current)
+    sharedViewModel.saveSkillTask(skillTask0, LocalContext.current)
+    sharedViewModel.saveSkillTask(skillTask1, LocalContext.current)
+    */
+
+
     SkillListElement(sharedViewModel, skillProgression = SkillProgressionModel("aaaa", "aaaaaa", 0, mutableMapOf(
         Pair<String, Int>("0", 1),
         Pair<String, Int>("1", 0))))
