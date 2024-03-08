@@ -120,4 +120,23 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
     ){
         skillRepository.retrieveSkill(skillId, context, data)
     }
+
+    fun retrieveSkillSection(
+        skillId: String,
+        sectionId: String,
+        context: Context,
+        data: (SkillSectionModel) -> Unit
+    ){
+        skillRepository.retrieveSkillSection(skillId, sectionId, context, data)
+    }
+
+    fun retrieveSkillTask(
+        skillId: String,
+        sectionId: String,
+        taskId: String,
+        context: Context,
+        data: (SkillTaskModel) -> Unit
+    ){
+        skillRepository.retrieveSkillTask(skillId, sectionId, taskId, context, data)
+    }
 }

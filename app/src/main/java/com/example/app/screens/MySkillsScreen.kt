@@ -37,11 +37,22 @@ import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
 @Composable
-fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillProgressionModel){
+fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillProgressionModel, taskId: String){
     var skill : MutableState<SkillModel> = remember{mutableStateOf(SkillModel())};
     sharedViewModel.retrieveSkill(skillProgression.skillId, LocalContext.current, ){data ->
         skill.value = data
     }
+
+    var skillSection : MutableState<SkillSectionModel> = remember{mutableStateOf(SkillSectionModel())};
+    sharedViewModel.retrieveSkillSection(skillProgression.skillId, skillProgression.currentSectionId, LocalContext.current, ){data ->
+        skillSection.value = data
+    }
+
+    var skillTask : MutableState<SkillTaskModel> = remember{mutableStateOf(SkillTaskModel())};
+    sharedViewModel.retrieveSkillTask(skillProgression.skillId, skillProgression.currentSectionId, taskId, LocalContext.current, ){data ->
+        skillTask.value = data
+    }
+
 
     Box(modifier = Modifier
         .clip(RoundedCornerShape(8))
@@ -51,6 +62,10 @@ fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillPr
             Column {
                 Row {
                     Text(text = skill.value.titleSkill)
+                    Text(text = "" + skillProgression.mapNonCompletedTasks.get(taskId) + "/" + skillTask.value.requiredAmount )
+                }
+                Row {
+
                 }
             }
         }
@@ -74,9 +89,10 @@ fun SkillListBlock(sharedViewModel: SharedViewModel){
     */
 
 
-    SkillListElement(sharedViewModel, skillProgression = SkillProgressionModel("aaaa", "aaaaaa", 0, mutableMapOf(
+    SkillListElement(sharedViewModel, skillProgression = SkillProgressionModel("aaaa", "aaaaaa", "0", mutableMapOf(
         Pair<String, Int>("0", 1),
-        Pair<String, Int>("1", 0))))
+        Pair<String, Int>("1", 0))),
+        "0")
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -111,6 +127,8 @@ fun MySkillsScreen(navController: NavHostController,
                     ) {
                         Text(text = "My Skills", fontSize = 32.sp)
                     }
+
+
 
                     SkillListBlock(sharedViewModel);
                 }
