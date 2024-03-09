@@ -44,6 +44,14 @@ fun ScreenMain(){
         composable(Routes.MySkills.route){
             MySkillsScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
+
+        composable(Routes.Badges.route){
+            BadgesScreen(navController = navController, sharedViewModel = sharedViewModel)
+        }
+
+        composable(Routes.Stats.route){
+            StatsScreen(navController = navController, sharedViewModel = sharedViewModel)
+        }
     }
 
 }

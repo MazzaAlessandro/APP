@@ -1,6 +1,5 @@
 package com.example.app.screens
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,12 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -37,11 +35,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
+import com.example.app.additionalUI.AnimatedPieChart
+import com.example.app.additionalUI.BadgeIcon
+import com.example.app.additionalUI.PieChartData
+import com.example.app.additionalUI.StatData
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.UserDataModel
-import com.example.app.scrollingBanner.AnimatedPieChart
-import com.example.app.scrollingBanner.PieChartData
 import com.example.app.util.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -56,6 +56,13 @@ fun ProfileScreen(navController: NavHostController,
         PieChartData("Completed Skills: ", 12, color = Color(0xFF6650a4)),
         PieChartData("Skills In progress: ", 5, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
         PieChartData("Unstarted Skills: ", 9, color = Color.Gray.copy(alpha = 0.5f))
+    )
+
+    val stat = listOf(
+        StatData("Total days using the app:", 356),
+        StatData("Consecutive days using the app:", 21),
+        StatData("Badges obtained:", 12),
+        StatData("Total Skills:", 26)
     )
 
     val userData = UserDataModel()
@@ -122,27 +129,13 @@ fun ProfileScreen(navController: NavHostController,
             Row (modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    //sends to an extended list of all obtained badges
-                    Log.println(Log.INFO, "badges", "click")
+                    navController.navigate(Routes.Badges.route)
                 }
                 .padding(20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    Box(
-                        modifier = Modifier
-                            .size(75.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray.copy(alpha = 0.75f))
-                    ){
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(2.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFCD7F32))
-                        )
-                    }
+                    BadgeIcon(Color(0xFFCD7F32), 75.dp)
 
                     Spacer(modifier = Modifier.height(5.dp))
 
@@ -150,20 +143,7 @@ fun ProfileScreen(navController: NavHostController,
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    Box(
-                        modifier = Modifier
-                            .size(75.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray.copy(alpha = 0.75f))
-                    ){
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(2.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFC0C0C0))
-                        )
-                    }
+                    BadgeIcon(Color(0xFFC0C0C0), 75.dp)
 
                     Spacer(modifier = Modifier.height(5.dp))
 
@@ -171,20 +151,7 @@ fun ProfileScreen(navController: NavHostController,
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    Box(
-                        modifier = Modifier
-                            .size(75.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray.copy(alpha = 0.75f))
-                    ){
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(2.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFFFD700))
-                        )
-                    }
+                    BadgeIcon(Color(0xFFFFD700), 75.dp)
 
                     Spacer(modifier = Modifier.height(5.dp))
 
@@ -247,16 +214,38 @@ fun ProfileScreen(navController: NavHostController,
             Column(
                 modifier = Modifier
                     .clickable {
-                        //sends to an extended list of stats
-                        Log.println(Log.INFO, "stats", "click")
+                        navController.navigate(Routes.Stats.route)
                     }
+                    .fillMaxHeight()
                     .padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
+                stat.map {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Text(
+                            text = it.statName,
+                            color = Color.Black
+                        )
 
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            color = Color.Gray,
+                            thickness = 1.dp
+                        )
+
+                        Text(
+                            text = it.statValue.toString(),
+                            color = Color.Black
+                        )
+                    }
+                }
             }
-
         }
     }
 }

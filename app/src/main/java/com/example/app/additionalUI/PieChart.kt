@@ -1,4 +1,4 @@
-package com.example.app.scrollingBanner
+package com.example.app.additionalUI
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
