@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BadgeIcon(
-    color : Color,
+    badge : BadgeColor,
     size : Dp
 ){
     Box(
@@ -29,7 +29,7 @@ fun BadgeIcon(
                 .fillMaxSize()
                 .padding(2.dp)
                 .clip(CircleShape)
-                .background(color)
+                .background(badge.color)
         )
     }
 }

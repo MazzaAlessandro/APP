@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">APP</string>
+    <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra metus mauris, vel aliquet lorem euismod non. Ut lacinia felis et ligula varius porta ut vel sem. Vestibulum et sollicitudin dolor. Nulla sagittis tortor lectus, id sollicitudin nulla pellentesque quis. Nulla non sem vel tellus iaculis suscipit. Quisque porttitor, purus id vestibulum scelerisque, arcu leo bibendum nisi, sed auctor justo enim non est. Nam consectetur consectetur ante, in rutrum tortor. Quisque ac magna eget eros molestie elementum vel non sapien. Nulla finibus aliquet ultrices. Aliquam id ex tristique, bibendum neque a, vehicula massa. Sed eget pulvinar libero. Aenean vulputate egestas purus, non suscipit velit elementum ut. Donec fringilla mi nec interdum convallis. "</string>
 </resources>

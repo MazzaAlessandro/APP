@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.additionalUI.AnimatedPieChart
+import com.example.app.additionalUI.BadgeColor
 import com.example.app.additionalUI.BadgeIcon
 import com.example.app.additionalUI.PieChartData
 import com.example.app.additionalUI.StatData
@@ -135,7 +136,7 @@ fun ProfileScreen(navController: NavHostController,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    BadgeIcon(Color(0xFFCD7F32), 75.dp)
+                    BadgeIcon(BadgeColor.BRONZE, 75.dp)
 
                     Spacer(modifier = Modifier.height(5.dp))
 
@@ -143,7 +144,7 @@ fun ProfileScreen(navController: NavHostController,
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    BadgeIcon(Color(0xFFC0C0C0), 75.dp)
+                    BadgeIcon(BadgeColor.SILVER, 75.dp)
 
                     Spacer(modifier = Modifier.height(5.dp))
 
@@ -151,7 +152,7 @@ fun ProfileScreen(navController: NavHostController,
                 }
 
                 Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    BadgeIcon(Color(0xFFFFD700), 75.dp)
+                    BadgeIcon(BadgeColor.GOLD, 75.dp)
 
                     Spacer(modifier = Modifier.height(5.dp))
 
