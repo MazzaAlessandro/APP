@@ -125,38 +125,43 @@ fun ProfileScreen(navController: NavHostController,
                 thickness = 1.dp
             )
 
-            Text(text = "Badges earned", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
-
-            Row (modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
+            Column(
+                modifier = Modifier.clickable {
                     navController.navigate(Routes.Badges.route)
-                }
-                .padding(20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    BadgeIcon(BadgeColor.BRONZE, 75.dp)
+                },
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text(text = "Badges earned", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
 
-                    Spacer(modifier = Modifier.height(5.dp))
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column (horizontalAlignment = Alignment.CenterHorizontally){
+                        BadgeIcon(BadgeColor.BRONZE, 75.dp)
 
-                    Text(text = "34", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
-                }
+                        Spacer(modifier = Modifier.height(5.dp))
 
-                Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    BadgeIcon(BadgeColor.SILVER, 75.dp)
+                        Text(text = "34", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                    }
 
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Column (horizontalAlignment = Alignment.CenterHorizontally){
+                        BadgeIcon(BadgeColor.SILVER, 75.dp)
 
-                    Text("25", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
-                }
+                        Spacer(modifier = Modifier.height(5.dp))
 
-                Column (horizontalAlignment = Alignment.CenterHorizontally){
-                    BadgeIcon(BadgeColor.GOLD, 75.dp)
+                        Text("25", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                    }
 
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Column (horizontalAlignment = Alignment.CenterHorizontally){
+                        BadgeIcon(BadgeColor.GOLD, 75.dp)
 
-                    Text("12", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                        Spacer(modifier = Modifier.height(5.dp))
+
+                        Text("12", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                    }
                 }
             }
 
@@ -210,18 +215,18 @@ fun ProfileScreen(navController: NavHostController,
                 thickness = 1.dp
             )
 
-            Text(text = "Statistics", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
-
             Column(
                 modifier = Modifier
                     .clickable {
                         navController.navigate(Routes.Stats.route)
                     }
                     .fillMaxHeight()
-                    .padding(10.dp),
+                    .padding(10.dp, 0.dp, 10.dp, 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
+                Text(text = "Statistics", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+
                 stat.map {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
