@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,17 +14,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -33,26 +32,22 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
+import com.example.app.models.SkillCompleteStructureModel
 import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
 @Composable
-fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillProgressionModel, taskId: String){
-    var skill : MutableState<SkillModel> = remember{mutableStateOf(SkillModel())};
-    sharedViewModel.retrieveSkill(skillProgression.skillId, LocalContext.current, ){data ->
-        skill.value = data
-    }
+fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillProgressionModel, skill: SkillModel){
 
-    var skillSection : MutableState<SkillSectionModel> = remember{mutableStateOf(SkillSectionModel())};
-    sharedViewModel.retrieveSkillSection(skillProgression.skillId, skillProgression.currentSectionId, LocalContext.current, ){data ->
-        skillSection.value = data
-    }
 
+
+
+    /*
     var skillTask : MutableState<SkillTaskModel> = remember{mutableStateOf(SkillTaskModel())};
     sharedViewModel.retrieveSkillTask(skillProgression.skillId, skillProgression.currentSectionId, taskId, LocalContext.current, ){data ->
         skillTask.value = data
     }
-
+    */
 
     Box(modifier = Modifier
         .clip(RoundedCornerShape(8))
@@ -61,8 +56,10 @@ fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillPr
         Row {
             Column {
                 Row {
-                    Text(text = skill.value.titleSkill)
-                    Text(text = "" + skillProgression.mapNonCompletedTasks.get(taskId) + "/" + skillTask.value.requiredAmount )
+                    Text(text = skill.titleSkill)
+                    //val completedAmount: Int = skillProgression.mapNonCompletedTasks.map { entry -> entry.value }.sum()
+                    
+                    //Text(text = completedAmount.toString())
                 }
                 Row {
 
@@ -75,24 +72,132 @@ fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillPr
 @Composable
 fun SkillListBlock(sharedViewModel: SharedViewModel){
 
-    var skill:SkillModel = SkillModel("aaaaaa", "firstSkill", mutableListOf("0"))
-    var skillSection:SkillSectionModel = SkillSectionModel("0", "aaaaaa", "my step title eat", "fjefjn", mutableListOf())
-    var skillTask0:SkillTaskModel = SkillTaskModel("0", "0", "aaaaaa", 2)
-    var skillTask1:SkillTaskModel = SkillTaskModel("1", "0", "aaaaaa", 1)
+    var skill1:SkillModel = SkillModel("aaaaaa", "First Skill", mutableListOf("0"))
+    var skill1Section:SkillSectionModel = SkillSectionModel("0", "aaaaaa", "my step title eat", "fjefjn", mutableListOf("0", "1"))
+    var skill1Task0:SkillTaskModel = SkillTaskModel("0", "0", "aaaaaa", "touch this twice", 2)
+    var skill1Task1:SkillTaskModel = SkillTaskModel("1", "0", "aaaaaa", "touch this once", 1)
+
+    var skill2:SkillModel = SkillModel("bbbbbb", "Second Skill", mutableListOf("0"))
+    var skill2Section:SkillSectionModel = SkillSectionModel("0", "bbbbbb", "my step title eat", "fjefjn", mutableListOf("0", "1"))
+    var skill2Task0:SkillTaskModel = SkillTaskModel("0", "0", "bbbbbb", "touch this four times", 4)
+    var skill2Task1:SkillTaskModel = SkillTaskModel("1", "0", "bbbbbb", "touch this once", 1)
+
+    var skillProgressionA0 = SkillProgressionModel("aaaa", "aaaaaa", "0", mutableMapOf(
+        Pair<String, Int>("0", 1),
+        Pair<String, Int>("1", 0)))
+
+    var currentUser : MutableState<UserDataModel> = remember{mutableStateOf(UserDataModel())};
+    currentUser.value = UserDataModel("aaaa", "ee", "ee", "ee", emptyList())
+
+    var listCompleteStructures:MutableState<List<SkillCompleteStructureModel>> = remember {
+        mutableStateOf(listOf())
+    }
+
+    val currentContext: Context = LocalContext.current;
+
+
+    //SAVE EVERYTHING
+    /*
+    sharedViewModel.saveSkill(skill1, LocalContext.current)
+    sharedViewModel.saveSkillSection(skill1Section, LocalContext.current)
+    sharedViewModel.saveSkillTask(skill1Task0, LocalContext.current)
+    sharedViewModel.saveSkillTask(skill1Task1, LocalContext.current)
+
+    sharedViewModel.saveSkill(skill2, LocalContext.current)
+    sharedViewModel.saveSkillSection(skill2Section, LocalContext.current)
+    sharedViewModel.saveSkillTask(skill2Task0, LocalContext.current)
+    sharedViewModel.saveSkillTask(skill2Task1, LocalContext.current)*/
+
+    /*sharedViewModel.saveSkillProgression(skillProgressionA0, LocalContext.current)
+    sharedViewModel.saveSkillProgression(skillProgressionA1, LocalContext.current)*/
+
+
+    var listOfSkillProgressions: MutableState<List<SkillProgressionModel>> = remember {
+        mutableStateOf(listOf(SkillProgressionModel()))
+    };
+
+
+    LaunchedEffect(currentUser){
+        sharedViewModel.retrieveSkillProgression("aaaa", "aaaaaa", context = currentContext){skillProg ->
+
+            var skill: SkillModel;
+            var skillSection: SkillSectionModel;
+            var structure: SkillCompleteStructureModel;
+
+            sharedViewModel.retrieveSkill(skillProg.skillId, currentContext, ){data ->
+                skill = data
+                sharedViewModel.retrieveSkillSection(skillProg.skillId, skillProg.currentSectionId, currentContext, ){data ->
+                    skillSection = data
+
+                    structure = SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
+
+                    sharedViewModel.retrieveAllSkillTasks(skill.id, skillSection.id, skillSection.skillTasksList, currentContext){listTasks ->
+                        structure = SkillCompleteStructureModel(
+                            skillProg, skill, skillSection, listTasks.associate { task ->
+                                if(skillProg.mapNonCompletedTasks.containsKey(task.id)){
+                                    Pair(task, Pair(skillProg.mapNonCompletedTasks.getOrDefault(task.id, 0), task.requiredAmount))
+                                }else{
+                                    Pair(task, Pair(task.requiredAmount, task.requiredAmount))
+                                }
+                            }
+                        )
+
+                        listCompleteStructures.value += structure
+                    }
+                }
+            }
+        }
+    }
+
 
     /*
-    //SAVE EVERYTHING
-    sharedViewModel.saveSkill(skill, LocalContext.current)
-    sharedViewModel.saveSkillSection(skillSection, LocalContext.current)
-    sharedViewModel.saveSkillTask(skillTask0, LocalContext.current)
-    sharedViewModel.saveSkillTask(skillTask1, LocalContext.current)
+    sharedViewModel.retrieveSkillProgression("aaaa", "aaaaaa", LocalContext.current){
+        listOfSkillProgressions.value += it
+    }
+
+    for(skillProg: SkillProgressionModel in listOfSkillProgressions.value){
+        //Text(text = skillProg.skillId + skillProg.userId + skillProg.currentSectionId)
+
+        val skill : MutableState<SkillModel> = remember{mutableStateOf(SkillModel())};
+        sharedViewModel.retrieveSkill(skillProg.skillId, LocalContext.current, ){data ->
+            skill.value = data
+        }
+
+
+        val skillSection : MutableState<SkillSectionModel> = remember{mutableStateOf(SkillSectionModel())};
+        sharedViewModel.retrieveSkillSection(skillProg.skillId, skillProg.currentSectionId, LocalContext.current, ){data ->
+            skillSection.value = data
+        }
+
+        //SkillListElement(sharedViewModel = sharedViewModel, skillProgression = skillProg, skill = skill.value)
+    }
     */
 
+    SkillContainerFunction(sharedViewModel = sharedViewModel, list = listCompleteStructures.value)
 
+    /*
+    for (i in listCompleteStructures.value){
+        Text(text = i.skill.id + " " + i.skillProgression.userId + " " + i.skillProgression.currentSectionId)
+    }*/
+    Text(text = listCompleteStructures.value.count().toString())
+
+
+
+/*
     SkillListElement(sharedViewModel, skillProgression = SkillProgressionModel("aaaa", "aaaaaa", "0", mutableMapOf(
         Pair<String, Int>("0", 1),
-        Pair<String, Int>("1", 0))),
-        "0")
+        Pair<String, Int>("1", 0))))*/
+
+}
+
+@Composable
+fun SkillContainerFunction(sharedViewModel: SharedViewModel, list: List<SkillCompleteStructureModel>){
+    Column {
+        list.forEach{
+                structure -> SkillListElement(sharedViewModel = sharedViewModel, skillProgression = structure.skillProgression, skill = structure.skill)
+
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -127,8 +232,6 @@ fun MySkillsScreen(navController: NavHostController,
                     ) {
                         Text(text = "My Skills", fontSize = 32.sp)
                     }
-
-
 
                     SkillListBlock(sharedViewModel);
                 }

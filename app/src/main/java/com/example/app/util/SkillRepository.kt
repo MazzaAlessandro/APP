@@ -36,6 +36,9 @@ class SkillRepository {
     private var currentTask: MutableStateFlow<SkillTaskModel> = MutableStateFlow(SkillTaskModel())
     var task: StateFlow<SkillTaskModel> = currentTask.asStateFlow()
 
+    private var currentSkillTaskList: MutableStateFlow<List<SkillTaskModel>> = MutableStateFlow(emptyList())
+    var skillTaskList: StateFlow<List<SkillTaskModel>> = currentSkillTaskList.asStateFlow();
+
 
     fun retrieveSkill(
         skillId: String,
@@ -172,7 +175,7 @@ class SkillRepository {
 
                         currentSkillListProgression.value = currentSkillListProg
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Data not HAHA found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -180,7 +183,51 @@ class SkillRepository {
         }
     }
 
+    fun retrieveAllSkillTasks(
+        skillId: String,
+        sectionId: String,
+        taskIds: List<String>,
+        context: Context,
+        data: (List<SkillTaskModel>) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
 
+        val fireStoreRef = Firebase.firestore
+            .collection("skilltask")
+            .whereEqualTo("idSkill", skillId)
+            .whereEqualTo("idSection", sectionId)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {documents ->
+                    if (!documents.isEmpty){
+                        val currentSkillTaskListF : MutableList<SkillTaskModel> = mutableListOf();
+
+                        for(d in documents){
+
+                            /*
+                            d.toObject(SkillProgressionModel::class.java)?.let { skillprog ->
+                                currentSkillListProgression.value += skillprog
+                            }
+                            */
+
+                            if(taskIds.contains(d.toObject<SkillTaskModel>().id)){
+                                currentSkillTaskListF += d.toObject<SkillTaskModel>()
+
+                                Toast.makeText(context, "WAWAWAWAAW", Toast.LENGTH_SHORT).show()
+                            }
+
+                        }
+
+                        data(currentSkillTaskListF)
+                        currentSkillTaskList.value = currentSkillTaskListF
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     fun saveSkill(
         skillData: SkillModel,

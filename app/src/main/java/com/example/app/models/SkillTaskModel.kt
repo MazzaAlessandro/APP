@@ -5,5 +5,7 @@ class SkillTaskModel (
     var idSection: String = "",
     var idSkill: String = "",
 
+    var taskDescription: String = "",
+
     var requiredAmount:Int = 0,
 )

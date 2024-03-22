@@ -83,6 +83,13 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
 
     }
 
+    fun saveSkillProgression(
+        skillProgressionData: SkillProgressionModel,
+        context: Context
+    )= CoroutineScope(Dispatchers.IO).launch{
+
+        skillRepository.saveSkillProgression(skillProgressionData, context);
+    }
 
     fun updateUserData(
         mail : String,
@@ -102,6 +109,15 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
     ) = CoroutineScope(Dispatchers.IO).launch{
 
         userRepository.retrieveData(mail, context, data);
+    }
+
+    fun retrieveSkillProgression(
+        userId: String,
+        skillId: String,
+        context: Context,
+        data: (SkillProgressionModel) -> Unit
+    ){
+        skillRepository.retrieveSkillProgression(skillId, userId, context, data)
     }
 
     fun retrieveUserSkillProgressionList(
@@ -139,4 +155,15 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
     ){
         skillRepository.retrieveSkillTask(skillId, sectionId, taskId, context, data)
     }
+
+    fun retrieveAllSkillTasks(
+        skillId: String,
+        sectionId: String,
+        taskIds: List<String>,
+        context: Context,
+        data: (List<SkillTaskModel>) -> Unit
+    ){
+        skillRepository.retrieveAllSkillTasks(skillId, sectionId, taskIds, context, data)
+    }
+
 }
