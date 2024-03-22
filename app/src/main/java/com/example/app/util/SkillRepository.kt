@@ -170,9 +170,9 @@ class SkillRepository {
                             */
 
                             currentSkillListProg += d.toObject<SkillProgressionModel>()!!
-                            data(currentSkillListProg)
                         }
 
+                        data(currentSkillListProg)
                         currentSkillListProgression.value = currentSkillListProg
                     } else {
                         Toast.makeText(context, "Data not HAHA found", Toast.LENGTH_SHORT).show()

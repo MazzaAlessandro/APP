@@ -37,17 +37,7 @@ import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
 @Composable
-fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillProgressionModel, skill: SkillModel){
-
-
-
-
-    /*
-    var skillTask : MutableState<SkillTaskModel> = remember{mutableStateOf(SkillTaskModel())};
-    sharedViewModel.retrieveSkillTask(skillProgression.skillId, skillProgression.currentSectionId, taskId, LocalContext.current, ){data ->
-        skillTask.value = data
-    }
-    */
+fun SkillListElement(sharedViewModel: SharedViewModel, skillCompleteStructureModel: SkillCompleteStructureModel){
 
     Box(modifier = Modifier
         .clip(RoundedCornerShape(8))
@@ -55,11 +45,12 @@ fun SkillListElement(sharedViewModel: SharedViewModel, skillProgression: SkillPr
         .padding(20.dp)){
         Row {
             Column {
-                Row {
-                    Text(text = skill.titleSkill)
-                    //val completedAmount: Int = skillProgression.mapNonCompletedTasks.map { entry -> entry.value }.sum()
-                    
-                    //Text(text = completedAmount.toString())
+                Row (horizontalArrangement = Arrangement.spacedBy(25.dp)) {
+                    Text(text = skillCompleteStructureModel.skill.titleSkill)
+                    val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
+                    val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
+
+                    Text(text = completedAmount.toString() + "/" + requiredAmount)
                 }
                 Row {
 
@@ -86,6 +77,11 @@ fun SkillListBlock(sharedViewModel: SharedViewModel){
         Pair<String, Int>("0", 1),
         Pair<String, Int>("1", 0)))
 
+    var skillProgressionA1 = SkillProgressionModel("aaaa", "bbbbbb", "0", mutableMapOf(
+        Pair<String, Int>("0", 3),
+        Pair<String, Int>("1", 1)))
+
+
     var currentUser : MutableState<UserDataModel> = remember{mutableStateOf(UserDataModel())};
     currentUser.value = UserDataModel("aaaa", "ee", "ee", "ee", emptyList())
 
@@ -108,7 +104,8 @@ fun SkillListBlock(sharedViewModel: SharedViewModel){
     sharedViewModel.saveSkillTask(skill2Task0, LocalContext.current)
     sharedViewModel.saveSkillTask(skill2Task1, LocalContext.current)*/
 
-    /*sharedViewModel.saveSkillProgression(skillProgressionA0, LocalContext.current)
+    /*
+    sharedViewModel.saveSkillProgression(skillProgressionA0, LocalContext.current)
     sharedViewModel.saveSkillProgression(skillProgressionA1, LocalContext.current)*/
 
 
@@ -118,31 +115,33 @@ fun SkillListBlock(sharedViewModel: SharedViewModel){
 
 
     LaunchedEffect(currentUser){
-        sharedViewModel.retrieveSkillProgression("aaaa", "aaaaaa", context = currentContext){skillProg ->
+        sharedViewModel.retrieveUserSkillProgressionList("aaaa", context = currentContext){skillProgList ->
 
-            var skill: SkillModel;
-            var skillSection: SkillSectionModel;
-            var structure: SkillCompleteStructureModel;
+            skillProgList.forEach{skillProg ->
+                var skill: SkillModel;
+                var skillSection: SkillSectionModel;
+                var structure: SkillCompleteStructureModel;
 
-            sharedViewModel.retrieveSkill(skillProg.skillId, currentContext, ){data ->
-                skill = data
-                sharedViewModel.retrieveSkillSection(skillProg.skillId, skillProg.currentSectionId, currentContext, ){data ->
-                    skillSection = data
+                sharedViewModel.retrieveSkill(skillProg.skillId, currentContext, ){data ->
+                    skill = data
+                    sharedViewModel.retrieveSkillSection(skillProg.skillId, skillProg.currentSectionId, currentContext, ){data ->
+                        skillSection = data
 
-                    structure = SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
+                        structure = SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
 
-                    sharedViewModel.retrieveAllSkillTasks(skill.id, skillSection.id, skillSection.skillTasksList, currentContext){listTasks ->
-                        structure = SkillCompleteStructureModel(
-                            skillProg, skill, skillSection, listTasks.associate { task ->
-                                if(skillProg.mapNonCompletedTasks.containsKey(task.id)){
-                                    Pair(task, Pair(skillProg.mapNonCompletedTasks.getOrDefault(task.id, 0), task.requiredAmount))
-                                }else{
-                                    Pair(task, Pair(task.requiredAmount, task.requiredAmount))
+                        sharedViewModel.retrieveAllSkillTasks(skill.id, skillSection.id, skillSection.skillTasksList, currentContext){listTasks ->
+                            structure = SkillCompleteStructureModel(
+                                skillProg, skill, skillSection, listTasks.associate { task ->
+                                    if(skillProg.mapNonCompletedTasks.containsKey(task.id)){
+                                        Pair(task, Pair(skillProg.mapNonCompletedTasks.getOrDefault(task.id, 0), task.requiredAmount))
+                                    }else{
+                                        Pair(task, Pair(task.requiredAmount, task.requiredAmount))
+                                    }
                                 }
-                            }
-                        )
+                            )
 
-                        listCompleteStructures.value += structure
+                            listCompleteStructures.value += structure
+                        }
                     }
                 }
             }
@@ -192,11 +191,9 @@ fun SkillListBlock(sharedViewModel: SharedViewModel){
 
 @Composable
 fun SkillContainerFunction(sharedViewModel: SharedViewModel, list: List<SkillCompleteStructureModel>){
-    Column {
-        list.forEach{
-                structure -> SkillListElement(sharedViewModel = sharedViewModel, skillProgression = structure.skillProgression, skill = structure.skill)
+    list.forEach{
+            structure -> SkillListElement(sharedViewModel = sharedViewModel, structure)
 
-        }
     }
 }
 
