@@ -1,6 +1,9 @@
 package com.example.app.util
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
@@ -14,6 +17,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SharedViewModel(private val userRepository: UserRepository, private val skillRepository: SkillRepository): ViewModel() {
+
+    var dialogShown by mutableStateOf(false)
+        private set
 
     private val currentUserMail: StateFlow<String> = userRepository.userMail;
     private val currentUserData : StateFlow<UserDataModel> = userRepository.userData;
@@ -166,4 +172,11 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.retrieveAllSkillTasks(skillId, sectionId, taskIds, context, data)
     }
 
+    fun popUpOn(){
+        dialogShown = true
+    }
+
+    fun popUpOff(){
+        dialogShown = false
+    }
 }
