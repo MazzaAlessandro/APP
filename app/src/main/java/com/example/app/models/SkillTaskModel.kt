@@ -1,6 +1,10 @@
 package com.example.app.models
 
-class SkillTaskModel (
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+data class SkillTaskModel (
     var id: String = "",
     var idSection: String = "",
     var idSkill: String = "",
@@ -8,4 +12,4 @@ class SkillTaskModel (
     var taskDescription: String = "",
 
     var requiredAmount:Int = 0,
-)
+): Parcelable

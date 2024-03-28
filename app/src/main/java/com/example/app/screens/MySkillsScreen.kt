@@ -63,12 +63,12 @@ fun SkillListElement(sharedViewModel: SharedViewModel, skillCompleteStructureMod
 @Composable
 fun SkillListBlock(sharedViewModel: SharedViewModel){
 
-    var skill1:SkillModel = SkillModel("aaaaaa", "First Skill", mutableListOf("0"))
+    var skill1:SkillModel = SkillModel("aaaaaa", "First Skill","", mutableListOf("0"))
     var skill1Section:SkillSectionModel = SkillSectionModel("0", "aaaaaa", "my step title eat", "fjefjn", mutableListOf("0", "1"))
     var skill1Task0:SkillTaskModel = SkillTaskModel("0", "0", "aaaaaa", "touch this twice", 2)
     var skill1Task1:SkillTaskModel = SkillTaskModel("1", "0", "aaaaaa", "touch this once", 1)
 
-    var skill2:SkillModel = SkillModel("bbbbbb", "Second Skill", mutableListOf("0"))
+    var skill2:SkillModel = SkillModel("bbbbbb", "Second Skill", "", mutableListOf("0"))
     var skill2Section:SkillSectionModel = SkillSectionModel("0", "bbbbbb", "my step title eat", "fjefjn", mutableListOf("0", "1"))
     var skill2Task0:SkillTaskModel = SkillTaskModel("0", "0", "bbbbbb", "touch this four times", 4)
     var skill2Task1:SkillTaskModel = SkillTaskModel("1", "0", "bbbbbb", "touch this once", 1)
