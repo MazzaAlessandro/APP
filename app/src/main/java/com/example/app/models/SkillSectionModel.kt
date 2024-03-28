@@ -1,6 +1,5 @@
 package com.example.app.models
 
-import android.graphics.Bitmap
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
@@ -8,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 data class SkillSectionModel(
     var id: String = "",
     var idSkill: String = "",
-    var titleStep: String = "Title step",
+    var titleSection: String = "Title step",
     var descriptionStep: String = "Title step",
 
     //var imageBadgeStep: Bitmap,
