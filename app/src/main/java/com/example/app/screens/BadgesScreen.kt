@@ -25,8 +25,8 @@ fun BadgesScreen(
         BadgeData(BadgeColor.BRONZE, "Skill 1",  "This is a longer badge description that goes on multiple lines to see how it fits in the box", "24/10/12"),
         BadgeData(BadgeColor.SILVER, "Skill 2", "badge description", "24/10/12"),
         BadgeData(BadgeColor.BRONZE, "Skill 3", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.GOLD, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeData(BadgeColor.GOLD, "Skill 1", "badge description"),
+        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12", false),
         BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
         BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
         BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
@@ -49,12 +49,14 @@ fun BadgesScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            //BadgeCard(badge = BadgeColor.BRONZE, skillName = "Skill 1", description = "This is a description for the card. Let's make it longer to see how it fits", date = "24/10/12", done = false)
             badgeList.map {
                 BadgeBanner(
                     it.badge,
                     it.skillName,
                     it.description,
-                    it.date)
+                    it.date,
+                    it.done)
             }
         }
     }
@@ -64,5 +66,6 @@ data class BadgeData(
     val badge: BadgeColor,
     val skillName : String,
     val description : String,
-    val date : String,
+    val date : String = "",
+    val done : Boolean = true
 )
