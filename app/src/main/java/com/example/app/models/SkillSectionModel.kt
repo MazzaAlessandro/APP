@@ -7,8 +7,8 @@ import kotlinx.android.parcel.Parcelize
 data class SkillSectionModel(
     var id: String = "",
     var idSkill: String = "",
-    var titleSection: String = "Title step",
-    var descriptionStep: String = "Title step",
+    var titleSection: String = "",
+    var descriptionSection: String = "",
 
     //var imageBadgeStep: Bitmap,
 
