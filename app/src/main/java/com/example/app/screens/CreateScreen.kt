@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -258,8 +260,26 @@ fun CreateScreen(
             ) {
                 Text(text = "Create a skill", fontSize = 32.sp)
 
+
                 //GeneralInfoBox(sharedViewModel, title = title, {title = it}, description, {description = it})
                 GeneralInfoBox(skill.value, {skill.value = skill.value.copy(titleSkill = it)}, {skill.value = skill.value.copy(skillDescription = it)})
+
+
+                /*
+                LazyColumn{
+                    itemsIndexed(skillSections.value){index, section ->
+                        SectionBox(id = index, section = section,
+                            {skillSections.value = skillSections.value.toMutableList().apply {
+                                set(index, section.copy(titleSection = it))
+                            }
+                            },
+                            {skillSections.value = skillSections.value.toMutableList().apply {
+                                set(index, section.copy(descriptionSection = it))
+                            }
+                            })
+                    }
+                }*/
+
 
 
                 skillSections.value.forEachIndexed{index, section ->
@@ -280,6 +300,8 @@ fun CreateScreen(
                     skillSections.value = skillSections.value + SkillSectionModel(id = skillSections.value.size.toString(), titleSection = "", skillTasksList = mutableListOf())}) {
                     Text(text = "ADD SECTION +")
                 }
+
+
             }
         }
     }
