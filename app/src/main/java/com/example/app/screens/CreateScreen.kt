@@ -44,6 +44,7 @@ import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillModel
+import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
@@ -271,30 +272,14 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         sharedViewModel.saveSkillTask(it, context)
     }
 
-}
+    //val skillProg = SkillProgressionModel("aaaaaa", skill.id, "0", )
 
-fun TestSkillSave(){
-    val db = FirebaseFirestore.getInstance()
-    val skill = SkillModel(titleSkill = "TITLE TEST", skillDescription = "WAWAWA DESCR", skillSectionsList = listOf())
-    val newSkillRef = db.collection("skill").document()
-    skill.id = newSkillRef.id
-    newSkillRef.set(skill)
 }
 
 
-fun TestCreateSection(){
-    val db = FirebaseFirestore.getInstance()
-    val skill = SkillSectionModel()
-    val newSkillRef = db.collection("section").document()
-    skill.id = newSkillRef.id
-    newSkillRef.set(skill)
-}
-
-
-// TODO TAKE CARE OF THE ID OF THE SKILL SECTIONS
-// TODO CREATE THE LIST / MAP OF SKILL TASKS
-// TODO PUT THE BUTTONS AND THE UIS
-// TODO CHANGE TO LAZY COLUMNS AS SOON AS POSSIBLE
+//TODO ADD THE SKILL PROGRESSIONS
+//TODO MAKE SURE THAT EVERYTHING GETS SAVED CORRECTLY
+//TODO SOLVE PROBLEM IN SAVING TASKS
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateScreen(
