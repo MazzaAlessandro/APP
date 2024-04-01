@@ -1,18 +1,24 @@
 package com.example.app.screens
 
+import android.content.Context
+import android.icu.text.CaseMap.Title
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,11 +28,15 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -86,12 +96,23 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
 }
 
 @Composable
-fun SectionBox(id:Int, section:SkillSectionModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit){
+fun SectionBox(id:Int, section:SkillSectionModel,
+               listTasks: List<SkillTaskModel>,
+               onTitleChange: (String) -> Unit,
+               onDescriptionChange: (String) -> Unit,
+               onAddTask: () -> Unit,
+               onChangeTaskDescription: (Int, String) -> Unit,
+               onChangeTaskAmount: (Int, Int) -> Unit){
+
+    var sectionCounter by rememberSaveable {
+        mutableStateOf(0)
+    }
+
     Box(modifier = Modifier
         .background(color = Color(0xFFD9D9D9), shape = RoundedCornerShape(10.dp))
         .padding(15.dp)
     ){
-        Column {
+        Column{
             Row (verticalAlignment = Alignment.CenterVertically)
             {
 
@@ -126,6 +147,26 @@ fun SectionBox(id:Int, section:SkillSectionModel, onTitleChange: (String) -> Uni
                         .fillMaxWidth(),
                 )
             }
+
+            Spacer(modifier = Modifier
+                .size(400.dp, 15.dp)
+            )
+
+            listTasks.forEachIndexed{index, task ->
+                
+                TaskBox(id = index, task = task, onDescriptionChange = { onChangeTaskDescription(index, it) }, onAmountChange = { onChangeTaskAmount(index, it.toInt()) })
+
+                Spacer(modifier = Modifier
+                    .height(10.dp)
+                )
+                
+            }
+
+
+            Button(onClick = onAddTask) {
+                Text(text = "ADD TASK +")
+            }
+
         }
     }
 }
@@ -169,11 +210,28 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                     .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
             ){
                 val containerColor = Color(0xFFF0F0F0)
-                TextField(value = task.requiredAmount.toString(),
-                    onValueChange = onAmountChange,
+                TextField(value =
+
+                    if(task.requiredAmount != 0){
+                        task.requiredAmount.toString()
+                    }else{
+                        ""
+                    },
+                    onValueChange = {
+                        try{
+                            val value = it.toLong()
+                            if(value < Int.MAX_VALUE && value > 0){
+                                onAmountChange(it)
+                            }
+                        } catch (e: NumberFormatException){
+                            onAmountChange((0).toString())
+                        }
+
+                    },
                     modifier = Modifier
                         .padding(10.dp)
                         .fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = containerColor,
                         unfocusedContainerColor = containerColor,
@@ -192,6 +250,28 @@ fun GenerateNewSkillID(): String{
 }
 
 
+fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>){
+
+    val db = FirebaseFirestore.getInstance()
+    val skillRef = db.collection("skill").document(refId)
+    skillRef.set(skill.copy(skillSectionsList = sections.map{
+        it.id
+    }))
+
+    sections.forEach{
+
+        val taskList = (tasks[it.id]?.toMutableList() ?: mutableListOf()).map{
+            it.id
+        }
+
+        sharedViewModel.saveSkillSection(it.copy(skillTasksList = taskList), context)
+    }
+
+    tasks.values.flatten().forEach{
+        sharedViewModel.saveSkillTask(it, context)
+    }
+
+}
 
 fun TestSkillSave(){
     val db = FirebaseFirestore.getInstance()
@@ -211,10 +291,6 @@ fun TestCreateSection(){
 }
 
 
-
-
-
-
 // TODO TAKE CARE OF THE ID OF THE SKILL SECTIONS
 // TODO CREATE THE LIST / MAP OF SKILL TASKS
 // TODO PUT THE BUTTONS AND THE UIS
@@ -226,13 +302,23 @@ fun CreateScreen(
     sharedViewModel: SharedViewModel
 ){
 
+    val skillID by rememberSaveable {
+        mutableStateOf(GenerateNewSkillID())
+    }
+
     var skill : MutableState<SkillModel> = rememberSaveable {
-        mutableStateOf(SkillModel())
+        mutableStateOf(SkillModel(id = skillID))
     }
 
     var skillSections: MutableState<List<SkillSectionModel>> = rememberSaveable {
         mutableStateOf(mutableListOf())
     }
+
+    var skillTasks: MutableState<Map<String, MutableList<SkillTaskModel>>> = rememberSaveable {
+        mutableStateOf(mapOf())
+    }
+
+    val context = LocalContext.current;
 
 
     Scaffold(
@@ -249,41 +335,25 @@ fun CreateScreen(
                 .padding(10.dp)
 
         ){
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .verticalScroll(rememberScrollState()),
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
-                Text(text = "Create a skill", fontSize = 32.sp)
+
+                item {
+                    Text(text = "Create a skill", fontSize = 32.sp)
 
 
-                //GeneralInfoBox(sharedViewModel, title = title, {title = it}, description, {description = it})
-                GeneralInfoBox(skill.value, {skill.value = skill.value.copy(titleSkill = it)}, {skill.value = skill.value.copy(skillDescription = it)})
+                    //GeneralInfoBox(sharedViewModel, title = title, {title = it}, description, {description = it})
+                    GeneralInfoBox(skill.value, {skill.value = skill.value.copy(titleSkill = it)}, {skill.value = skill.value.copy(skillDescription = it)})
+                }
 
-
-                /*
-                LazyColumn{
-                    itemsIndexed(skillSections.value){index, section ->
-                        SectionBox(id = index, section = section,
-                            {skillSections.value = skillSections.value.toMutableList().apply {
-                                set(index, section.copy(titleSection = it))
-                            }
-                            },
-                            {skillSections.value = skillSections.value.toMutableList().apply {
-                                set(index, section.copy(descriptionSection = it))
-                            }
-                            })
-                    }
-                }*/
-
-
-
-                skillSections.value.forEachIndexed{index, section ->
-                    SectionBox(id = index, section = section,
+                itemsIndexed(skillSections.value){index, section ->
+                    SectionBox(id = index, section = section, skillTasks.value.get(section.id)?.toList() ?: mutableListOf(),
                         {skillSections.value = skillSections.value.toMutableList().apply {
                             set(index, section.copy(titleSection = it))
                         }
@@ -291,16 +361,54 @@ fun CreateScreen(
                         {skillSections.value = skillSections.value.toMutableList().apply {
                             set(index, section.copy(descriptionSection = it))
                         }
+                        },
+                        {
+                            val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
+                            updatedList.add(SkillTaskModel(updatedList.size.toString(), section.id, skillID, "", 0))
+
+                            val updatedMap = skillTasks.value.toMutableMap()
+                            updatedMap[section.id] = updatedList
+
+                            skillTasks.value = updatedMap
+                        },
+                        {id, description ->
+                            val updatedTask = skillTasks.value[section.id]?.get(id)?.copy(taskDescription = description) ?: SkillTaskModel()
+
+                            val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
+                            updatedList.set(id, updatedTask)
+
+                            val updatedMap = skillTasks.value.toMutableMap()
+                            updatedMap[section.id] = updatedList
+
+                            skillTasks.value = updatedMap
+                        },
+                        {id, amount ->
+                            val updatedTask = skillTasks.value[section.id]?.get(id)?.copy(requiredAmount = amount) ?: SkillTaskModel()
+
+                            val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
+                            updatedList.set(id, updatedTask)
+
+                            val updatedMap = skillTasks.value.toMutableMap()
+                            updatedMap[section.id] = updatedList
+
+                            skillTasks.value = updatedMap
                         })
                 }
 
-                TaskBox(1, SkillTaskModel("ddee", "dddd", "ssss", "assad dadad dedurica", 2), {}, {})
+                item {
+                    //TaskBox(1, SkillTaskModel("ddee", "dddd", skillID, "assad dadad dedurica", 2), {}, {})
 
-                Button(onClick = {
-                    skillSections.value = skillSections.value + SkillSectionModel(id = skillSections.value.size.toString(), titleSection = "", skillTasksList = mutableListOf())}) {
-                    Text(text = "ADD SECTION +")
+                    Button(onClick = {
+                        skillSections.value = skillSections.value + SkillSectionModel(id = skillSections.value.size.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf())}) {
+                        Text(text = "ADD SECTION +")
+                    }
+
+                    Button(onClick = {
+                        SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value)
+                    }) {
+                        Text(text = "SAVE")
+                    }
                 }
-
 
             }
         }
