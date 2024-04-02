@@ -1,8 +1,8 @@
 package com.example.app.additionalUI
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,11 +20,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,6 +34,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
+import com.example.app.screens.BadgeData
 
 //This is the round icon of a Badge that can be used on its own
 @Composable
@@ -72,14 +74,18 @@ fun BadgeBanner(
     skillName : String,
     description : String,
     date : String,
-    done: Boolean = true
+    done: Boolean = true,
+    onClick: () -> Unit
 ){
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(5.dp, 2.dp)
         .clip(shape = RoundedCornerShape(10.dp))
         .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-        .background(Color.Gray.copy(alpha = 0.2f)),
+        .background(Color.Gray.copy(alpha = 0.2f))
+        .clickable {
+                onClick()
+        },
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -112,76 +118,88 @@ fun BadgeBanner(
 //If you did not completed the badge, the card has a button that takes you to that tutorial
 @Composable
 fun BadgeCard(
-    badge : BadgeColor,
-    skillName : String,
-    description : String,
-    date : String,
-    done: Boolean
+    badge: BadgeData,
+    onCloseClick: () -> Unit
 ){
-    OutlinedCard(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ),
-        border = BorderStroke(1.dp, Color.Black),
+    Box(
         modifier = Modifier
-            .padding(30.dp)
-            .fillMaxWidth()
-            .height(450.dp)
-
-    ) {
-
-        IconButton(
-            onClick = { /*TODO*/ },
-            modifier = Modifier.align(Alignment.End),
-        ) {
-            Icon(imageVector = Icons.Default.Close, contentDescription = "close")
-        }
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            BadgeIcon(badge, 100.dp, done)
-
-            Text(
-                text = skillName,
-                modifier = Modifier
-                    .padding(10.dp),
-                textAlign = TextAlign.Center,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = description,
-                modifier = Modifier
-                    .padding(15.dp, 0.dp, 15.dp, 10.dp),
-                textAlign = TextAlign.Center
-            )
-
-            if(done){
-                Text(
-                    "Achieved on: $date",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(15.dp, 10.dp, 15.dp, 20.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-            else{
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(0.dp, 0.dp, 0.dp, 10.dp)
-                        .width(120.dp)
+            .fillMaxSize()
+            .background(Color.Gray.copy(alpha = 0.5f))
+            .zIndex(10F)
+            .clickable {  },
+        contentAlignment = Alignment.Center
+    ){
+        Popup(
+            alignment = Alignment.Center,
+            properties = PopupProperties(
+                excludeFromSystemGesture = true,
+            ),
+            // to dismiss on click outside
+            onDismissRequest = { onCloseClick() }
+        ){
+            Box(
+                Modifier
+                    .width(375.dp)
+                    .height(525.dp)
+                    .clip(shape = RoundedCornerShape(10.dp))
+                    .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.surface),
+                contentAlignment = Alignment.Center
+            ) {
+                IconButton(
+                    onClick = {
+                        onCloseClick()
+                    },
+                    modifier = Modifier.align(Alignment.TopEnd),
                 ) {
-                    Text("START", fontSize = 20.sp)
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "close")
+                }
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    BadgeIcon(badge.badge, 100.dp, badge.done)
+
+                    Text(
+                        text = badge.skillName,
+                        modifier = Modifier
+                            .padding(10.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = badge.description,
+                        modifier = Modifier
+                            .padding(15.dp, 0.dp, 15.dp, 10.dp),
+                        textAlign = TextAlign.Center
+                    )
+
+                    if(badge.done){
+                        val date = badge.date
+                        Text(
+                            "Achieved on: $date",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(15.dp, 10.dp, 15.dp, 20.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    else{
+                        Button(
+                            onClick = { /*TODO*/ },
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(0.dp, 0.dp, 0.dp, 10.dp)
+                                .width(120.dp)
+                        ) {
+                            Text("START", fontSize = 20.sp)
+                        }
+                    }
                 }
             }
         }
