@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +50,7 @@ import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillModel
+import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
@@ -187,7 +189,7 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                onChangeTaskDescription: (Int, String) -> Unit,
                onChangeTaskAmount: (Int, Int) -> Unit){
 
-    var sectionCounter by rememberSaveable {
+    var sectionCounter by remember {
         mutableStateOf(0)
     }
 
@@ -313,8 +315,12 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         sharedViewModel.saveSkillTask(it, context)
     }
 
-    //val skillProg = SkillProgressionModel("aaaaaa", skill.id, "0", )
+    val mapNonCompletedTasks: Map<String, Int> = tasks.get("0")?.associate { task ->
+        Pair(task.id, 0)
+    } ?: mutableMapOf()
 
+    val skillProg = SkillProgressionModel("aaaa", skill.id, "0", mapNonCompletedTasks)
+    sharedViewModel.saveSkillProgression(skillProg, context)
 }
 
 
@@ -328,19 +334,19 @@ fun CreateScreen(
     sharedViewModel: SharedViewModel
 ){
 
-    val skillID by rememberSaveable {
+    val skillID by remember {
         mutableStateOf(GenerateNewSkillID())
     }
 
-    var skill : MutableState<SkillModel> = rememberSaveable {
+    var skill : MutableState<SkillModel> = remember {
         mutableStateOf(SkillModel(id = skillID))
     }
 
-    var skillSections: MutableState<List<SkillSectionModel>> = rememberSaveable {
+    var skillSections: MutableState<List<SkillSectionModel>> = remember {
         mutableStateOf(mutableListOf())
     }
 
-    var skillTasks: MutableState<Map<String, MutableList<SkillTaskModel>>> = rememberSaveable {
+    var skillTasks: MutableState<Map<String, MutableList<SkillTaskModel>>> = remember {
         mutableStateOf(mapOf())
     }
 

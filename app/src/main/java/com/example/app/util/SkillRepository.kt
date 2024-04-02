@@ -100,7 +100,7 @@ class SkillRepository {
     )= CoroutineScope(Dispatchers.IO).launch{
         val fireStoreRef = Firebase.firestore
             .collection("skilltask")
-            .document(taskId + sectionId + skillId)
+            .document(taskId + "_" + sectionId + skillId)
 
         try{
             fireStoreRef.get()
@@ -278,7 +278,7 @@ class SkillRepository {
 
         val fireStoreRef = Firebase.firestore
             .collection("skilltask")
-            .document(skillTaskData.id + skillTaskData.idSection + skillTaskData.idSkill)
+            .document(skillTaskData.id + "_" +  skillTaskData.idSection + skillTaskData.idSkill)
 
         try {
 
