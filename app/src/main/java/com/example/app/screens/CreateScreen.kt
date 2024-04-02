@@ -1,7 +1,6 @@
 package com.example.app.screens
 
 import android.content.Context
-import android.icu.text.CaseMap.Title
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,12 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,9 +35,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,11 +49,92 @@ import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillModel
-import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun TextFieldString(value: String, onValueChange: (String) -> Unit, isSingleLine: Boolean){
+    val containerColor = Color(0xFFF0F0F0)
+    val lineColor = Color(0xFFDEDEDE)
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    TextField(value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth(),
+        singleLine = isSingleLine,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = containerColor,
+            unfocusedContainerColor = containerColor,
+            disabledContainerColor = containerColor,
+            unfocusedIndicatorColor = containerColor,
+            focusedIndicatorColor = lineColor,
+        ),
+        trailingIcon = {
+            IconButton(onClick = { keyboardController?.hide() }) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardHide,
+                    contentDescription = "Close keyboard"
+                )
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun TextFieldInt(value: Int, onValueChange: (String) -> Unit){
+    val containerColor = Color(0xFFF0F0F0)
+    val lineColor = Color(0xFFDEDEDE)
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    TextField(value =
+
+        if(value != 0){
+            value.toString()
+        }else{
+            ""
+        },
+        onValueChange = {
+            try{
+                val value = it.toLong()
+                if(value < Int.MAX_VALUE && value > 0){
+                    onValueChange(it)
+                }
+            } catch (e: NumberFormatException){
+                if(it == "") onValueChange((0).toString())
+            }
+
+        },
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = containerColor,
+            unfocusedContainerColor = containerColor,
+            disabledContainerColor = containerColor,
+            unfocusedIndicatorColor = containerColor,
+            focusedIndicatorColor = lineColor,
+        ),
+        trailingIcon = {
+            IconButton(onClick = { keyboardController?.hide() }) {
+                Icon(
+                    imageVector = Icons.Filled.KeyboardHide,
+                    contentDescription = "Close keyboard"
+                )
+            }
+        }
+    )
+}
+
 
 @Composable
 fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit){
@@ -70,9 +156,10 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                     modifier = Modifier
                         .background(color = Color(0xFFF0F0F0), shape = RoundedCornerShape(10))
                 ){
-                    TextField(value = skill.titleSkill,
+                    TextFieldString(
+                        value = skill.titleSkill,
                         onValueChange = onTitleChange,
-                        modifier = Modifier.padding(10.dp),
+                        isSingleLine = true
                     )
                 }
             }
@@ -85,12 +172,7 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                 modifier = Modifier
                     .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
             ){
-                TextField(value = skill.skillDescription,
-                    onValueChange = onDescriptionChange,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),
-                )
+                TextFieldString(value = skill.skillDescription, onValueChange = onDescriptionChange, false)
             }
         }
     }
@@ -126,9 +208,10 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                     modifier = Modifier
                         .background(color = Color(0xFFF0F0F0), shape = RoundedCornerShape(10))
                 ){
-                    TextField(value = section.titleSection,
+                    TextFieldString(
+                        value = section.titleSection,
                         onValueChange = onTitleChange,
-                        modifier = Modifier.padding(10.dp),
+                        isSingleLine = true
                     )
                 }
             }
@@ -141,12 +224,7 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                 modifier = Modifier
                     .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
             ){
-                TextField(value = section.descriptionSection,
-                    onValueChange = onDescriptionChange,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),
-                )
+                TextFieldString(value = section.descriptionSection, onValueChange = onDescriptionChange, false)
             }
 
             Spacer(modifier = Modifier
@@ -172,9 +250,10 @@ fun SectionBox(id:Int, section:SkillSectionModel,
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, onAmountChange: (String) -> Unit){
+
     Box(modifier = Modifier
         .background(color = Color(0xFFD3E9FF), shape = RoundedCornerShape(10.dp))
         .padding(15.dp)
@@ -188,18 +267,7 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                 modifier = Modifier
                     .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
             ){
-                val containerColor = Color(0xFFF0F0F0)
-                TextField(value = task.taskDescription,
-                    onValueChange = onDescriptionChange,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = containerColor,
-                        unfocusedContainerColor = containerColor,
-                        disabledContainerColor = containerColor,
-                    )
-                )
+                TextFieldString(task.taskDescription, onDescriptionChange, false)
             }
 
             Text(text = "Required amount:",
@@ -211,34 +279,7 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                     .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
             ){
                 val containerColor = Color(0xFFF0F0F0)
-                TextField(value =
-
-                    if(task.requiredAmount != 0){
-                        task.requiredAmount.toString()
-                    }else{
-                        ""
-                    },
-                    onValueChange = {
-                        try{
-                            val value = it.toLong()
-                            if(value < Int.MAX_VALUE && value > 0){
-                                onAmountChange(it)
-                            }
-                        } catch (e: NumberFormatException){
-                            onAmountChange((0).toString())
-                        }
-
-                    },
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = containerColor,
-                        unfocusedContainerColor = containerColor,
-                        disabledContainerColor = containerColor,
-                    )
-                )
+                TextFieldInt(task.requiredAmount, onAmountChange)
             }
         }
     }
