@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -36,51 +42,140 @@ import com.example.app.models.SkillCompleteStructureModel
 import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
+//TODO ADD THE DATES IN THE SKILL PROGRESSIONS
+
 @Composable
-fun SkillListElement(sharedViewModel: SharedViewModel, skillCompleteStructureModel: SkillCompleteStructureModel){
+fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel){
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(10))
+        .background(color = Color(0XFFD9D9D9))
+        .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)){
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10))
+            .background(color = Color(0XFFF0F0F0))
+            .padding(5.dp),
+            contentAlignment = Alignment.Center
+            ){
+            Text(text = skillCompleteStructureModel.skill.titleSkill,
+                fontSize = 28.sp,
+            )
+        }
+
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(25.dp)) {
+            Box(modifier = Modifier
+                .weight(2.0f),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(40))
+                        .background(color = MaterialTheme.colorScheme.primary)
+                        .padding(vertical = 3.dp, horizontal = 20.dp),
+
+                    text = skillCompleteStructureModel.skillSection.titleSection, color = Color.White, fontSize = 20.sp)
+            }
+
+            Box(modifier = Modifier
+                .weight(1.0f)
+                .clip(RoundedCornerShape(10))
+                .padding(5.dp),
+                contentAlignment = Alignment.Center
+            ){
+                val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
+                val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
+                Text(text = completedAmount.toString() + "/" + requiredAmount, fontSize = 15.sp)
+            }
+        }
+        skillCompleteStructureModel.skillTasks.forEach{
+            TaskListElement(progression = it.value.first, task = it.key)
+        }
+    }
+
+    /*
+    Row {
+        Column {
+            Row (horizontalArrangement = Arrangement.spacedBy(25.dp)) {
+                Text(text = skillCompleteStructureModel.skill.titleSkill)
+                val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
+                val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
+
+                Text(text = completedAmount.toString() + "/" + requiredAmount)
+            }
+            Row {
+
+            }
+        }
+    }*/
+}
+
+@Composable
+fun TaskListElement(progression: Int, task: SkillTaskModel){
+
+    val containerColor = Color(0xFFF0F0F0)
+
 
     Box(modifier = Modifier
-        .clip(RoundedCornerShape(8))
-        .background(color = Color.Red)
-        .padding(20.dp)){
-        Row {
-            Column {
-                Row (horizontalArrangement = Arrangement.spacedBy(25.dp)) {
-                    Text(text = skillCompleteStructureModel.skill.titleSkill)
-                    val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
-                    val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
+        .background(color = Color(0xFFD3E9FF), shape = RoundedCornerShape(10.dp))
+        .padding(15.dp)
+    ){
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(text = task.taskDescription,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(containerColor, RoundedCornerShape(10))
+                    .padding(10.dp)
+                    .weight(3.0f)
+            )
 
-                    Text(text = completedAmount.toString() + "/" + requiredAmount)
-                }
-                Row {
+            Text(
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(40))
+                    .background(color = MaterialTheme.colorScheme.primary)
+                    .padding(vertical = 3.dp, horizontal = 20.dp),
 
-                }
-            }
+                text = progression.toString() + "/" + task.requiredAmount.toString(), color = Color.White, fontSize = 20.sp)
+
+
+        }
+    }
+
+}
+
+@Composable
+fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>){
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10))
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        listSkills.forEach{skillStructure ->
+            SkillListElement(skillCompleteStructureModel = skillStructure)
         }
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun SkillListBlock(sharedViewModel: SharedViewModel){
-
-    var skill1:SkillModel = SkillModel("aaaaaa", "First Skill","", mutableListOf("0"))
-    var skill1Section:SkillSectionModel = SkillSectionModel("0", "aaaaaa", "my step title eat", "fjefjn", mutableListOf("0", "1"))
-    var skill1Task0:SkillTaskModel = SkillTaskModel("0", "0", "aaaaaa", "touch this twice", 2)
-    var skill1Task1:SkillTaskModel = SkillTaskModel("1", "0", "aaaaaa", "touch this once", 1)
-
-    var skill2:SkillModel = SkillModel("bbbbbb", "Second Skill", "", mutableListOf("0"))
-    var skill2Section:SkillSectionModel = SkillSectionModel("0", "bbbbbb", "my step title eat", "fjefjn", mutableListOf("0", "1"))
-    var skill2Task0:SkillTaskModel = SkillTaskModel("0", "0", "bbbbbb", "touch this four times", 4)
-    var skill2Task1:SkillTaskModel = SkillTaskModel("1", "0", "bbbbbb", "touch this once", 1)
-
-    var skillProgressionA0 = SkillProgressionModel("aaaa", "aaaaaa", "0", mutableMapOf(
-        Pair<String, Int>("0", 1),
-        Pair<String, Int>("1", 0)))
-
-    var skillProgressionA1 = SkillProgressionModel("aaaa", "bbbbbb", "0", mutableMapOf(
-        Pair<String, Int>("0", 3),
-        Pair<String, Int>("1", 1)))
-
+fun MySkillsScreen(navController: NavHostController,
+                  sharedViewModel: SharedViewModel
+){
 
     var currentUser : MutableState<UserDataModel> = remember{mutableStateOf(UserDataModel())};
     currentUser.value = UserDataModel("aaaa", "ee", "ee", "ee", emptyList())
@@ -92,49 +187,48 @@ fun SkillListBlock(sharedViewModel: SharedViewModel){
     val currentContext: Context = LocalContext.current;
 
 
-    //SAVE EVERYTHING
-    /*
-    sharedViewModel.saveSkill(skill1, LocalContext.current)
-    sharedViewModel.saveSkillSection(skill1Section, LocalContext.current)
-    sharedViewModel.saveSkillTask(skill1Task0, LocalContext.current)
-    sharedViewModel.saveSkillTask(skill1Task1, LocalContext.current)
+    LaunchedEffect(currentUser) {
+        sharedViewModel.retrieveUserSkillProgressionList(
+            "aaaa",
+            context = currentContext
+        ) { skillProgList ->
 
-    sharedViewModel.saveSkill(skill2, LocalContext.current)
-    sharedViewModel.saveSkillSection(skill2Section, LocalContext.current)
-    sharedViewModel.saveSkillTask(skill2Task0, LocalContext.current)
-    sharedViewModel.saveSkillTask(skill2Task1, LocalContext.current)*/
-
-    /*
-    sharedViewModel.saveSkillProgression(skillProgressionA0, LocalContext.current)
-    sharedViewModel.saveSkillProgression(skillProgressionA1, LocalContext.current)*/
-
-
-    var listOfSkillProgressions: MutableState<List<SkillProgressionModel>> = remember {
-        mutableStateOf(listOf(SkillProgressionModel()))
-    };
-
-
-    LaunchedEffect(currentUser){
-        sharedViewModel.retrieveUserSkillProgressionList("aaaa", context = currentContext){skillProgList ->
-
-            skillProgList.forEach{skillProg ->
+            skillProgList.forEach { skillProg ->
                 var skill: SkillModel;
                 var skillSection: SkillSectionModel;
                 var structure: SkillCompleteStructureModel;
 
-                sharedViewModel.retrieveSkill(skillProg.skillId, currentContext, ){data ->
+                sharedViewModel.retrieveSkill(skillProg.skillId, currentContext,) { data ->
                     skill = data
-                    sharedViewModel.retrieveSkillSection(skillProg.skillId, skillProg.currentSectionId, currentContext, ){data ->
+                    sharedViewModel.retrieveSkillSection(
+                        skillProg.skillId,
+                        skillProg.currentSectionId,
+                        currentContext,
+                    ) { data ->
                         skillSection = data
 
-                        structure = SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
+                        structure =
+                            SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
 
-                        sharedViewModel.retrieveAllSkillTasks(skill.id, skillSection.id, skillSection.skillTasksList, currentContext){listTasks ->
+                        sharedViewModel.retrieveAllSkillTasks(
+                            skill.id,
+                            skillSection.id,
+                            skillSection.skillTasksList,
+                            currentContext
+                        ) { listTasks ->
                             structure = SkillCompleteStructureModel(
                                 skillProg, skill, skillSection, listTasks.associate { task ->
-                                    if(skillProg.mapNonCompletedTasks.containsKey(task.id)){
-                                        Pair(task, Pair(skillProg.mapNonCompletedTasks.getOrDefault(task.id, 0), task.requiredAmount))
-                                    }else{
+                                    if (skillProg.mapNonCompletedTasks.containsKey(task.id)) {
+                                        Pair(
+                                            task,
+                                            Pair(
+                                                skillProg.mapNonCompletedTasks.getOrDefault(
+                                                    task.id,
+                                                    0
+                                                ), task.requiredAmount
+                                            )
+                                        )
+                                    } else {
                                         Pair(task, Pair(task.requiredAmount, task.requiredAmount))
                                     }
                                 }
@@ -148,60 +242,6 @@ fun SkillListBlock(sharedViewModel: SharedViewModel){
         }
     }
 
-
-    /*
-    sharedViewModel.retrieveSkillProgression("aaaa", "aaaaaa", LocalContext.current){
-        listOfSkillProgressions.value += it
-    }
-
-    for(skillProg: SkillProgressionModel in listOfSkillProgressions.value){
-        //Text(text = skillProg.skillId + skillProg.userId + skillProg.currentSectionId)
-
-        val skill : MutableState<SkillModel> = remember{mutableStateOf(SkillModel())};
-        sharedViewModel.retrieveSkill(skillProg.skillId, LocalContext.current, ){data ->
-            skill.value = data
-        }
-
-
-        val skillSection : MutableState<SkillSectionModel> = remember{mutableStateOf(SkillSectionModel())};
-        sharedViewModel.retrieveSkillSection(skillProg.skillId, skillProg.currentSectionId, LocalContext.current, ){data ->
-            skillSection.value = data
-        }
-
-        //SkillListElement(sharedViewModel = sharedViewModel, skillProgression = skillProg, skill = skill.value)
-    }
-    */
-
-    SkillContainerFunction(sharedViewModel = sharedViewModel, list = listCompleteStructures.value)
-
-    /*
-    for (i in listCompleteStructures.value){
-        Text(text = i.skill.id + " " + i.skillProgression.userId + " " + i.skillProgression.currentSectionId)
-    }*/
-    Text(text = listCompleteStructures.value.count().toString())
-
-
-
-/*
-    SkillListElement(sharedViewModel, skillProgression = SkillProgressionModel("aaaa", "aaaaaa", "0", mutableMapOf(
-        Pair<String, Int>("0", 1),
-        Pair<String, Int>("1", 0))))*/
-
-}
-
-@Composable
-fun SkillContainerFunction(sharedViewModel: SharedViewModel, list: List<SkillCompleteStructureModel>){
-    list.forEach{
-            structure -> SkillListElement(sharedViewModel = sharedViewModel, structure)
-
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Composable
-fun MySkillsScreen(navController: NavHostController,
-                  sharedViewModel: SharedViewModel
-){
     Scaffold(
         topBar = { AppToolBar(title = "My Skills", navController, sharedViewModel) },
         bottomBar = {
@@ -210,29 +250,22 @@ fun MySkillsScreen(navController: NavHostController,
     ){innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Box(
-                modifier = Modifier.fillMaxSize()
-            )
-            {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8))
-                            .background(color = Color.Green)
-                            .padding(20.dp)
-                    ) {
-                        Text(text = "My Skills", fontSize = 32.sp)
-                    }
-
-                    SkillListBlock(sharedViewModel);
-                }
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10))
+                    .background(color = Color(0XFFD9D9D9))
+                    .padding(20.dp)
+            ) {
+                Text(text = "My Skills", fontSize = 32.sp)
             }
+
+
+            SkillListBlock(listSkills = listCompleteStructures.value)
         }
     }
 
