@@ -335,7 +335,24 @@ class SkillRepository {
 
 
 
+    fun updateSkillProgression(userId: String,
+                               skillId: String,
+                               skillProgressionData: SkillProgressionModel,
+                               context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("skillprogression")
+            .document(userId + skillId)
 
+        try{
+            fireStoreRef.set(skillProgressionData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
 

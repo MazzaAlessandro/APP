@@ -126,6 +126,17 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.retrieveSkillProgression(skillId, userId, context, data)
     }
 
+    fun updateSkillProgression(
+        userId: String,
+        skillId: String,
+        skillProgressionData: SkillProgressionModel,
+        context: Context,
+        ){
+
+        skillRepository.updateSkillProgression(userId, skillId, skillProgressionData, context);
+
+    }
+
     fun retrieveUserSkillProgressionList(
         userId: String,
         context: Context,

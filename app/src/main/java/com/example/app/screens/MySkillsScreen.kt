@@ -1,6 +1,8 @@
 package com.example.app.screens
 
 import android.content.Context
+import android.widget.Button
+import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -21,6 +23,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -96,7 +99,7 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
 }
 
 @Composable
-fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel){
+fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, index:Int,  onClickTask: (Int, SkillTaskModel) -> Unit){
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -121,26 +124,25 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel){
             }
         }
         skillCompleteStructureModel.skillTasks.forEach{
-            TaskListElement(progression = it.value.first, task = it.key)
+            TaskListElement(progression = it.value.first, task = it.key, {onClickTask(index, it.key)})
         }
     }
 }
 
 @Composable
-fun TaskListElement(progression: Int, task: SkillTaskModel){
-    val containerColor = Color(0xFFF0F0F0)
+fun TaskListElement(progression: Int, task: SkillTaskModel, onClickTask: () -> Unit){
 
     CustomProgressIndicator(
         description = task.taskDescription,
         amount = progression,
         required = task.requiredAmount,
         height = 40.dp,
-        {}
+        onClickTask
     )
 }
 
 @Composable
-fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>){
+fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (Int, SkillTaskModel) -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,8 +151,8 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>){
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        listSkills.forEach{skillStructure ->
-            SkillListElement(skillCompleteStructureModel = skillStructure)
+        listSkills.forEachIndexed{index, skillStructure ->
+            SkillListElement(skillCompleteStructureModel = skillStructure, index, onClickTask)
         }
     }
 }
@@ -160,7 +162,7 @@ fun CustomProgressIndicator(description: String, amount: Int, required: Int, hei
     Box(modifier = Modifier
         .fillMaxWidth()
         .height(height)
-        .clickable {  },
+        .clickable{onClickTask()},
         contentAlignment = Alignment.Center
     ){
         Box(modifier = Modifier
@@ -286,7 +288,26 @@ fun MySkillsScreen(navController: NavHostController,
             }
 
 
-            SkillListBlock(listSkills = listCompleteStructures.value)
+            SkillListBlock(listSkills = listCompleteStructures.value
+            ) { index, task ->
+
+                var updatedList = listCompleteStructures.value.toMutableList()
+                var updatedStructure = updatedList.get(index)
+
+                val basedNumber = updatedStructure.skillTasks[task]!!.first
+                var updatedMap = updatedStructure.skillTasks.toMutableMap()
+                updatedMap.set(task, Pair(minOf(task.requiredAmount, basedNumber + 1), 1))
+
+                var updatedProgression = updatedStructure.skillProgression
+                var updatedProgMap = updatedProgression.mapNonCompletedTasks.toMutableMap()
+                updatedProgMap.set(task.id, basedNumber + 1)
+
+                updatedProgression = updatedProgression.copy(mapNonCompletedTasks = updatedProgMap)
+                updatedStructure = updatedStructure.copy(skillProgression = updatedProgression, skillTasks = updatedMap)
+
+                updatedList.set(index, updatedStructure)
+                listCompleteStructures.value = updatedList
+            }
 
         }
     }
