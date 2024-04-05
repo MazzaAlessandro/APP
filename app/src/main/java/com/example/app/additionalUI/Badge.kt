@@ -75,8 +75,22 @@ fun BadgeBanner(
     description : String,
     date : String,
     done: Boolean = true,
+    size: BannerSize = BannerSize.MEDIUM,
     onClick: () -> Unit
 ){
+    var iconSize: Dp = 60.dp
+    var fontSize = 15
+
+    if (size == BannerSize.SMALL){
+        iconSize = 45.dp
+        fontSize = 12
+    }
+
+    if (size == BannerSize.LARGE){
+        iconSize = 75.dp
+        fontSize = 18
+    }
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(5.dp, 2.dp)
@@ -91,7 +105,7 @@ fun BadgeBanner(
             .fillMaxWidth()
             .padding(10.dp),
             verticalAlignment = Alignment.CenterVertically){
-            BadgeIcon(badge, 60.dp, done)
+            BadgeIcon(badge, iconSize, done)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -99,14 +113,14 @@ fun BadgeBanner(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = skillName, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text(text = skillName, fontSize = fontSize.sp, fontWeight = FontWeight.Bold)
 
-                Text(text = description, lineHeight = 15.sp)
+                Text(text = description, fontSize = (fontSize + 1).sp, lineHeight = (fontSize + 1).sp)
 
                 Spacer(modifier = Modifier.fillMaxHeight())
 
                 if(done && date.isNotBlank()){
-                    Text("Achieved on: $date", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("Achieved on: $date", fontSize = (fontSize - 3).sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -204,4 +218,16 @@ fun BadgeCard(
             }
         }
     }
+}
+
+enum class BannerSize(){
+    SMALL,
+    MEDIUM,
+    LARGE
+}
+
+enum class BadgeColor(val color : Color){
+    BRONZE(Color(0xFFCD7F32)),
+    SILVER(Color(0xFFC0C0C0)),
+    GOLD(Color(0xFFFFD700))
 }

@@ -62,6 +62,10 @@ fun ProfileScreen(navController: NavHostController,
 ){
     val context = LocalContext.current
 
+    /*
+    * TODO: connect to Firebase in order to get actual data from the Database
+    *  This is just hard coded
+    * */
     val pieData = listOf(
         PieChartData("Completed Skills: ", 12, color = Color(0xFF6650a4)),
         PieChartData("Skills In progress: ", 5, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
