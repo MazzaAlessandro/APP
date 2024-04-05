@@ -1,34 +1,48 @@
 package com.example.app.screens
 
 import android.content.Context
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -45,6 +59,43 @@ import com.example.app.util.SharedViewModel
 //TODO ADD THE DATES IN THE SKILL PROGRESSIONS
 
 @Composable
+fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
+    val colorCircle = MaterialTheme.colorScheme.primary;
+    var progress by remember { mutableStateOf(0.5f) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color(0XFFF0F0F0),
+                RoundedCornerShape(10)
+            ) // Use the color of the background in your image
+            .padding(horizontal = 20.dp, vertical = 15.dp),
+
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(50.dp) // Set the size of the circle
+                .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
+        )
+        Spacer(Modifier.width(25.dp)) // Space between the circle and the text
+        Column(modifier = Modifier.weight(1f)) {
+            Text(skillCompleteStructureModel.skill.titleSkill, fontSize = 25.sp)
+            Text(skillCompleteStructureModel.skillSection.titleSection,
+                color = Color.White,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .background(color = colorCircle, RoundedCornerShape(20))
+                    .padding(vertical = 5.dp, horizontal = 7.dp)
+                )
+        }
+        val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
+        val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
+        Text(text = completedAmount.toString() + "/" + requiredAmount, fontSize = 20.sp)
+    }
+}
+
+@Composable
 fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel){
 
     Column(modifier = Modifier
@@ -54,33 +105,11 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel){
         .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)){
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10))
-            .background(color = Color(0XFFF0F0F0))
-            .padding(5.dp),
-            contentAlignment = Alignment.Center
-            ){
-            Text(text = skillCompleteStructureModel.skill.titleSkill,
-                fontSize = 28.sp,
-            )
-        }
+
+        SkillTitleBlock(skillCompleteStructureModel)
 
         Row(modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(25.dp)) {
-            Box(modifier = Modifier
-                .weight(2.0f),
-                contentAlignment = Alignment.Center
-            ){
-                Text(
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(40))
-                        .background(color = MaterialTheme.colorScheme.primary)
-                        .padding(vertical = 3.dp, horizontal = 20.dp),
-
-                    text = skillCompleteStructureModel.skillSection.titleSection, color = Color.White, fontSize = 20.sp)
-            }
 
             Box(modifier = Modifier
                 .weight(1.0f)
@@ -88,70 +117,26 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel){
                 .padding(5.dp),
                 contentAlignment = Alignment.Center
             ){
-                val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
-                val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
-                Text(text = completedAmount.toString() + "/" + requiredAmount, fontSize = 15.sp)
+
             }
         }
         skillCompleteStructureModel.skillTasks.forEach{
             TaskListElement(progression = it.value.first, task = it.key)
         }
     }
-
-    /*
-    Row {
-        Column {
-            Row (horizontalArrangement = Arrangement.spacedBy(25.dp)) {
-                Text(text = skillCompleteStructureModel.skill.titleSkill)
-                val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
-                val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
-
-                Text(text = completedAmount.toString() + "/" + requiredAmount)
-            }
-            Row {
-
-            }
-        }
-    }*/
 }
 
 @Composable
 fun TaskListElement(progression: Int, task: SkillTaskModel){
-
     val containerColor = Color(0xFFF0F0F0)
 
-
-    Box(modifier = Modifier
-        .background(color = Color(0xFFD3E9FF), shape = RoundedCornerShape(10.dp))
-        .padding(15.dp)
-    ){
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Text(text = task.taskDescription,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(containerColor, RoundedCornerShape(10))
-                    .padding(10.dp)
-                    .weight(3.0f)
-            )
-
-            Text(
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(40))
-                    .background(color = MaterialTheme.colorScheme.primary)
-                    .padding(vertical = 3.dp, horizontal = 20.dp),
-
-                text = progression.toString() + "/" + task.requiredAmount.toString(), color = Color.White, fontSize = 20.sp)
-
-
-        }
-    }
-
+    CustomProgressIndicator(
+        description = task.taskDescription,
+        amount = progression,
+        required = task.requiredAmount,
+        height = 40.dp,
+        {}
+    )
 }
 
 @Composable
@@ -169,6 +154,41 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>){
         }
     }
 }
+
+@Composable
+fun CustomProgressIndicator(description: String, amount: Int, required: Int, height: Dp, onClickTask: () -> Unit){
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(height)
+        .clickable {  },
+        contentAlignment = Alignment.Center
+    ){
+        Box(modifier = Modifier
+            .fillMaxSize()
+        ){
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White, RoundedCornerShape(10)))
+            Box(modifier = Modifier
+                .fillMaxHeight()
+                .background(Color(0xFFD3E9FF), RoundedCornerShape(10))
+                .fillMaxWidth(amount.toFloat() / required.toFloat()))
+        }
+
+        Row (modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically){
+            Text(text = description,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1.0f))
+
+            Text(text = amount.toString() + "/" + required.toString(),
+                modifier = Modifier.padding(horizontal = 20.dp))
+
+        }
+
+    }
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -251,7 +271,8 @@ fun MySkillsScreen(navController: NavHostController,
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
@@ -266,6 +287,7 @@ fun MySkillsScreen(navController: NavHostController,
 
 
             SkillListBlock(listSkills = listCompleteStructures.value)
+
         }
     }
 
