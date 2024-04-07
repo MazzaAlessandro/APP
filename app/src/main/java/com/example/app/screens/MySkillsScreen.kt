@@ -59,7 +59,7 @@ import com.example.app.models.SkillCompleteStructureModel
 import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
-//TODO ADD THE DATES IN THE SKILL PROGRESSIONS
+//TODO PUT AT LEAST ONE SECTION RESTRICTION
 
 @Composable
 fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
@@ -162,7 +162,7 @@ fun CustomProgressIndicator(description: String, amount: Int, required: Int, hei
     Box(modifier = Modifier
         .fillMaxWidth()
         .height(height)
-        .clickable{onClickTask()},
+        .clickable { onClickTask() },
         contentAlignment = Alignment.Center
     ){
         Box(modifier = Modifier
@@ -191,6 +191,39 @@ fun CustomProgressIndicator(description: String, amount: Int, required: Int, hei
     }
 }
 
+fun ComputeListTaskAdd1(context: Context, index: Int, task: SkillTaskModel, listCompleteStructures: MutableList<SkillCompleteStructureModel>) : MutableList<SkillCompleteStructureModel>{
+    var updatedList = listCompleteStructures
+    var updatedStructure = updatedList.get(index)
+
+    val basedNumber = updatedStructure.skillTasks[task]!!.first
+    var updatedMap = updatedStructure.skillTasks.toMutableMap()
+    //Toast.makeText(context, minOf(basedNumber + 1, task.requiredAmount).toString(), Toast.LENGTH_SHORT).show()
+    updatedMap.set(task, Pair(minOf(basedNumber + 1, task.requiredAmount), task.requiredAmount))
+
+    var updatedProgression = updatedStructure.skillProgression
+    var updatedProgMap = updatedProgression.mapNonCompletedTasks.toMutableMap()
+    updatedProgMap.set(task.id, basedNumber + 1)
+
+    updatedProgression = updatedProgression.copy(mapNonCompletedTasks = updatedProgMap)
+    updatedStructure = updatedStructure.copy(skillProgression = updatedProgression, skillTasks = updatedMap)
+
+    updatedList.set(index, updatedStructure)
+
+    return updatedList
+}
+
+
+fun ComputeSkipSection(index: Int, listCompleteStructures: MutableList<SkillCompleteStructureModel>) : Boolean{
+
+    var updatedList = listCompleteStructures
+    var updatedStructure = updatedList.get(index)
+
+    val mustSkipSection: Boolean = updatedStructure.skillTasks.all {
+        it.value.first == it.value.second
+    }
+
+    return mustSkipSection
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -208,6 +241,17 @@ fun MySkillsScreen(navController: NavHostController,
 
     val currentContext: Context = LocalContext.current;
 
+    var isStartRun: MutableState<Boolean> = remember {
+        mutableStateOf(true)
+    }
+
+    var currentStructureIndex : MutableState<Int> = remember {
+        mutableStateOf(0)
+    }
+
+    var triggerSectionSkip : MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
 
     LaunchedEffect(currentUser) {
         sharedViewModel.retrieveUserSkillProgressionList(
@@ -264,6 +308,64 @@ fun MySkillsScreen(navController: NavHostController,
         }
     }
 
+    LaunchedEffect(triggerSectionSkip.value) {
+
+        if(isStartRun.value){
+            Toast.makeText(currentContext, "HORRIBLE", Toast.LENGTH_SHORT).show()
+            return@LaunchedEffect
+        }
+
+
+        var updatedList = listCompleteStructures.value.toMutableList()
+        var updatedStructure = updatedList.get(currentStructureIndex.value)
+
+
+        var updatedProgression = updatedStructure.skillProgression
+
+        val indexOfSection = updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
+
+        if(indexOfSection == updatedStructure.skill.skillSectionsList.size-1){
+            return@LaunchedEffect
+        }
+
+        updatedProgression.currentSectionId = updatedStructure.skill.skillSectionsList.get(indexOfSection + 1)
+
+        sharedViewModel.retrieveSkillSection(
+            updatedProgression.skillId,
+            updatedProgression.currentSectionId,
+            currentContext,
+        ) { data ->
+            updatedStructure.skillSection = data
+
+            sharedViewModel.retrieveAllSkillTasks(
+                updatedStructure.skill.id,
+                updatedStructure.skillSection.id,
+                updatedStructure.skillSection.skillTasksList,
+                currentContext
+            ) { listTasks ->
+
+                updatedStructure = updatedStructure.copy(skillTasks = listTasks.associate {
+                    Pair(it, Pair(0, it.requiredAmount))
+                })
+
+                updatedProgression = updatedProgression.copy(mapNonCompletedTasks = listTasks.associate {
+                    Pair(it.id, 0)
+                })
+
+                Toast.makeText(currentContext, updatedProgression.mapNonCompletedTasks.size.toString(), Toast.LENGTH_SHORT).show()
+
+                sharedViewModel.saveSkillProgression(updatedProgression, currentContext)
+
+
+                updatedStructure = updatedStructure.copy(skillProgression = updatedProgression)
+                updatedList.set(currentStructureIndex.value, updatedStructure)
+                listCompleteStructures.value = updatedList
+            }
+        }
+
+
+    }
+
     Scaffold(
         topBar = { AppToolBar(title = "My Skills", navController, sharedViewModel) },
         bottomBar = {
@@ -291,24 +393,20 @@ fun MySkillsScreen(navController: NavHostController,
             SkillListBlock(listSkills = listCompleteStructures.value
             ) { index, task ->
 
-                var updatedList = listCompleteStructures.value.toMutableList()
-                var updatedStructure = updatedList.get(index)
+                val updatedList = ComputeListTaskAdd1(currentContext, index, task, listCompleteStructures.value.toMutableList())
 
-                val basedNumber = updatedStructure.skillTasks[task]!!.first
-                var updatedMap = updatedStructure.skillTasks.toMutableMap()
-                updatedMap.set(task, Pair(minOf(task.requiredAmount, basedNumber + 1), 1))
+                val mustSkipSection = ComputeSkipSection(index, updatedList)
+                if(mustSkipSection){
+                    currentStructureIndex.value = index
 
-                var updatedProgression = updatedStructure.skillProgression
-                var updatedProgMap = updatedProgression.mapNonCompletedTasks.toMutableMap()
-                updatedProgMap.set(task.id, basedNumber + 1)
+                    isStartRun.value = false
+                    triggerSectionSkip.value = !triggerSectionSkip.value
+                }else{
+                    sharedViewModel.saveSkillProgression(updatedList.get(index).skillProgression, currentContext)
+                }
 
-                updatedProgression = updatedProgression.copy(mapNonCompletedTasks = updatedProgMap)
-                updatedStructure = updatedStructure.copy(skillProgression = updatedProgression, skillTasks = updatedMap)
-
-                updatedList.set(index, updatedStructure)
                 listCompleteStructures.value = updatedList
             }
-
         }
     }
 

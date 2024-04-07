@@ -83,7 +83,7 @@ class SkillRepository {
                         data(sectionModelData)
                         currentSection.value = sectionModelData
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Data not found SKILLSECT", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception) {
@@ -212,8 +212,6 @@ class SkillRepository {
 
                             if(taskIds.contains(d.toObject<SkillTaskModel>().id)){
                                 currentSkillTaskListF += d.toObject<SkillTaskModel>()
-
-                                Toast.makeText(context, "WAWAWAWAAW", Toast.LENGTH_SHORT).show()
                             }
 
                         }
