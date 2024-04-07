@@ -59,12 +59,10 @@ import com.example.app.models.SkillCompleteStructureModel
 import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
-//TODO PUT AT LEAST ONE SECTION RESTRICTION
 
 @Composable
 fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
     val colorCircle = MaterialTheme.colorScheme.primary;
-    var progress by remember { mutableStateOf(0.5f) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,6 +137,9 @@ fun TaskListElement(progression: Int, task: SkillTaskModel, onClickTask: () -> U
         height = 40.dp,
         onClickTask
     )
+
+
+
 }
 
 @Composable
@@ -218,9 +219,11 @@ fun ComputeSkipSection(index: Int, listCompleteStructures: MutableList<SkillComp
     var updatedList = listCompleteStructures
     var updatedStructure = updatedList.get(index)
 
+    val indexOfSection = updatedStructure.skill.skillSectionsList.indexOf(updatedStructure.skillProgression.currentSectionId)
+
     val mustSkipSection: Boolean = updatedStructure.skillTasks.all {
         it.value.first == it.value.second
-    }
+    } && indexOfSection != updatedStructure.skill.skillSectionsList.size-1
 
     return mustSkipSection
 }

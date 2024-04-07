@@ -1,6 +1,7 @@
 package com.example.app.screens
 
 import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,10 @@ import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+
+
+//TODO MAKE IT POSSIBLE TO ADD SECTION BETWEEN OTHERS
+//TODO MAKE IT POSSIBLE TO ADD TASKS BETWEEN OTERS
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -137,7 +142,6 @@ fun TextFieldInt(value: Int, onValueChange: (String) -> Unit){
     )
 }
 
-
 @Composable
 fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit){
 
@@ -186,8 +190,10 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                onTitleChange: (String) -> Unit,
                onDescriptionChange: (String) -> Unit,
                onAddTask: () -> Unit,
+               onDeleteSection: (Int) -> Unit,
                onChangeTaskDescription: (Int, String) -> Unit,
-               onChangeTaskAmount: (Int, Int) -> Unit){
+               onChangeTaskAmount: (Int, Int) -> Unit,
+               onDeleteTask: (String, Int) -> Unit){
 
     var sectionCounter by remember {
         mutableStateOf(0)
@@ -235,7 +241,10 @@ fun SectionBox(id:Int, section:SkillSectionModel,
 
             listTasks.forEachIndexed{index, task ->
                 
-                TaskBox(id = index, task = task, onDescriptionChange = { onChangeTaskDescription(index, it) }, onAmountChange = { onChangeTaskAmount(index, it.toInt()) })
+                TaskBox(id = index, task = task, onDescriptionChange = { onChangeTaskDescription(index, it) }, onAmountChange = { onChangeTaskAmount(index, it.toInt()) }, {
+                    onDeleteTask(section.id, it)
+                }
+                    )
 
                 Spacer(modifier = Modifier
                     .height(10.dp)
@@ -248,13 +257,17 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                 Text(text = "ADD TASK +")
             }
 
+            Button(onClick = {onDeleteSection(id)}) {
+                Text(text = "DELETE SECTION -")
+            }
+
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, onAmountChange: (String) -> Unit){
+fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, onAmountChange: (String) -> Unit, onDeleteTask: (Int) -> Unit){
 
     Box(modifier = Modifier
         .background(color = Color(0xFFD3E9FF), shape = RoundedCornerShape(10.dp))
@@ -283,6 +296,10 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                 val containerColor = Color(0xFFF0F0F0)
                 TextFieldInt(task.requiredAmount, onAmountChange)
             }
+
+            Button(onClick = {onDeleteTask(id)}) {
+                Text(text = "DELETE TASK -")
+            }
         }
     }
 }
@@ -292,7 +309,6 @@ fun GenerateNewSkillID(): String{
     val newSkillRef = db.collection("skill").document()
     return newSkillRef.id
 }
-
 
 fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>){
 
@@ -315,18 +331,15 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         sharedViewModel.saveSkillTask(it, context)
     }
 
-    val mapNonCompletedTasks: Map<String, Int> = tasks.get("0")?.associate { task ->
+    val mapNonCompletedTasks: Map<String, Int> = tasks.get(sections.get(0).id)?.associate { task ->
         Pair(task.id, 0)
     } ?: mutableMapOf()
 
-    val skillProg = SkillProgressionModel("aaaa", skill.id, "0", mapNonCompletedTasks)
+    val skillProg = SkillProgressionModel("aaaa", skill.id, sections.get(0).id, mapNonCompletedTasks)
     sharedViewModel.saveSkillProgression(skillProg, context)
 }
 
 
-//TODO ADD THE SKILL PROGRESSIONS
-//TODO MAKE SURE THAT EVERYTHING GETS SAVED CORRECTLY
-//TODO SOLVE PROBLEM IN SAVING TASKS
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateScreen(
@@ -348,6 +361,14 @@ fun CreateScreen(
 
     var skillTasks: MutableState<Map<String, MutableList<SkillTaskModel>>> = remember {
         mutableStateOf(mapOf())
+    }
+
+    var sectionIdCounter: MutableState<Int> = remember {
+        mutableStateOf(0)
+    }
+
+    var taskIdCounter: MutableState<Int> = remember {
+        mutableStateOf(0)
     }
 
     val context = LocalContext.current;
@@ -396,12 +417,20 @@ fun CreateScreen(
                         },
                         {
                             val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
-                            updatedList.add(SkillTaskModel(updatedList.size.toString(), section.id, skillID, "", 0))
+                            updatedList.add(SkillTaskModel(taskIdCounter.value.toString(), section.id, skillID, "", 0))
+
+                            taskIdCounter.value += 1;
 
                             val updatedMap = skillTasks.value.toMutableMap()
                             updatedMap[section.id] = updatedList
 
                             skillTasks.value = updatedMap
+                        },
+                        {
+                            skillTasks.value = skillTasks.value - skillSections.value.get(it).id
+
+                            skillSections.value = skillSections.value - skillSections.value.get(it)
+
                         },
                         {id, description ->
                             val updatedTask = skillTasks.value[section.id]?.get(id)?.copy(taskDescription = description) ?: SkillTaskModel()
@@ -424,18 +453,38 @@ fun CreateScreen(
                             updatedMap[section.id] = updatedList
 
                             skillTasks.value = updatedMap
-                        })
+                        },
+                        {idSection, idTask ->
+                            val updatedListTasks = skillTasks.value.get(idSection)
+                                ?.minus(skillTasks.value.get(idSection)!!.get(idTask))
+                            var updatedMapTasks = skillTasks.value.toMutableMap()
+                            updatedMapTasks.set(idSection, updatedListTasks!!.toMutableList())
+
+                            skillTasks.value = updatedMapTasks
+                        }
+                        )
                 }
 
                 item {
                     //TaskBox(1, SkillTaskModel("ddee", "dddd", skillID, "assad dadad dedurica", 2), {}, {})
 
                     Button(onClick = {
-                        skillSections.value = skillSections.value + SkillSectionModel(id = skillSections.value.size.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf())}) {
+                        skillSections.value = skillSections.value + SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf())
+                        sectionIdCounter.value += 1
+                    }) {
                         Text(text = "ADD SECTION +")
                     }
 
                     Button(onClick = {
+
+                        if(skillSections.value.isEmpty()){
+                            Toast.makeText(context, "THERE ARE NO SECTIONS", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }else if(skillTasks.value.any { it.value.isEmpty() } || skillSections.value.any{ !skillTasks.value.keys.contains(it.id) }){
+                            Toast.makeText(context, "THERE IS A SECTION WITHOUT ANY TASKS", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+
                         SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value)
                     }) {
                         Text(text = "SAVE")
