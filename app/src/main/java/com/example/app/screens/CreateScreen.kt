@@ -189,7 +189,7 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                listTasks: List<SkillTaskModel>,
                onTitleChange: (String) -> Unit,
                onDescriptionChange: (String) -> Unit,
-               onAddTask: () -> Unit,
+               onAddTask: (Int) -> Unit,
                onDeleteSection: (Int) -> Unit,
                onChangeTaskDescription: (Int, String) -> Unit,
                onChangeTaskAmount: (Int, Int) -> Unit,
@@ -240,6 +240,14 @@ fun SectionBox(id:Int, section:SkillSectionModel,
             )
 
             listTasks.forEachIndexed{index, task ->
+
+                Button(onClick = {onAddTask(index)}) {
+                    Text(text = "ADD TASK +")
+                }
+
+                Spacer(modifier = Modifier
+                    .height(10.dp)
+                )
                 
                 TaskBox(id = index, task = task, onDescriptionChange = { onChangeTaskDescription(index, it) }, onAmountChange = { onChangeTaskAmount(index, it.toInt()) }, {
                     onDeleteTask(section.id, it)
@@ -249,13 +257,16 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                 Spacer(modifier = Modifier
                     .height(10.dp)
                 )
-                
+
             }
 
-
-            Button(onClick = onAddTask) {
+            Button(onClick = {onAddTask(listTasks.size)}) {
                 Text(text = "ADD TASK +")
             }
+
+            Spacer(modifier = Modifier
+                .height(10.dp)
+            )
 
             Button(onClick = {onDeleteSection(id)}) {
                 Text(text = "DELETE SECTION -")
@@ -385,13 +396,11 @@ fun CreateScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(10.dp)
 
         ){
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
@@ -406,6 +415,19 @@ fun CreateScreen(
                 }
 
                 itemsIndexed(skillSections.value){index, section ->
+                    Button(onClick = {
+
+                        var updatedSkillSections = skillSections.value.toMutableList()
+                        updatedSkillSections.add(index, SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf()))
+
+                        skillSections.value = updatedSkillSections
+                        sectionIdCounter.value += 1
+                    }) {
+                        Text(text = "ADD SECTION +")
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     SectionBox(id = index, section = section, skillTasks.value.get(section.id)?.toList() ?: mutableListOf(),
                         {skillSections.value = skillSections.value.toMutableList().apply {
                             set(index, section.copy(titleSection = it))
@@ -417,7 +439,7 @@ fun CreateScreen(
                         },
                         {
                             val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
-                            updatedList.add(SkillTaskModel(taskIdCounter.value.toString(), section.id, skillID, "", 0))
+                            updatedList.add(it, SkillTaskModel(taskIdCounter.value.toString(), section.id, skillID, "", 0))
 
                             taskIdCounter.value += 1;
 
@@ -463,6 +485,8 @@ fun CreateScreen(
                             skillTasks.value = updatedMapTasks
                         }
                         )
+
+
                 }
 
                 item {
