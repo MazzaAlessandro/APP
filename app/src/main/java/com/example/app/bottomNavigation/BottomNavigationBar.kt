@@ -6,6 +6,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -13,7 +14,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomNavigationBar(navController: NavController){
+fun BottomNavigationBar(navController: NavController,
+                        openDialog: MutableState<Boolean>,
+                        pendingRoute: MutableState<String?>
+){
 
     val items = listOf<BottomNavItem>(
         BottomNavItem.Search,
@@ -30,10 +34,20 @@ fun BottomNavigationBar(navController: NavController){
             NavigationBarItem(
                 selected = currentRoute == item.screen_route,
                 onClick = {
-                          navController.navigate(item.screen_route){
-                              popUpTo(navController.graph.startDestinationId)
-                              launchSingleTop = true
-                          }
+                    if (currentRoute != item.screen_route) {
+                        if (currentRoute == "Create") { // Only show dialog if current screen is "CREATE"
+                            pendingRoute.value = item.screen_route
+                            openDialog.value = true
+                        } else {
+                            // Navigate without confirmation for other screens
+                            navController.navigate(item.screen_route) {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                        }
+
+                    }
+
                 },
                 icon = {
                     Icon(

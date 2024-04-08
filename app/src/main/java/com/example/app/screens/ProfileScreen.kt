@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +59,9 @@ import kotlinx.coroutines.tasks.await
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ProfileScreen(navController: NavHostController,
-                  sharedViewModel: SharedViewModel
+                  sharedViewModel: SharedViewModel,
+                  openDialog: MutableState<Boolean>,
+                  pendingRoute: MutableState<String?>
 ){
     val context = LocalContext.current
 
@@ -118,7 +121,7 @@ fun ProfileScreen(navController: NavHostController,
     Scaffold(
         topBar = { AppToolBar(title = "Profile", navController, sharedViewModel) },
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            BottomNavigationBar(navController = navController, openDialog, pendingRoute)
         }
     ){innerPadding ->
         Column(

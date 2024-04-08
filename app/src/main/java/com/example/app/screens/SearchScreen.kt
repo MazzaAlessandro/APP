@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +35,9 @@ import com.example.app.util.SharedViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(navController: NavHostController,
-                 sharedViewModel: SharedViewModel
+                 sharedViewModel: SharedViewModel,
+                 openDialog: MutableState<Boolean>,
+                 pendingRoute: MutableState<String?>
 ){
     var text by remember {mutableStateOf("")}
     var active by remember {mutableStateOf(false)}
@@ -49,7 +52,7 @@ fun SearchScreen(navController: NavHostController,
     Scaffold(
         topBar = { AppToolBar(title = "Search a Skill", navController, sharedViewModel) },
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            BottomNavigationBar(navController = navController, openDialog, pendingRoute)
         }
     ){innerPadding ->
         Column(

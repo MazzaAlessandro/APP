@@ -232,7 +232,10 @@ fun ComputeSkipSection(index: Int, listCompleteStructures: MutableList<SkillComp
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MySkillsScreen(navController: NavHostController,
-                  sharedViewModel: SharedViewModel
+                  sharedViewModel: SharedViewModel,
+                   openDialog: MutableState<Boolean>,
+                   pendingRoute: MutableState<String?>
+
 ){
 
     var currentUser : MutableState<UserDataModel> = remember{mutableStateOf(UserDataModel())};
@@ -314,7 +317,6 @@ fun MySkillsScreen(navController: NavHostController,
     LaunchedEffect(triggerSectionSkip.value) {
 
         if(isStartRun.value){
-            Toast.makeText(currentContext, "HORRIBLE", Toast.LENGTH_SHORT).show()
             return@LaunchedEffect
         }
 
@@ -372,7 +374,7 @@ fun MySkillsScreen(navController: NavHostController,
     Scaffold(
         topBar = { AppToolBar(title = "My Skills", navController, sharedViewModel) },
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            BottomNavigationBar(navController = navController, openDialog, pendingRoute)
         }
     ){innerPadding ->
         Column(

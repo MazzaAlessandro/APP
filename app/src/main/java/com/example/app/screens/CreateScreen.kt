@@ -57,10 +57,6 @@ import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 
-
-//TODO MAKE IT POSSIBLE TO ADD SECTION BETWEEN OTHERS
-//TODO MAKE IT POSSIBLE TO ADD TASKS BETWEEN OTERS
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextFieldString(value: String, onValueChange: (String) -> Unit, isSingleLine: Boolean){
@@ -355,7 +351,9 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
 @Composable
 fun CreateScreen(
     navController: NavHostController,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
+    openDialog: MutableState<Boolean>,
+    pendingRoute: MutableState<String?>
 ){
 
     val skillID by remember {
@@ -388,7 +386,7 @@ fun CreateScreen(
     Scaffold(
         topBar = { AppToolBar(title = "Create a new Skill", navController, sharedViewModel) },
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            BottomNavigationBar(navController = navController, openDialog, pendingRoute)
         }
     ){innerPadding ->
 
@@ -510,6 +508,8 @@ fun CreateScreen(
                         }
 
                         SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value)
+
+                        navController.navigate("MySkills")
                     }) {
                         Text(text = "SAVE")
                     }
