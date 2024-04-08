@@ -120,14 +120,14 @@ class SkillRepository {
 
     fun retrieveSkillProgression(
         skillId : String,
-        userId : String,
+        userEmail : String,
         context : Context,
         data: (SkillProgressionModel) -> Unit
     ) = CoroutineScope(Dispatchers.IO).launch{
 
         val fireStoreRef = Firebase.firestore
             .collection("skillprogression")
-            .document(userId + skillId)
+            .document(userEmail + skillId)
 
         try{
             fireStoreRef.get()
@@ -146,14 +146,14 @@ class SkillRepository {
     }
 
     fun retrieveSkillPogressionList(
-        userId : String,
+        userEmail : String,
         context : Context,
         data: (List<SkillProgressionModel>) -> Unit
     ) = CoroutineScope(Dispatchers.IO).launch{
 
         val fireStoreRef = Firebase.firestore
             .collection("skillprogression")
-            .whereEqualTo("userId", userId);
+            .whereEqualTo("userMail", userEmail);
 
         try{
             fireStoreRef.get()
@@ -297,7 +297,7 @@ class SkillRepository {
 
         val fireStoreRef = Firebase.firestore
             .collection("skillprogression")
-            .document(skillProgression.userId + skillProgression.skillId)
+            .document(skillProgression.userMail + skillProgression.skillId)
 
         try {
 
@@ -333,14 +333,14 @@ class SkillRepository {
 
 
 
-    fun updateSkillProgression(userId: String,
+    fun updateSkillProgression(userEmail: String,
                                skillId: String,
                                skillProgressionData: SkillProgressionModel,
                                context: Context
     ) = CoroutineScope(Dispatchers.IO).launch{
         val fireStoreRef = Firebase.firestore
             .collection("skillprogression")
-            .document(userId + skillId)
+            .document(userEmail + skillId)
 
         try{
             fireStoreRef.set(skillProgressionData)

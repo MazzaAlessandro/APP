@@ -26,7 +26,7 @@ fun ScreenMain(){
 
 
 
-    NavHost(navController = navController, startDestination = "MySkills") {
+    NavHost(navController = navController, startDestination = "Login") {
 
         composable(Routes.Login.route) {
             LoginScreen(navController = navController, sharedViewModel = sharedViewModel)

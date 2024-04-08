@@ -60,6 +60,11 @@ import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 
 
+//TODO MAKE THE USER CONNECTED TO THE SKILL
+//TODO MAKE IT POSSIBLE FOR A USER TO SEARCH FOR THE SKILL HE CREATED
+//TODO MAKE IT NON AUTOMATIC TO START A SKILL
+
+
 @Composable
 fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
     val colorCircle = MaterialTheme.colorScheme.primary;
@@ -261,7 +266,7 @@ fun MySkillsScreen(navController: NavHostController,
 
     LaunchedEffect(currentUser) {
         sharedViewModel.retrieveUserSkillProgressionList(
-            "aaaa",
+            sharedViewModel.getCurrentUserMail(),
             context = currentContext
         ) { skillProgList ->
 

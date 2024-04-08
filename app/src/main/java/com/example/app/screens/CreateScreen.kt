@@ -342,7 +342,7 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         Pair(task.id, 0)
     } ?: mutableMapOf()
 
-    val skillProg = SkillProgressionModel("aaaa", skill.id, sections.get(0).id, mapNonCompletedTasks)
+    val skillProg = SkillProgressionModel(sharedViewModel.getCurrentUserMail(), skill.id, sections.get(0).id, mapNonCompletedTasks)
     sharedViewModel.saveSkillProgression(skillProg, context)
 }
 
