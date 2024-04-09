@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,11 +49,7 @@ import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
-import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -95,7 +90,7 @@ fun ProfileScreen(navController: NavHostController,
         mutableStateOf(UserDataModel())
     }
 
-    LaunchedEffect(mail){
+    /*LaunchedEffect(mail){
         if (mail != null){
             val userRef = Firebase.firestore
                 .collection("user")
@@ -109,14 +104,14 @@ fun ProfileScreen(navController: NavHostController,
                 }
             }
         }
-    }
-    /*sharedViewModel.retrieveUserData(
+    }*/
+    sharedViewModel.retrieveUserData(
         mail,
         context
     ){
         data ->
-        userData.username = data.username
-    }*/
+        userData = data
+    }
 
     Scaffold(
         topBar = { AppToolBar(title = "Profile", navController, sharedViewModel) },

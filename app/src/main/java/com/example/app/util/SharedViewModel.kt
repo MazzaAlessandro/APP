@@ -107,7 +107,6 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
 
     }
 
-    // The result is in currentUserData
     fun retrieveUserData(
         mail : String,
         context : Context,

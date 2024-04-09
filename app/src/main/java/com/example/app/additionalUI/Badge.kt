@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
-import com.example.app.screens.BadgeData
+import com.example.app.models.BadgeData
 
 //This is the round icon of a Badge that can be used on its own
 @Composable
