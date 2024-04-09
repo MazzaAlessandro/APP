@@ -30,6 +30,9 @@ class SkillRepository {
     private var currentSkill: MutableStateFlow<SkillModel> = MutableStateFlow(SkillModel())
     var skill: StateFlow<SkillModel> = currentSkill.asStateFlow();
 
+    private var currentSkillList: MutableStateFlow<List<SkillModel>> = MutableStateFlow(emptyList())
+    var skillList: StateFlow<List<SkillModel>> = currentSkillList.asStateFlow();
+
     private var currentSection: MutableStateFlow<SkillSectionModel> = MutableStateFlow(SkillSectionModel())
     var section: StateFlow<SkillSectionModel> = currentSection.asStateFlow();
 
@@ -65,7 +68,47 @@ class SkillRepository {
         }
     }
 
-    fun retrieveSkillSection(
+    fun retrieveAllUserSkill(
+        userEmail: String,
+        context: Context,
+        data: (List<SkillModel>) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("skill")
+            .whereEqualTo("creatorEmail", userEmail);
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {documents ->
+                    if (!documents.isEmpty){
+                        val currentSkillListLoc : MutableList<SkillModel> = mutableListOf();
+
+                        for(d in documents){
+
+                            /*
+                            d.toObject(SkillProgressionModel::class.java)?.let { skillprog ->
+                                currentSkillListProgression.value += skillprog
+                            }
+                            */
+
+                            currentSkillListLoc += d.toObject<SkillModel>()!!
+                        }
+
+                        data(currentSkillListLoc)
+                        currentSkillList.value = currentSkillListLoc
+                    } else {
+                        Toast.makeText(context, "Data not HAHA found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+
+        fun retrieveSkillSection(
         skillId: String,
         sectionId: String,
         context: Context,
