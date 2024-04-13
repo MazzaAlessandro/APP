@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
-import com.example.app.util.SharedViewModel
 import com.example.app.models.UserDataModel
+import com.example.app.util.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -164,7 +164,8 @@ fun SignUpScreen(navController: NavHostController,
                                                 FirebaseAuth.getInstance().currentUser!!.uid,
                                                 username.value.text,
                                                 mail.value.text,
-                                                pfpUri.value),
+                                                pfpUri.value,
+                                            ),
                                             context
                                         )
                                         sharedViewModel.setCurrentUserMail(mail.value.text)

@@ -6,4 +6,5 @@ data class UserDataModel(
     var mail : String = "",
     var pfpUri : String = "",
     var listSkillProgressions: List<String> = mutableListOf(),
+    var badgeCounter : List<Int> = mutableListOf(0, 0, 0)
 )

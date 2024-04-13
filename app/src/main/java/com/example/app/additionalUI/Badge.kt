@@ -1,5 +1,6 @@
 package com.example.app.additionalUI
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import com.example.app.R
 import com.example.app.models.BadgeData
 
 //This is the round icon of a Badge that can be used on its own
@@ -46,24 +48,22 @@ fun BadgeIcon(
     size : Dp,
     filled : Boolean = true
 ){
+    var id = R.drawable.empty
+
     if(filled){
-        Box(
-            modifier = Modifier
-                .size(size)
-                .border(1.dp, Color.DarkGray.copy(alpha = 0.75f), CircleShape)
-                .clip(CircleShape)
-                .background(badge.color)
-        )
+        id = when (badge) {
+            BadgeColor.GOLD -> R.drawable.gold
+            BadgeColor.SILVER -> R.drawable.silver
+            BadgeColor.BRONZE -> R.drawable.bronze
+        }
     }
-    else{
-        Box(
-            modifier = Modifier
-                .size(size)
-                .border(1.dp, Color.DarkGray.copy(alpha = 0.75f),CircleShape)
-                .clip(CircleShape)
-                .background(Color.Black.copy(alpha = 0.5f))
-        )
-    }
+
+    Image(
+        modifier = Modifier
+            .size(size),
+        painter = painterResource(id = id),
+        contentDescription = "gold"
+    )
 }
 
 //This is a banner that includes the icon, the name of the skill, the description of the badge and, if completed, the date of completion

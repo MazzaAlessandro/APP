@@ -142,7 +142,8 @@ fun ModifyAccountScreen(navController: NavHostController,
                                         FirebaseAuth.getInstance().currentUser!!.uid,
                                         username.value.text,
                                         sharedViewModel.getCurrentUserMail(),
-                                        pfpUri.value),
+                                        pfpUri.value,
+                                    ),
                                 )
                                 updating.value = false
                                 navController.navigate(Routes.Profile.route)

@@ -64,18 +64,7 @@ fun ProfileScreen(navController: NavHostController,
     * TODO: connect to Firebase in order to get actual data from the Database
     *  This is just hard coded
     * */
-    val pieData = listOf(
-        PieChartData("Completed Skills: ", 12, color = Color(0xFF6650a4)),
-        PieChartData("Skills In progress: ", 5, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
-        PieChartData("Unstarted Skills: ", 9, color = Color.Gray.copy(alpha = 0.5f))
-    )
 
-    val stat = listOf(
-        StatData("Total days using the app:", 356),
-        StatData("Consecutive days using the app:", 21),
-        StatData("Badges obtained:", 12),
-        StatData("Total Skills:", 26)
-    )
 
     if(FirebaseAuth.getInstance().currentUser != null && sharedViewModel.getCurrentUserMail().isBlank()){
         val currMail = FirebaseAuth.getInstance().currentUser?.email
@@ -112,6 +101,19 @@ fun ProfileScreen(navController: NavHostController,
         data ->
         userData = data
     }
+
+    val pieData = listOf(
+        PieChartData("Completed Skills: ", 12, color = Color(0xFF6650a4)),
+        PieChartData("Skills In progress: ", 5, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
+        PieChartData("Unstarted Skills: ", 9, color = Color.Gray.copy(alpha = 0.5f))
+    )
+
+    val stat = listOf(
+        StatData("Total days using the app:", 356),
+        StatData("Consecutive days using the app:", 21),
+        StatData("Badges obtained:", userData.badgeCounter.sum()),
+        StatData("Total Skills:", 26)
+    )
 
     Scaffold(
         topBar = { AppToolBar(title = "Profile", navController, sharedViewModel) },
@@ -164,32 +166,33 @@ fun ProfileScreen(navController: NavHostController,
 
                 Row (modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.BRONZE, 75.dp)
+                        BadgeIcon(BadgeColor.GOLD, 85.dp)
 
                         Spacer(modifier = Modifier.height(5.dp))
 
-                        Text(text = "34", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                        Text(userData.badgeCounter[0].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.SILVER, 75.dp)
+                        BadgeIcon(BadgeColor.SILVER, 85.dp)
 
                         Spacer(modifier = Modifier.height(5.dp))
 
-                        Text("25", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                        Text(userData.badgeCounter[1].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.GOLD, 75.dp)
+                        BadgeIcon(BadgeColor.BRONZE, 85.dp)
 
                         Spacer(modifier = Modifier.height(5.dp))
 
-                        Text("12", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                        Text(userData.badgeCounter[2].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
+
                 }
             }
 

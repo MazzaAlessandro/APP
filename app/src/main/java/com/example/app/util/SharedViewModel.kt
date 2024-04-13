@@ -116,6 +116,14 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         userRepository.retrieveData(mail, context, data);
     }
 
+    fun retrieveProfileStats(
+        mail : String,
+        context : Context,
+        data: (UserDataModel) -> Unit
+    ){
+
+    }
+
     fun retrieveSkillProgression(
         userEmail: String,
         skillId: String,
