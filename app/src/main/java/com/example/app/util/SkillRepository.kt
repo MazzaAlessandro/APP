@@ -36,6 +36,11 @@ class SkillRepository {
     private var currentSection: MutableStateFlow<SkillSectionModel> = MutableStateFlow(SkillSectionModel())
     var section: StateFlow<SkillSectionModel> = currentSection.asStateFlow();
 
+    private var currentSectionList: MutableStateFlow<List<SkillSectionModel>> = MutableStateFlow(
+        emptyList()
+    )
+    var sectionList: StateFlow<List<SkillSectionModel>> = currentSectionList.asStateFlow();
+
     private var currentTask: MutableStateFlow<SkillTaskModel> = MutableStateFlow(SkillTaskModel())
     var task: StateFlow<SkillTaskModel> = currentTask.asStateFlow()
 
@@ -134,6 +139,44 @@ class SkillRepository {
         }
     }
 
+
+    fun retrieveAllSkillSection(
+        skillId: String,
+        context: Context,
+        data: (List<SkillSectionModel>) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("skillsection")
+            .whereEqualTo("idSkill", skillId);
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {documents ->
+                    if (!documents.isEmpty){
+                        val currentSkillSectionList : MutableList<SkillSectionModel> = mutableListOf();
+
+                        for(d in documents){
+
+                            /*
+                            d.toObject(SkillProgressionModel::class.java)?.let { skillprog ->
+                                currentSkillListProgression.value += skillprog
+                            }
+                            */
+
+                            currentSkillSectionList += d.toObject<SkillSectionModel>()!!
+                        }
+
+                        data(currentSkillSectionList)
+                        currentSectionList.value = currentSkillSectionList
+                    } else {
+                        Toast.makeText(context, "Data not SECT LIST found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
     fun retrieveSkillTask(
         skillId: String,
         sectionId: String,
