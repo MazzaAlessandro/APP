@@ -63,14 +63,19 @@ import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
 
-//TODO FIRST IT SHOULD LOAD THE LIST OF SKILLS AND SKILL PROGRESSIONS
-//THE SKILLS ARE USED TO GET ITS SKILLS
-//THE PROGRESSIONS ARE USED TO KNOW IF THE SKILLS ARE STARTED OR NOT
+
+//TODO PROBLEMS WITH PROG SAVE
+
 //TODO DEFINE A SEARCH OBJECT UI
 //TODO PUT A BUTTON TO ENROLL TO THAT SKILL
 //TODO THINK ABOUT THE ACTIONS THAT SHOULD BE DONE WHEN CLICKING ON A SKILL
 
 //TODO CHANGE THE ON ADD PROGRESSION SINCE THINGS ARE ALREADY COMPUTED
+
+//TODO SAVE FROM CREATE AND DELETE ON SAVE SYSTEM PROPERTIES
+
+
+//TODO CALLS VIEWMODEL
 
 enum class SelectedSkillState{
     NOT_SELECTED, NEW_SELECTED, REG_SELECTED
@@ -238,12 +243,23 @@ fun SkillInfoPopUp_STARTED(sharedViewModel: SharedViewModel, skill: SkillModel, 
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
 
 
                     SkillTitleBlock(completeStructure.value)
 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                            .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
+                    ){
+                        Text(text = skill.skillDescription,
+                            modifier = Modifier.padding(15.dp),
+                            fontSize = 12.sp,
+                            color = Color.Black)
+                    }
 
                     sectionsList.value.forEach{section ->
                         val indexOfCurrent = skill.skillSectionsList.indexOf(section.id)
@@ -310,9 +326,11 @@ fun SkillInfoPopUp_UNSTARTED(skill: SkillModel, sharedViewModel: SharedViewModel
     ){
         Popup(
             alignment = Alignment.Center,
+
             properties = PopupProperties(
                 excludeFromSystemGesture = true,
             ),
+
             // to dismiss on click outside
             onDismissRequest = { onCloseClick() }
         ){
@@ -322,8 +340,8 @@ fun SkillInfoPopUp_UNSTARTED(skill: SkillModel, sharedViewModel: SharedViewModel
                     .height(525.dp)
                     .clip(shape = RoundedCornerShape(10.dp))
                     .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.surface),
-                contentAlignment = Alignment.Center
+                    .background(MaterialTheme.colorScheme.surface)
+                    .verticalScroll(rememberScrollState()),
             ) {
                 IconButton(
                     onClick = {
@@ -337,18 +355,64 @@ fun SkillInfoPopUp_UNSTARTED(skill: SkillModel, sharedViewModel: SharedViewModel
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
 
-                    Text(
-                        text = skill.skillDescription,
+
+                    val colorCircle = MaterialTheme.colorScheme.primary;
+                    Row(
                         modifier = Modifier
-                            .padding(15.dp, 0.dp, 15.dp, 10.dp),
-                        textAlign = TextAlign.Center
-                    )
+                            .fillMaxWidth()
+                            .background(
+                                Color(0XFFF0F0F0),
+                                RoundedCornerShape(10)
+                            ) // Use the color of the background in your image
+                            .padding(horizontal = 20.dp, vertical = 15.dp),
+
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp) // Set the size of the circle
+                                .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
+                        )
+                        Spacer(Modifier.width(25.dp)) // Space between the circle and the text
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(skill.titleSkill, fontSize = 25.sp)
+                            Text(skill.skillSectionsList.count().toString() + " sections",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .background(color = colorCircle, RoundedCornerShape(20))
+                                    .padding(vertical = 5.dp, horizontal = 7.dp)
+                            )
+                        }
+                        Text(text = "02/11/2024", fontSize = 20.sp)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                            .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
+                    ){
+                        Text(text = skill.skillDescription,
+                            modifier = Modifier.padding(15.dp),
+                            fontSize = 12.sp,
+                            color = Color.Black)
+                    }
+
+                    sectionsList.value.forEach{section ->
+                        SectionElementBlock(
+                            section = section,
+                            amount = 0,
+                            required = 1,
+                            sharedViewModel = sharedViewModel
+                        )
+                    }
                     
                     Button(onClick = { onAddProgression() }) {
-                        Text(text = "START SKILL")
+                        Text(text = "START SKILL +")
                     }
 
                 }
@@ -387,7 +451,6 @@ fun SearchScreen(navController: NavHostController,
     var skillSelected: MutableState<SkillModel> = remember {
         mutableStateOf(SkillModel())
     }
-
 
     LaunchedEffect(Unit) {
         sharedViewModel.retrieveUserSkillProgressionList(

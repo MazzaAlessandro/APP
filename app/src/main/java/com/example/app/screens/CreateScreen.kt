@@ -68,7 +68,7 @@ fun TextFieldString(value: String, onValueChange: (String) -> Unit, isSingleLine
     TextField(value = value,
         onValueChange = onValueChange,
         modifier = Modifier
-            .padding(10.dp)
+            .padding(vertical = 10.dp)
             .fillMaxWidth(),
         singleLine = isSingleLine,
         colors = TextFieldDefaults.colors(

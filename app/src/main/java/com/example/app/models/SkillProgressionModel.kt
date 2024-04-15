@@ -7,4 +7,5 @@ import kotlinx.android.parcel.Parcelize
 data class SkillProgressionModel (var userMail:String = "",
                              var skillId: String = "",
                              var currentSectionId: String = "",
-                             var mapNonCompletedTasks: Map<String, Int> = mutableMapOf()): Parcelable
+                             var mapNonCompletedTasks: Map<String, Int> = mutableMapOf(),
+                            var isFinished: Boolean = mapNonCompletedTasks.isEmpty()): Parcelable

@@ -198,7 +198,13 @@ fun ComputeListTaskAdd1(context: Context, index: Int, task: SkillTaskModel, list
 
     var updatedProgression = updatedStructure.skillProgression
     var updatedProgMap = updatedProgression.mapNonCompletedTasks.toMutableMap()
-    updatedProgMap.set(task.id, basedNumber + 1)
+
+    if(basedNumber + 1 >= task.requiredAmount){
+        updatedProgMap.remove(task.id)
+    }else{
+        updatedProgMap.set(task.id, minOf(basedNumber + 1, task.requiredAmount))
+    }
+
 
     updatedProgression = updatedProgression.copy(mapNonCompletedTasks = updatedProgMap)
     updatedStructure = updatedStructure.copy(skillProgression = updatedProgression, skillTasks = updatedMap)
