@@ -20,6 +20,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -79,6 +80,8 @@ fun ProfileScreen(navController: NavHostController,
         mutableStateOf(UserDataModel())
     }
 
+    var skillProgressionList : List<Int> = mutableListOf(1, 2, 3)
+
     /*LaunchedEffect(mail){
         if (mail != null){
             val userRef = Firebase.firestore
@@ -103,16 +106,16 @@ fun ProfileScreen(navController: NavHostController,
     }
 
     val pieData = listOf(
-        PieChartData("Completed Skills: ", 12, color = Color(0xFF6650a4)),
-        PieChartData("Skills In progress: ", 5, color = Color(0xFF6650a4).copy(alpha = 0.75f)),
-        PieChartData("Unstarted Skills: ", 9, color = Color.Gray.copy(alpha = 0.5f))
+        PieChartData("Completed Skills: ", skillProgressionList[0], color = MaterialTheme.colorScheme.primary),
+        PieChartData("Skills In progress: ", skillProgressionList[1], color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+        PieChartData("Unstarted Skills: ", skillProgressionList[2], color = Color.Gray.copy(alpha = 0.5f))
     )
 
     val stat = listOf(
         StatData("Total days using the app:", 356),
-        StatData("Consecutive days using the app:", 21),
+        //StatData("Consecutive days using the app:", 21),
         StatData("Badges obtained:", userData.badgeCounter.sum()),
-        StatData("Total Skills:", 26)
+        StatData("Total Skills:", skillProgressionList.sum())
     )
 
     Scaffold(
@@ -170,7 +173,7 @@ fun ProfileScreen(navController: NavHostController,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.GOLD, 85.dp)
+                        BadgeIcon(BadgeColor.GOLD, 90.dp)
 
                         Spacer(modifier = Modifier.height(5.dp))
 
@@ -178,7 +181,7 @@ fun ProfileScreen(navController: NavHostController,
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.SILVER, 85.dp)
+                        BadgeIcon(BadgeColor.SILVER, 90.dp)
 
                         Spacer(modifier = Modifier.height(5.dp))
 
@@ -186,7 +189,7 @@ fun ProfileScreen(navController: NavHostController,
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.BRONZE, 85.dp)
+                        BadgeIcon(BadgeColor.BRONZE, 90.dp)
 
                         Spacer(modifier = Modifier.height(5.dp))
 
