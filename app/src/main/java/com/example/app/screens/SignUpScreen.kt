@@ -43,6 +43,7 @@ import androidx.navigation.NavHostController
 import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.models.UserDataModel
+import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -169,6 +170,9 @@ fun SignUpScreen(navController: NavHostController,
                                             context
                                         )
                                         sharedViewModel.setCurrentUserMail(mail.value.text)
+
+                                        sharedViewModel.saveUserSub(UserSkillSubsModel(userEmail = mail.value.text), context)
+
                                         authenticating.value = false
                                         navController.navigate(Routes.Profile.route)
                                     }

@@ -1,14 +1,12 @@
 package com.example.app.util
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.widget.Toast
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
-import com.example.app.models.UserDataModel
+import com.example.app.models.UserSkillSubsModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
@@ -23,6 +21,9 @@ class SkillRepository {
 
     private var currentSkillProgression: MutableStateFlow<SkillProgressionModel> = MutableStateFlow(SkillProgressionModel());
     var skillProgression: StateFlow<SkillProgressionModel> = currentSkillProgression.asStateFlow();
+
+    private var currentUserSub: MutableStateFlow<UserSkillSubsModel> = MutableStateFlow(UserSkillSubsModel());
+    var userSub: StateFlow<UserSkillSubsModel> = currentUserSub.asStateFlow();
 
     private var currentSkillListProgression: MutableStateFlow<List<SkillProgressionModel>> = MutableStateFlow(emptyList())
     var skillListProgression: StateFlow<List<SkillProgressionModel>> = currentSkillListProgression.asStateFlow();
@@ -98,6 +99,46 @@ class SkillRepository {
                             */
 
                             currentSkillListLoc += d.toObject<SkillModel>()!!
+                        }
+
+                        data(currentSkillListLoc)
+                        currentSkillList.value = currentSkillListLoc
+                    } else {
+                        Toast.makeText(context, "Data not HAHA found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    fun retrieveSkillsFromList(
+        context: Context,
+        listSkills: List<String>,
+        data: (List<SkillModel>) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("skill")
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {documents ->
+                    if (!documents.isEmpty){
+                        val currentSkillListLoc : MutableList<SkillModel> = mutableListOf();
+
+                        for(d in documents){
+
+                            /*
+                            d.toObject(SkillProgressionModel::class.java)?.let { skillprog ->
+                                currentSkillListProgression.value += skillprog
+                            }
+                            */
+
+                            if(d.toObject<SkillModel>()!!.id in listSkills){
+                                currentSkillListLoc += d.toObject<SkillModel>()!!
+                            }
                         }
 
                         data(currentSkillListLoc)
@@ -231,6 +272,32 @@ class SkillRepository {
         }
     }
 
+    fun retrieveUserSkillSub(
+        userEmail : String,
+        context : Context,
+        data: (UserSkillSubsModel) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("usersub")
+            .document(userEmail)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val userSkillSub = it.toObject<UserSkillSubsModel>()!!
+                        data(userSkillSub)
+                        currentUserSub.value = userSkillSub
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     fun retrieveSkillPogressionList(
         userEmail : String,
         context : Context,
@@ -325,6 +392,27 @@ class SkillRepository {
         try {
 
             fireStoreRef.set(skillData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun saveUserSkillSub(
+        userSub: UserSkillSubsModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("usersub")
+            .document(userSub.userEmail)
+
+        try {
+
+            fireStoreRef.set(userSub)
                 .addOnSuccessListener {
                     Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
@@ -430,6 +518,23 @@ class SkillRepository {
 
         try{
             fireStoreRef.set(skillProgressionData)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun updateUserSub(         userSub: UserSkillSubsModel,
+                               context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("usersub")
+            .document(userSub.userEmail)
+
+        try{
+            fireStoreRef.set(userSub)
                 .addOnSuccessListener {
                     Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }

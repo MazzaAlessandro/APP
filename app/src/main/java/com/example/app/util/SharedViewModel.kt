@@ -10,6 +10,7 @@ import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
+import com.example.app.models.UserSkillSubsModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -144,6 +145,20 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
 
     }
 
+    fun updateUserSub(
+        userSub: UserSkillSubsModel,
+        context: Context
+    ){
+        skillRepository.updateUserSub(userSub, context)
+    }
+
+    fun saveUserSub(
+        userSub: UserSkillSubsModel,
+        context: Context,
+    ){
+        skillRepository.saveUserSkillSub(userSub, context)
+    }
+
     fun retrieveUserSkillProgressionList(
         userEmail: String,
         context: Context,
@@ -159,6 +174,14 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         data: (SkillModel) -> Unit
     ){
         skillRepository.retrieveSkill(skillId, context, data)
+    }
+
+    fun retrieveSkillsFromList(
+        context: Context,
+        listSkills: List<String>,
+        data: (List<SkillModel>) -> Unit
+    ){
+        skillRepository.retrieveSkillsFromList(context, listSkills, data)
     }
 
     fun retrieveAllUserSkill(
@@ -204,6 +227,14 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         data: (List<SkillTaskModel>) -> Unit
     ){
         skillRepository.retrieveAllSkillTasks(skillId, sectionId, taskIds, context, data)
+    }
+
+    fun retrieveUserSkillSub(
+        userEmail : String,
+        context : Context,
+        data: (UserSkillSubsModel) -> Unit
+    ){
+        skillRepository.retrieveUserSkillSub(userEmail, context, data)
     }
 
     fun popUpOn(){

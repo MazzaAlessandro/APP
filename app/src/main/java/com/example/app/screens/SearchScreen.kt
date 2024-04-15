@@ -1,6 +1,5 @@
 package com.example.app.screens
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +51,6 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.app.Routes
-import com.example.app.additionalUI.BadgeIcon
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillCompleteStructureModel
@@ -61,6 +58,7 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
+import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
 
 
@@ -436,7 +434,11 @@ fun SearchScreen(navController: NavHostController,
     var skillTitleEditText by remember {mutableStateOf("")}
     var active by remember {mutableStateOf(false)}
 
-    var skillModels: List<SkillModel> = remember {
+    var skillModelsSearchBar: List<SkillModel> = remember {
+        mutableListOf()
+    }
+
+    var skillModelsRegistered: List<SkillModel> = remember {
         mutableListOf()
     }
 
@@ -452,6 +454,10 @@ fun SearchScreen(navController: NavHostController,
         mutableStateOf(SkillModel())
     }
 
+    var currentUserSkillSubs: MutableState<UserSkillSubsModel> = remember {
+        mutableStateOf(UserSkillSubsModel())
+    }
+
     LaunchedEffect(Unit) {
         sharedViewModel.retrieveUserSkillProgressionList(
             sharedViewModel.getCurrentUserMail(),
@@ -464,7 +470,18 @@ fun SearchScreen(navController: NavHostController,
             sharedViewModel.getCurrentUserMail(),
             currentContext
         ){
-            skillModels = it
+            skillModelsSearchBar = it
+        }
+
+        sharedViewModel.retrieveUserSkillSub(
+            sharedViewModel.getCurrentUserMail(),
+            currentContext,
+        ){
+            currentUserSkillSubs.value = it
+
+            sharedViewModel.retrieveSkillsFromList(currentContext, currentUserSkillSubs.value.registeredSkillsIDs){
+                skillModelsRegistered = it
+            }
         }
     }
 
@@ -514,7 +531,7 @@ fun SearchScreen(navController: NavHostController,
                         )
                     }
                 }) {
-                skillModels.forEach{
+                skillModelsSearchBar.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.forEach{
                     SkillSearchBlock(it, it.id in skillProgressions.map { it.skillId })
                     {
                         skillSelected.value = it
@@ -523,6 +540,19 @@ fun SearchScreen(navController: NavHostController,
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Column {
+            skillModelsRegistered.forEach{
+                SkillSearchBlock(skill = it, isInProgress = false) {
+                    
+                }
+            }
+        }
+
+
+
 
         if(isSkillSelected.value == SelectedSkillState.NEW_SELECTED){
             Box(){
