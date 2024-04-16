@@ -6,7 +6,11 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class UserSkillSubsModel(
     var userEmail: String = "",
+
+    //the skill that he started even if they are finished
     var startedSkillsIDs: List<String> = emptyList(),
+
+    //the skills he registered for without starting
     var registeredSkillsIDs: List<String> = emptyList()
 ) : Parcelable {
 }

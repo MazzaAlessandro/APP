@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -538,6 +539,17 @@ fun SearchScreen(navController: NavHostController,
                         isSkillSelected.value = if (it.id in skillProgressions.map { it.skillId }) SelectedSkillState.REG_SELECTED else SelectedSkillState.NEW_SELECTED
                     }
                 }
+
+                /*
+                Divider(color = Color.Black)
+
+                skillModelsSearchBar.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.forEach{
+                    SkillSearchBlock(it, it.id in skillProgressions.map { it.skillId })
+                    {
+                        skillSelected.value = it
+                        isSkillSelected.value = if (it.id in skillProgressions.map { it.skillId }) SelectedSkillState.REG_SELECTED else SelectedSkillState.NEW_SELECTED
+                    }
+                }*/
             }
         }
 

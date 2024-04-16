@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +50,9 @@ import com.example.app.additionalUI.PieChartData
 import com.example.app.additionalUI.StatData
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
+import com.example.app.models.SkillProgressionModel
 import com.example.app.models.UserDataModel
+import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -81,35 +85,42 @@ fun ProfileScreen(navController: NavHostController,
         mutableStateOf(UserDataModel())
     }
 
-    var skillProgressionList : MutableList<Int> = mutableListOf(0, 0, 0)
+    var skillProgressionList : MutableState<MutableList<SkillProgressionModel>> = remember{
+        mutableStateOf(mutableListOf())
+    }
 
     val primaryColor = MaterialTheme.colorScheme.primary
 
-
-
-    /*LaunchedEffect(mail){
-        if (mail != null){
-            val userRef = Firebase.firestore
-                .collection("user")
-                .document(mail)
-            val userSnapshot = userRef.get().await()
-
-            if (userSnapshot.exists()){
-                val user = userSnapshot.toObject<UserDataModel>()
-                user?.let {
-                    userData = it
-                }
-            }
-        }
-    }*/
-    sharedViewModel.retrieveUserData(
-        mail,
-        context
-    ){
-        data ->
-        userData = data
+    val userSkillSubsModel: MutableState<UserSkillSubsModel> = remember {
+        mutableStateOf(UserSkillSubsModel())
     }
 
+    LaunchedEffect(userData) {
+        Toast.makeText(context, "AAAAAHI", Toast.LENGTH_SHORT).show()
+        sharedViewModel.retrieveUserData(
+            mail,
+            context
+        ){
+            userData = it
+
+            sharedViewModel.retrieveUserSkillSub(
+                mail,
+                context
+            ){
+                userSkillSubsModel.value = it
+
+                sharedViewModel.retrieveUserSkillProgressionList(
+                    mail,
+                    context
+                ){
+                    skillProgressionList.value = it.toMutableList()
+                }
+
+            }
+        }
+    }
+
+    /*
     sharedViewModel.retrieveUserSkillProgressionList(
             mail,
             context = context
@@ -139,11 +150,9 @@ fun ProfileScreen(navController: NavHostController,
         sharedViewModel.updateUserData(userData, context)
     }
 
-    var pieData = mutableListOf(
-        PieChartData("Completed Skills: ", userData.listSkillProgressions[0], primaryColor),
-        PieChartData("Skills In progress: ", userData.listSkillProgressions[1], primaryColor.copy(alpha = 0.5f)),
-        PieChartData("Unstarted Skills: ", userData.listSkillProgressions[2], color = Color.Gray.copy(alpha = 0.5f))
-    )
+     */
+
+
 
     val stat = listOf(
         StatData("Total days using the app:", 356),
@@ -247,6 +256,12 @@ fun ProfileScreen(navController: NavHostController,
                 .padding(20.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+
+                var pieData = mutableListOf(
+                    PieChartData("Completed Skills: ", skillProgressionList.value.filter { it.isFinished }.count(), primaryColor),
+                    PieChartData("Skills In progress: ", skillProgressionList.value.filter { !it.isFinished }.count(), primaryColor.copy(alpha = 0.5f)),
+                    PieChartData("Unstarted Skills: ", userSkillSubsModel.value.registeredSkillsIDs.count(), color = Color.Gray.copy(alpha = 0.5f))
+                )
                 AnimatedPieChart(
                     modifier = Modifier
                         .padding(10.dp),
