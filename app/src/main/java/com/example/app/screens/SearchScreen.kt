@@ -564,7 +564,7 @@ fun SearchScreen(navController: NavHostController,
                         .padding(10.dp),
                     onValueChange = {skillTitleEditText = it})
 
-                Text(text = "SKILLS STARTED - " + skillModelsStarted.value.count(), fontSize = 25.sp)
+                Text(text = "SKILLS STARTED - " + skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count(), fontSize = 25.sp)
             }
 
 
@@ -580,7 +580,7 @@ fun SearchScreen(navController: NavHostController,
             item{
                 Divider(color = Color.Black)
 
-                Text(text = "SKILLS REGISTERED - " + skillModelsStarted.value.count(), fontSize = 25.sp)
+                Text(text = "SKILLS REGISTERED - " + skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count(), fontSize = 25.sp)
             }
 
             items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
@@ -595,7 +595,7 @@ fun SearchScreen(navController: NavHostController,
             item{
                 Divider(color = Color.Black)
 
-                Text(text = "SKILLS CREATED - " + skillModelsStarted.value.count(), fontSize = 25.sp)
+                Text(text = "SKILLS CREATED - " + skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count(), fontSize = 25.sp)
             }
 
             items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
