@@ -96,7 +96,6 @@ fun ProfileScreen(navController: NavHostController,
     }
 
     LaunchedEffect(userData) {
-        Toast.makeText(context, "AAAAAHI", Toast.LENGTH_SHORT).show()
         sharedViewModel.retrieveUserData(
             mail,
             context

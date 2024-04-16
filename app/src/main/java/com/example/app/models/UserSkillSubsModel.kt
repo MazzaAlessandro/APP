@@ -11,6 +11,9 @@ data class UserSkillSubsModel(
     var startedSkillsIDs: List<String> = emptyList(),
 
     //the skills he registered for without starting
-    var registeredSkillsIDs: List<String> = emptyList()
+    var registeredSkillsIDs: List<String> = emptyList(),
+
+    //the skills he created but didn't register nor start
+    var createdSkillsId: List<String> = emptyList()
 ) : Parcelable {
 }

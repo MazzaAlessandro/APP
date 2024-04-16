@@ -224,7 +224,7 @@ fun ComputeSkipSection(index: Int, listCompleteStructures: MutableList<SkillComp
 
     val mustSkipSection: Boolean = updatedStructure.skillTasks.all {
         it.value.first == it.value.second
-    } && indexOfSection != updatedStructure.skill.skillSectionsList.size-1
+    }
 
     return mustSkipSection
 }
@@ -331,6 +331,8 @@ fun MySkillsScreen(navController: NavHostController,
         val indexOfSection = updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
 
         if(indexOfSection == updatedStructure.skill.skillSectionsList.size-1){
+            sharedViewModel.saveSkillProgression(listCompleteStructures.value.get(currentStructureIndex.value).skillProgression.copy(isFinished = true), currentContext)
+
             return@LaunchedEffect
         }
 

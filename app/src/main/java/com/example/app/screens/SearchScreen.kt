@@ -16,13 +16,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,8 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -77,7 +78,7 @@ import com.example.app.util.SharedViewModel
 //TODO CALLS VIEWMODEL
 
 enum class SelectedSkillState{
-    NOT_SELECTED, NEW_SELECTED, REG_SELECTED
+    NOT_SELECTED, NEW_SELECTED, SARTED_SELECTED, REGISTERED_SELECTED
 }
 
 @Composable
@@ -114,7 +115,7 @@ fun SectionElementBlock(section: SkillSectionModel, amount: Int, required: Int, 
 }
 
 @Composable
-fun SkillSearchBlock(skill: SkillModel, isInProgress: Boolean, onClick: () -> Unit){
+fun SkillSearchBlock(skill: SkillModel, selectedSkillState: SelectedSkillState, onClick: () -> Unit){
     val colorCircle = MaterialTheme.colorScheme.primary;
     Row(
         modifier = Modifier
@@ -138,14 +139,35 @@ fun SkillSearchBlock(skill: SkillModel, isInProgress: Boolean, onClick: () -> Un
         Column(modifier = Modifier.weight(1f)) {
             Text(skill.titleSkill, fontSize = 25.sp)
 
-            if(isInProgress){
-                Text(text = "Already in progress", fontSize = 12.sp)
-            }else{
+            if(selectedSkillState == SelectedSkillState.SARTED_SELECTED){
+                Text(text = "Already in progress", fontSize = 12.sp, color = Color.White,
+                    modifier = Modifier
+                        .background(Color.Blue, shape = RoundedCornerShape(40.dp))
+                        .padding(horizontal = 20.dp, vertical = 2.dp)
+                )
+            }else if (selectedSkillState == SelectedSkillState.NEW_SELECTED){
                 Row(Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                     ) {
                     Text(text = "Not started", fontSize = 12.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier
+                    )
+
+                    val sectionAmount = skill.skillSectionsList.size
+
+                    Text(text = sectionAmount.toString() + " section" + if(sectionAmount > 1) "s" else "", fontSize = 12.sp, textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1.0f))
+                }
+            }else{
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(text = "Registered", fontSize = 12.sp, textAlign = TextAlign.Center, color = Color.White,
+                        modifier = Modifier
+                            .background(Color.Green, shape = RoundedCornerShape(40.dp))
+                            .padding(2.dp)
+                            .weight(1.0f)
+                    )
 
                     val sectionAmount = skill.skillSectionsList.size
 
@@ -228,7 +250,7 @@ fun SkillInfoPopUp_STARTED(sharedViewModel: SharedViewModel, skill: SkillModel, 
                     .clip(shape = RoundedCornerShape(10.dp))
                     .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surface)
-                    .verticalScroll(rememberScrollState()),
+                    //.verticalScroll(rememberScrollState()),
             ) {
                 IconButton(
                     onClick = {
@@ -289,7 +311,7 @@ fun SkillInfoPopUp_STARTED(sharedViewModel: SharedViewModel, skill: SkillModel, 
 }
 
 @Composable
-fun SkillInfoPopUp_UNSTARTED(skill: SkillModel, sharedViewModel: SharedViewModel, onAddProgression: () -> Unit, onCloseClick: () -> Unit) {
+fun SkillInfoPopUp_UNSTARTED(skill: SkillModel, sharedViewModel: SharedViewModel, isRegistered: Boolean, onAddProgression: () -> Unit, onCloseClick: () -> Unit, onRegisterSkill: () -> Unit) {
     val currentContext = LocalContext.current
 
     var sectionsList: MutableState<List<SkillSectionModel>> = remember {
@@ -414,6 +436,18 @@ fun SkillInfoPopUp_UNSTARTED(skill: SkillModel, sharedViewModel: SharedViewModel
                         Text(text = "START SKILL +")
                     }
 
+                    if(!isRegistered){
+                        Button(onClick = { onRegisterSkill() }) {
+                            Text(text = "REGISTER SKILL +")
+                        }
+                    }else{
+                        Text(text = "SKILL REGISTERED",
+                            color = Color.White,
+                            modifier = Modifier
+                                .background(Color.Green, shape = RoundedCornerShape(40.dp))
+                                .padding(10.dp)
+                        )
+                    }
                 }
             }
         }
@@ -432,46 +466,62 @@ fun SearchScreen(navController: NavHostController,
 
     val currentContext = LocalContext.current
 
+
+/*
+    sharedViewModel.retrieveAllUserSkill(
+        sharedViewModel.getCurrentUserMail(),
+        currentContext,
+    ){skill ->
+        sharedViewModel.retrieveUserSkillSub(
+            sharedViewModel.getCurrentUserMail(),
+            currentContext
+        ){
+            sharedViewModel.updateUserSub(
+                it.copy(createdSkillsId = skill.map { it.id }),
+                currentContext
+            )
+        }
+    }
+
+    */
+
     var skillTitleEditText by remember {mutableStateOf("")}
     var active by remember {mutableStateOf(false)}
 
-    var skillModelsSearchBar: List<SkillModel> = remember {
-        mutableListOf()
+    val skillModelsStarted: MutableState<List<SkillModel>> = remember {
+        mutableStateOf(mutableListOf())
     }
 
-    var skillModelsRegistered: List<SkillModel> = remember {
-        mutableListOf()
+    val skillModelsRegistered: MutableState<List<SkillModel>> = remember {
+        mutableStateOf(mutableListOf())
     }
 
-    var skillProgressions: List<SkillProgressionModel> = remember {
-        mutableListOf()
+    val skillModelsCreated: MutableState<List<SkillModel>> = remember {
+        mutableStateOf(mutableListOf())
     }
 
-    var isSkillSelected: MutableState<SelectedSkillState> = remember {
+    val skillProgressions: MutableState<List<SkillProgressionModel>> = remember {
+        mutableStateOf(mutableListOf())
+    }
+
+    val isSkillSelected: MutableState<SelectedSkillState> = remember {
         mutableStateOf(SelectedSkillState.NOT_SELECTED)
     }
 
-    var skillSelected: MutableState<SkillModel> = remember {
+    val skillSelected: MutableState<SkillModel> = remember {
         mutableStateOf(SkillModel())
     }
 
-    var currentUserSkillSubs: MutableState<UserSkillSubsModel> = remember {
+    val currentUserSkillSubs: MutableState<UserSkillSubsModel> = remember {
         mutableStateOf(UserSkillSubsModel())
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(currentUserSkillSubs.value) {
         sharedViewModel.retrieveUserSkillProgressionList(
             sharedViewModel.getCurrentUserMail(),
             currentContext,
         ){
-            skillProgressions = it
-        }
-
-        sharedViewModel.retrieveAllUserSkill(
-            sharedViewModel.getCurrentUserMail(),
-            currentContext
-        ){
-            skillModelsSearchBar = it
+            skillProgressions.value = it
         }
 
         sharedViewModel.retrieveUserSkillSub(
@@ -481,7 +531,15 @@ fun SearchScreen(navController: NavHostController,
             currentUserSkillSubs.value = it
 
             sharedViewModel.retrieveSkillsFromList(currentContext, currentUserSkillSubs.value.registeredSkillsIDs){
-                skillModelsRegistered = it
+                skillModelsRegistered.value = it
+            }
+
+            sharedViewModel.retrieveSkillsFromList(currentContext, currentUserSkillSubs.value.startedSkillsIDs){
+                skillModelsStarted.value = it
+            }
+
+            sharedViewModel.retrieveSkillsFromList(currentContext, currentUserSkillSubs.value.createdSkillsId.filter { !(it in currentUserSkillSubs.value.startedSkillsIDs) }){
+                skillModelsCreated.value = it
             }
         }
     }
@@ -493,13 +551,68 @@ fun SearchScreen(navController: NavHostController,
             BottomNavigationBar(navController = navController, openDialog, pendingRoute)
         }
     ){innerPadding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+
+
+            item {
+                TextField(value = skillTitleEditText,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    onValueChange = {skillTitleEditText = it})
+
+                Text(text = "SKILLS STARTED - " + skillModelsStarted.value.count(), fontSize = 25.sp)
+            }
+
+
+            items(skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
+                SkillSearchBlock(it, SelectedSkillState.SARTED_SELECTED)
+                {
+                    skillSelected.value = it
+                    isSkillSelected.value = SelectedSkillState.SARTED_SELECTED
+                }
+            }
+
+
+            item{
+                Divider(color = Color.Black)
+
+                Text(text = "SKILLS REGISTERED - " + skillModelsStarted.value.count(), fontSize = 25.sp)
+            }
+
+            items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
+                SkillSearchBlock(it, SelectedSkillState.REGISTERED_SELECTED)
+                {
+                    skillSelected.value = it
+                    isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+                }
+            }
+
+
+            item{
+                Divider(color = Color.Black)
+
+                Text(text = "SKILLS CREATED - " + skillModelsStarted.value.count(), fontSize = 25.sp)
+            }
+
+            items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
+                SkillSearchBlock(it, if(it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED)
+                {
+                    skillSelected.value = it
+                    isSkillSelected.value =
+                        if(it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                        else SelectedSkillState.NEW_SELECTED
+                }
+            }
+
+
+            /*
             SearchBar(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 query = skillTitleEditText,
                 onQueryChange = {
                                 skillTitleEditText = it
@@ -531,44 +644,27 @@ fun SearchScreen(navController: NavHostController,
                             contentDescription = "Close Icon"
                         )
                     }
-                }) {
-                skillModelsSearchBar.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.forEach{
-                    SkillSearchBlock(it, it.id in skillProgressions.map { it.skillId })
-                    {
-                        skillSelected.value = it
-                        isSkillSelected.value = if (it.id in skillProgressions.map { it.skillId }) SelectedSkillState.REG_SELECTED else SelectedSkillState.NEW_SELECTED
-                    }
-                }
-
-                /*
-                Divider(color = Color.Black)
-
-                skillModelsSearchBar.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.forEach{
-                    SkillSearchBlock(it, it.id in skillProgressions.map { it.skillId })
-                    {
-                        skillSelected.value = it
-                        isSkillSelected.value = if (it.id in skillProgressions.map { it.skillId }) SelectedSkillState.REG_SELECTED else SelectedSkillState.NEW_SELECTED
-                    }
-                }*/
-            }
+                })*/
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        /*
         Column {
             skillModelsRegistered.forEach{
                 SkillSearchBlock(skill = it, isInProgress = false) {
                     
                 }
             }
-        }
+        }*/
 
 
 
 
-        if(isSkillSelected.value == SelectedSkillState.NEW_SELECTED){
+        if(isSkillSelected.value == SelectedSkillState.NEW_SELECTED || isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED){
             Box(){
                 SkillInfoPopUp_UNSTARTED(skillSelected.value, sharedViewModel,
+                    isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED,
                     {
                         sharedViewModel.retrieveSkillSection(
                             skillSelected.value.id,
@@ -578,24 +674,40 @@ fun SearchScreen(navController: NavHostController,
                             val mapNonCompletedTasks: Map<String, Int> = section.skillTasksList.associateWith { 0 }
 
                             val skillProgression = SkillProgressionModel(sharedViewModel.getCurrentUserMail(), skillSelected.value.id, skillSelected.value.skillSectionsList.get(0),mapNonCompletedTasks)
-                            skillProgressions += skillProgression
+                            skillProgressions.value += skillProgression
 
                             sharedViewModel.saveSkillProgression(skillProgression, currentContext)
 
-                            isSkillSelected.value = SelectedSkillState.REG_SELECTED
-                        }
+                            var startedSkillIds = skillProgressions.value.map {
+                                it.skillId
+                            }
+                            sharedViewModel.updateUserSub(currentUserSkillSubs.value.copy(startedSkillsIDs = startedSkillIds), currentContext)
 
+                            isSkillSelected.value = SelectedSkillState.SARTED_SELECTED
+                        }
                     },
 
                     {
                         isSkillSelected.value = SelectedSkillState.NOT_SELECTED
                     },
+                    {
+                        //COMEBACK
+                        val regSkillIds = currentUserSkillSubs.value.registeredSkillsIDs
+
+                        currentUserSkillSubs.value = currentUserSkillSubs.value.copy(registeredSkillsIDs = regSkillIds + skillSelected.value.id)
+
+                        sharedViewModel.updateUserSub(currentUserSkillSubs.value, currentContext)
+
+                        skillModelsRegistered.value += skillSelected.value
+
+                        isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+                    }
                 )
             }
-        }else if(isSkillSelected.value == SelectedSkillState.REG_SELECTED){
+        }else if(isSkillSelected.value == SelectedSkillState.SARTED_SELECTED){
             Box(){
 
-                SkillInfoPopUp_STARTED(sharedViewModel, skillSelected.value, skillProgressions?.find { it.skillId == skillSelected.value.id } ?: SkillProgressionModel(), {                        isSkillSelected.value = SelectedSkillState.NOT_SELECTED
+                SkillInfoPopUp_STARTED(sharedViewModel, skillSelected.value, skillProgressions.value?.find { it.skillId == skillSelected.value.id } ?: SkillProgressionModel(), {                        isSkillSelected.value = SelectedSkillState.NOT_SELECTED
                 })
             }
         }

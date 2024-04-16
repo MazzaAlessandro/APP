@@ -338,6 +338,12 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         sharedViewModel.saveSkillTask(it, context)
     }
 
+
+    sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), context){
+        val createdSkillsIdList = it.createdSkillsId + skill.id
+        sharedViewModel.updateUserSub(it.copy(createdSkillsId = createdSkillsIdList), context)
+    }
+
 }
 
 
