@@ -75,12 +75,17 @@ fun ProfileScreen(navController: NavHostController,
     }
 
     //val userId = FirebaseAuth.getInstance().currentUser?.uid
+    var totSkills = 0
     val mail = sharedViewModel.getCurrentUserMail()
     var userData by remember(mail){
         mutableStateOf(UserDataModel())
     }
 
-    var skillProgressionList : List<Int> = mutableListOf(1, 2, 3)
+    var skillProgressionList : MutableList<Int> = mutableListOf(0, 0, 0)
+
+    val primaryColor = MaterialTheme.colorScheme.primary
+
+
 
     /*LaunchedEffect(mail){
         if (mail != null){
@@ -105,17 +110,46 @@ fun ProfileScreen(navController: NavHostController,
         userData = data
     }
 
-    val pieData = listOf(
-        PieChartData("Completed Skills: ", skillProgressionList[0], color = MaterialTheme.colorScheme.primary),
-        PieChartData("Skills In progress: ", skillProgressionList[1], color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-        PieChartData("Unstarted Skills: ", skillProgressionList[2], color = Color.Gray.copy(alpha = 0.5f))
+    sharedViewModel.retrieveUserSkillProgressionList(
+            mail,
+            context = context
+    ){skillProgList ->
+        var tmp0 = 0
+        var tmp1 = 0
+        var tmp2 = 0
+
+        skillProgList.forEach { skillProg ->
+
+            if (skillProg.isFinished)
+                tmp0++
+
+            else{
+                if(skillProg.currentSectionId == "0")
+                    tmp2++
+                else
+                    tmp1++
+            }
+        }
+
+        println(tmp0)
+        println(tmp1)
+        println(tmp2)
+        userData.listSkillProgressions = mutableListOf(tmp0, tmp1, tmp2)
+
+        sharedViewModel.updateUserData(userData, context)
+    }
+
+    var pieData = mutableListOf(
+        PieChartData("Completed Skills: ", userData.listSkillProgressions[0], primaryColor),
+        PieChartData("Skills In progress: ", userData.listSkillProgressions[1], primaryColor.copy(alpha = 0.5f)),
+        PieChartData("Unstarted Skills: ", userData.listSkillProgressions[2], color = Color.Gray.copy(alpha = 0.5f))
     )
 
     val stat = listOf(
         StatData("Total days using the app:", 356),
         //StatData("Consecutive days using the app:", 21),
         StatData("Badges obtained:", userData.badgeCounter.sum()),
-        StatData("Total Skills:", skillProgressionList.sum())
+        StatData("Total Skills:", totSkills)
     )
 
     Scaffold(

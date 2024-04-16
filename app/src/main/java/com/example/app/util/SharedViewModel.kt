@@ -168,6 +168,13 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.retrieveSkillPogressionList(userEmail, context, data)
     }
 
+    fun updateUserData(
+        user: UserDataModel,
+        context: Context,
+    ){
+        userRepository.saveData(user, context)
+    }
+
     fun retrieveSkill(
         skillId: String,
         context: Context,
