@@ -21,9 +21,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,8 +81,10 @@ import com.example.app.util.SharedViewModel
 //TODO CALLS VIEWMODEL
 
 enum class SelectedSkillState{
-    NOT_SELECTED, NEW_SELECTED, SARTED_SELECTED, REGISTERED_SELECTED
+    NOT_SELECTED, NEW_SELECTED, STARTED_SELECTED, REGISTERED_SELECTED
 }
+
+const val EXPANSION_ANIMATION_DURATION = 300
 
 @Composable
 fun SectionElementBlock(section: SkillSectionModel, amount: Int, required: Int, sharedViewModel: SharedViewModel){
@@ -117,62 +122,85 @@ fun SectionElementBlock(section: SkillSectionModel, amount: Int, required: Int, 
 @Composable
 fun SkillSearchBlock(skill: SkillModel, selectedSkillState: SelectedSkillState, onClick: () -> Unit){
     val colorCircle = MaterialTheme.colorScheme.primary;
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                Color(0XFFF0F0F0),
-                RoundedCornerShape(10)
-            ) // Use the color of the background in your image
-            .padding(horizontal = 20.dp, vertical = 15.dp)
-            .clickable { onClick() }
-        ,
 
-        verticalAlignment = Alignment.CenterVertically
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(5.dp, 2.dp)
+        .clip(shape = RoundedCornerShape(10.dp))
+        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+        .background(Color.Gray.copy(alpha = 0.2f))
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .size(50.dp) // Set the size of the circle
-                .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
-        )
-        Spacer(Modifier.width(25.dp)) // Space between the circle and the text
-        Column(modifier = Modifier.weight(1f)) {
-            Text(skill.titleSkill, fontSize = 25.sp)
+                .fillMaxWidth()
+                .padding(10.dp)
+                .clickable { onClick() },
 
-            if(selectedSkillState == SelectedSkillState.SARTED_SELECTED){
-                Text(text = "Already in progress", fontSize = 12.sp, color = Color.White,
-                    modifier = Modifier
-                        .background(Color.Blue, shape = RoundedCornerShape(40.dp))
-                        .padding(horizontal = 20.dp, vertical = 2.dp)
-                )
-            }else if (selectedSkillState == SelectedSkillState.NEW_SELECTED){
-                Row(Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(50.dp) // Set the size of the circle
+                    .background(
+                        colorCircle,
+                        shape = CircleShape
+                    ) // Use the color of the circle in your image
+            )
+            Spacer(Modifier.width(25.dp)) // Space between the circle and the text
+            Column(modifier = Modifier.weight(1f)) {
+                Text(skill.titleSkill, fontSize = 25.sp)
+
+                if (selectedSkillState == SelectedSkillState.STARTED_SELECTED) {
+                    Text(
+                        text = "Already in progress", fontSize = 12.sp, color = Color.White,
+                        modifier = Modifier
+                            .background(Color.Blue, shape = RoundedCornerShape(40.dp))
+                            .padding(horizontal = 20.dp, vertical = 2.dp)
+                    )
+                } else if (selectedSkillState == SelectedSkillState.NEW_SELECTED) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
                     ) {
-                    Text(text = "Not started", fontSize = 12.sp, textAlign = TextAlign.Center,
-                        modifier = Modifier
-                    )
+                        Text(
+                            text = "Not started", fontSize = 12.sp, textAlign = TextAlign.Center,
+                            modifier = Modifier
+                        )
 
-                    val sectionAmount = skill.skillSectionsList.size
+                        val sectionAmount = skill.skillSectionsList.size
 
-                    Text(text = sectionAmount.toString() + " section" + if(sectionAmount > 1) "s" else "", fontSize = 12.sp, textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1.0f))
-                }
-            }else{
-                Row(Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(text = "Registered", fontSize = 12.sp, textAlign = TextAlign.Center, color = Color.White,
-                        modifier = Modifier
-                            .background(Color.Green, shape = RoundedCornerShape(40.dp))
-                            .padding(2.dp)
-                            .weight(1.0f)
-                    )
+                        Text(
+                            text = sectionAmount.toString() + " section" + if (sectionAmount > 1) "s" else "",
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1.0f)
+                        )
+                    }
+                } else {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Text(
+                            text = "Registered",
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            color = Color.White,
+                            modifier = Modifier
+                                .background(Color.Green, shape = RoundedCornerShape(40.dp))
+                                .padding(2.dp)
+                                .weight(1.0f)
+                        )
 
-                    val sectionAmount = skill.skillSectionsList.size
+                        val sectionAmount = skill.skillSectionsList.size
 
-                    Text(text = sectionAmount.toString() + " section" + if(sectionAmount > 1) "s" else "", fontSize = 12.sp, textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1.0f))
+                        Text(
+                            text = sectionAmount.toString() + " section" + if (sectionAmount > 1) "s" else "",
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.weight(1.0f)
+                        )
+                    }
                 }
             }
         }
@@ -562,25 +590,68 @@ fun SearchScreen(navController: NavHostController,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp),
-                    onValueChange = {skillTitleEditText = it})
+                    onValueChange = {skillTitleEditText = it},
+                    label = { Text(text = "Search a skill by name") },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "search"
+                        )
+                    },
+                    )
 
-                Text(text = "SKILLS STARTED - " + skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count(), fontSize = 25.sp)
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(text = "Started Skills", fontSize = 25.sp)
+
+                    Text(text = skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count().toString() + " elements",
+                        fontSize = 15.sp,
+                        color = Color.Gray)
+
+                }
+
+                Divider(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 2.dp),
+                    color = Color.Black)
             }
 
 
             items(skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
-                SkillSearchBlock(it, SelectedSkillState.SARTED_SELECTED)
+                SkillSearchBlock(it, SelectedSkillState.STARTED_SELECTED)
                 {
                     skillSelected.value = it
-                    isSkillSelected.value = SelectedSkillState.SARTED_SELECTED
+                    isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
                 }
             }
 
 
             item{
-                Divider(color = Color.Black)
 
-                Text(text = "SKILLS REGISTERED - " + skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count(), fontSize = 25.sp)
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(text = "Registered Skills", fontSize = 25.sp)
+
+                    Text(text = skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count().toString() + " elements",
+                        fontSize = 15.sp,
+                        color = Color.Gray)
+
+                }
+
+                Divider(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 2.dp),
+                    color = Color.Black)
             }
 
             items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
@@ -593,9 +664,24 @@ fun SearchScreen(navController: NavHostController,
 
 
             item{
-                Divider(color = Color.Black)
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(text = "Created Skills", fontSize = 25.sp)
 
-                Text(text = "SKILLS CREATED - " + skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count(), fontSize = 25.sp)
+                    Text(text = skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count().toString() + " elements",
+                        fontSize = 15.sp,
+                        color = Color.Gray)
+
+                }
+
+                Divider(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 2.dp),
+                    color = Color.Black)
             }
 
             items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }){
@@ -683,7 +769,7 @@ fun SearchScreen(navController: NavHostController,
                             }
                             sharedViewModel.updateUserSub(currentUserSkillSubs.value.copy(startedSkillsIDs = startedSkillIds), currentContext)
 
-                            isSkillSelected.value = SelectedSkillState.SARTED_SELECTED
+                            isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
                         }
                     },
 
@@ -704,7 +790,7 @@ fun SearchScreen(navController: NavHostController,
                     }
                 )
             }
-        }else if(isSkillSelected.value == SelectedSkillState.SARTED_SELECTED){
+        }else if(isSkillSelected.value == SelectedSkillState.STARTED_SELECTED){
             Box(){
 
                 SkillInfoPopUp_STARTED(sharedViewModel, skillSelected.value, skillProgressions.value?.find { it.skillId == skillSelected.value.id } ?: SkillProgressionModel(), {                        isSkillSelected.value = SelectedSkillState.NOT_SELECTED
