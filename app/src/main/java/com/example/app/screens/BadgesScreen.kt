@@ -45,7 +45,7 @@ fun BadgesScreen(
         BadgeDataModel(BadgeColor.SILVER, "Skill 2", "badge description", "24/10/12"),
         BadgeDataModel(BadgeColor.BRONZE, "Skill 3", "badge description", "24/10/12"),
         BadgeDataModel(BadgeColor.GOLD, "Skill 1", "badge description"),
-        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12", false),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
         BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
         BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
         BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
@@ -77,8 +77,8 @@ fun BadgesScreen(
                     //BadgeCard(badge = BadgeColor.BRONZE, skillName = "Skill 1", description = "This is a description for the card. Let's make it longer to see how it fits", date = "24/10/12", done = false)
                     badgeList.map {
                         BadgeBanner(
-                            it.badge,
-                            it.skillName,
+                            it.badgeColor,
+                            it.badgeName,
                             it.description,
                             it.date,
                             it.done,

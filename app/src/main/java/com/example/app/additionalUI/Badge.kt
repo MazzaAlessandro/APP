@@ -174,10 +174,10 @@ fun BadgeCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    BadgeIcon(badge.badge, 100.dp, badge.done)
+                    BadgeIcon(badge.badgeColor, 100.dp, badge.done)
 
                     Text(
-                        text = badge.skillName,
+                        text = badge.badgeName,
                         modifier = Modifier
                             .padding(10.dp),
                         textAlign = TextAlign.Center,
