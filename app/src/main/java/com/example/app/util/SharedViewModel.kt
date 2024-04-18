@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
@@ -159,6 +160,13 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.saveUserSkillSub(userSub, context)
     }
 
+    fun saveBadgeData(
+        badge: BadgeDataModel,
+        context: Context
+    ){
+        skillRepository.saveBadgeData(badge, context)
+    }
+
     fun retrieveUserSkillProgressionList(
         userEmail: String,
         context: Context,
@@ -242,6 +250,23 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         data: (UserSkillSubsModel) -> Unit
     ){
         skillRepository.retrieveUserSkillSub(userEmail, context, data)
+    }
+
+    fun retrieveBadge(
+        skillId: String,
+        sectionId: String,
+        context: Context,
+        data: (BadgeDataModel) -> Unit
+    ){
+        skillRepository.retrieveBadge(skillId, sectionId, context, data)
+    }
+
+    fun retrieveAllBadges(
+        badgesList : List<String>,
+        context: Context,
+        data: (List<BadgeDataModel>) -> Unit
+    ){
+        skillRepository.retrieveAllBadges(badgesList, context, data)
     }
 
     fun popUpOn(){

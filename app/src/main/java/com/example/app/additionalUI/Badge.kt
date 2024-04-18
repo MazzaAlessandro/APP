@@ -39,7 +39,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.example.app.R
-import com.example.app.models.BadgeData
+import com.example.app.models.BadgeDataModel
 
 //This is the round icon of a Badge that can be used on its own
 @Composable
@@ -132,7 +132,7 @@ fun BadgeBanner(
 //If you did not completed the badge, the card has a button that takes you to that tutorial
 @Composable
 fun BadgeCard(
-    badge: BadgeData,
+    badge: BadgeDataModel,
     onCloseClick: () -> Unit
 ){
     Box(
