@@ -25,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -136,7 +137,8 @@ fun SkillSearchBlock(skill: SkillModel, selectedSkillState: SelectedSkillState, 
                 .padding(10.dp)
                 .clickable { onClick() },
 
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
                 modifier = Modifier
@@ -146,8 +148,53 @@ fun SkillSearchBlock(skill: SkillModel, selectedSkillState: SelectedSkillState, 
                         shape = CircleShape
                     ) // Use the color of the circle in your image
             )
-            Spacer(Modifier.width(25.dp)) // Space between the circle and the text
-            Column(modifier = Modifier.weight(1f)) {
+            Spacer(Modifier.width(25.dp))
+            // Space between the circle and the text
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween){
+
+                Column(modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.SpaceEvenly,
+                    horizontalAlignment = Alignment.Start) {
+
+                    Text(skill.titleSkill, fontSize = 25.sp)
+
+                    val sectionAmount = skill.skillSectionsList.size
+
+                    Text(
+                        text = sectionAmount.toString() + " section" + if (sectionAmount > 1) "s" else "",
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                if (selectedSkillState == SelectedSkillState.STARTED_SELECTED) {
+                    Text(
+                        text = "In progress", fontSize = 14.sp, color = Color.White,
+                        modifier = Modifier
+                            .background(Color.Blue, shape = RoundedCornerShape(40.dp))
+                            .padding(horizontal = 20.dp, vertical = 2.dp)
+                    )
+                } else if (selectedSkillState == SelectedSkillState.NEW_SELECTED) {
+                    Text(
+                        text = "Not started", fontSize = 14.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier
+                    )
+                } else {
+                    Text(
+                        text = "Registered",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                        modifier = Modifier
+                            .background(Color.Green, shape = RoundedCornerShape(40.dp))
+                            .padding(2.dp)
+                            .weight(1.0f)
+                    )
+                }
+            }
+            /*Column(modifier = Modifier.weight(1f)) {
                 Text(skill.titleSkill, fontSize = 25.sp)
 
                 if (selectedSkillState == SelectedSkillState.STARTED_SELECTED) {
@@ -202,7 +249,7 @@ fun SkillSearchBlock(skill: SkillModel, selectedSkillState: SelectedSkillState, 
                         )
                     }
                 }
-            }
+            }*/
         }
     }
 }
@@ -614,6 +661,10 @@ fun SearchScreen(navController: NavHostController,
                         fontSize = 15.sp,
                         color = Color.Gray)
 
+                    Icon(imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = null,
+                        Modifier.clickable {  })
+
                 }
 
                 Divider(modifier = Modifier
@@ -646,6 +697,9 @@ fun SearchScreen(navController: NavHostController,
                         fontSize = 15.sp,
                         color = Color.Gray)
 
+                    Icon(imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = null,
+                        Modifier.clickable {  })
                 }
 
                 Divider(modifier = Modifier
@@ -675,6 +729,10 @@ fun SearchScreen(navController: NavHostController,
                     Text(text = skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }.count().toString() + " elements",
                         fontSize = 15.sp,
                         color = Color.Gray)
+
+                    Icon(imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = null,
+                        Modifier.clickable {  })
 
                 }
 
