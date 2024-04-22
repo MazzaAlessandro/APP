@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -153,10 +152,10 @@ fun BadgeCard(
         ){
             Box(
                 Modifier
-                    .width(375.dp)
-                    .height(525.dp)
-                    .clip(shape = RoundedCornerShape(10.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.75f)
+                    .clip(shape = RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
