@@ -24,7 +24,7 @@ import com.example.app.additionalUI.BadgeBanner
 import com.example.app.additionalUI.BadgeCard
 import com.example.app.additionalUI.BadgeColor
 import com.example.app.bottomNavigation.AppToolBar
-import com.example.app.models.BadgeData
+import com.example.app.models.BadgeDataModel
 import com.example.app.util.SharedViewModel
 
 @Composable
@@ -34,29 +34,29 @@ fun BadgesScreen(
 ){
     val selected = remember { mutableStateOf(false) }
 
-    var selectedBadge : BadgeData = BadgeData(
+    var selectedBadge : BadgeDataModel = BadgeDataModel(
         BadgeColor.BRONZE,
         "",
         ""
     )
 
-    val badgeList = listOf<BadgeData>(
-        BadgeData(BadgeColor.BRONZE, "Skill 1",  "This is a longer badge description that goes on multiple lines to see how it fits in the box", "24/10/12"),
-        BadgeData(BadgeColor.SILVER, "Skill 2", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 3", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.GOLD, "Skill 1", "badge description"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12", false),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.SILVER, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.GOLD, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
-        BadgeData(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+    val badgeList = listOf<BadgeDataModel>(
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1",  "This is a longer badge description that goes on multiple lines to see how it fits in the box", "24/10/12"),
+        BadgeDataModel(BadgeColor.SILVER, "Skill 2", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 3", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.GOLD, "Skill 1", "badge description"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.SILVER, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.GOLD, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
+        BadgeDataModel(BadgeColor.BRONZE, "Skill 1", "badge description", "24/10/12"),
     )
     Scaffold (
         topBar = { AppToolBar(title = "Total Badges", navController, sharedViewModel, true, Routes.Profile.route) }
@@ -77,8 +77,8 @@ fun BadgesScreen(
                     //BadgeCard(badge = BadgeColor.BRONZE, skillName = "Skill 1", description = "This is a description for the card. Let's make it longer to see how it fits", date = "24/10/12", done = false)
                     badgeList.map {
                         BadgeBanner(
-                            it.badge,
-                            it.skillName,
+                            it.badgeColor,
+                            it.badgeName,
                             it.description,
                             it.date,
                             it.done,

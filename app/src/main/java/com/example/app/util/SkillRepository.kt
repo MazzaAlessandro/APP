@@ -2,6 +2,7 @@ package com.example.app.util
 
 import android.content.Context
 import android.widget.Toast
+import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
@@ -20,10 +21,8 @@ import kotlinx.coroutines.launch
 class SkillRepository {
 
     private var currentSkillProgression: MutableStateFlow<SkillProgressionModel> = MutableStateFlow(SkillProgressionModel());
-    var skillProgression: StateFlow<SkillProgressionModel> = currentSkillProgression.asStateFlow();
 
     private var currentUserSub: MutableStateFlow<UserSkillSubsModel> = MutableStateFlow(UserSkillSubsModel());
-    var userSub: StateFlow<UserSkillSubsModel> = currentUserSub.asStateFlow();
 
     private var currentSkillListProgression: MutableStateFlow<List<SkillProgressionModel>> = MutableStateFlow(emptyList())
     var skillListProgression: StateFlow<List<SkillProgressionModel>> = currentSkillListProgression.asStateFlow();
@@ -32,10 +31,8 @@ class SkillRepository {
     var skill: StateFlow<SkillModel> = currentSkill.asStateFlow();
 
     private var currentSkillList: MutableStateFlow<List<SkillModel>> = MutableStateFlow(emptyList())
-    var skillList: StateFlow<List<SkillModel>> = currentSkillList.asStateFlow();
 
     private var currentSection: MutableStateFlow<SkillSectionModel> = MutableStateFlow(SkillSectionModel())
-    var section: StateFlow<SkillSectionModel> = currentSection.asStateFlow();
 
     private var currentSectionList: MutableStateFlow<List<SkillSectionModel>> = MutableStateFlow(
         emptyList()
@@ -47,6 +44,8 @@ class SkillRepository {
 
     private var currentSkillTaskList: MutableStateFlow<List<SkillTaskModel>> = MutableStateFlow(emptyList())
     var skillTaskList: StateFlow<List<SkillTaskModel>> = currentSkillTaskList.asStateFlow();
+
+    private var currentBadge: MutableStateFlow<BadgeDataModel> = MutableStateFlow(BadgeDataModel())
 
 
     fun retrieveSkill(
@@ -298,6 +297,67 @@ class SkillRepository {
         }
     }
 
+    fun retrieveBadge(
+        skillId: String,
+        sectionId: String,
+        context: Context,
+        data: (BadgeDataModel) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("badge")
+            .document(skillId + sectionId)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val badge = it.toObject<BadgeDataModel>()!!
+                        data(badge)
+                        currentBadge.value = badge
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun retrieveAllBadges(
+        badgesList : List<String>,
+        context: Context,
+        data: (List<BadgeDataModel>) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("badge")
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {documents ->
+                    if (!documents.isEmpty){
+                        val badgeList : MutableList<BadgeDataModel> = mutableListOf();
+
+                        for(d in documents){
+
+                            val badge = d.toObject<BadgeDataModel>()!!
+                            if(badge.skillId + badge.sectionId in badgesList){
+                                badgeList += badge
+                            }
+
+                        }
+
+                        data(badgeList)
+                    } else {
+                        Toast.makeText(context, "Data not SECT LIST found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     fun retrieveSkillPogressionList(
         userEmail : String,
         context : Context,
@@ -413,6 +473,27 @@ class SkillRepository {
         try {
 
             fireStoreRef.set(userSub)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun saveBadgeData(
+        badge: BadgeDataModel,
+        context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("badge")
+            .document(badge.skillId + badge.sectionId)
+
+        try {
+
+            fireStoreRef.set(badge)
                 .addOnSuccessListener {
                     Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
