@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,12 +16,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,11 +35,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.app.additionalUI.BadgeColor
+import com.example.app.additionalUI.BadgeIcon
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillCompleteStructureModel
@@ -65,25 +68,15 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
                 Color(0XFFF0F0F0),
                 RoundedCornerShape(10)
             ) // Use the color of the background in your image
-            .padding(horizontal = 20.dp, vertical = 15.dp),
+            .padding(horizontal = 10.dp, vertical = 10.dp),
 
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(50.dp) // Set the size of the circle
-                .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
-        )
-        Spacer(Modifier.width(25.dp)) // Space between the circle and the text
+        BadgeIcon(badge = BadgeColor.BRONZE, size = 65.dp)
+        Spacer(Modifier.width(10.dp)) // Space between the circle and the text
         Column(modifier = Modifier.weight(1f)) {
-            Text(skillCompleteStructureModel.skill.titleSkill, fontSize = 25.sp)
-            Text(skillCompleteStructureModel.skillSection.titleSection,
-                color = Color.White,
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .background(color = colorCircle, RoundedCornerShape(20))
-                    .padding(vertical = 5.dp, horizontal = 7.dp)
-                )
+            Text(skillCompleteStructureModel.skillSection.titleSection, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(skillCompleteStructureModel.skillSection.descriptionSection, fontSize = 16.sp)
         }
         val completedAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
         val requiredAmount: Int = skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
@@ -98,27 +91,55 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, i
         .fillMaxWidth()
         .clip(RoundedCornerShape(10))
         .background(color = Color(0XFFD9D9D9))
-        .padding(20.dp),
+        .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)){
 
+        Text(
+            skillCompleteStructureModel.skill.titleSkill,
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold)
+
         SkillTitleBlock(skillCompleteStructureModel)
 
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(25.dp)) {
+        Column(modifier = Modifier
+            .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp, 0.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    color = Color.Black,
+                    thickness = 1.dp
+                )
 
-            Box(modifier = Modifier
-                .weight(1.0f)
-                .clip(RoundedCornerShape(10))
-                .padding(5.dp),
-                contentAlignment = Alignment.Center
-            ){
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = "Tasks",
+                    fontSize = 18.sp
+                )
 
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    color = Color.Black,
+                    thickness = 1.dp
+                )
+            }
+
+            skillCompleteStructureModel.skillTasks.forEach{
+                TaskListElement(progression = it.value.first, task = it.key, {onClickTask(index, it.key)})
             }
         }
-        skillCompleteStructureModel.skillTasks.forEach{
-            TaskListElement(progression = it.value.first, task = it.key, {onClickTask(index, it.key)})
-        }
+
     }
 }
 
@@ -142,10 +163,9 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10))
-            .padding(20.dp),
+            .padding(7.dp, 5.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         listSkills.forEachIndexed{index, skillStructure ->
             SkillListElement(skillCompleteStructureModel = skillStructure, index, onClickTask)
@@ -157,6 +177,7 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (
 fun CustomProgressIndicator(description: String, amount: Int, required: Int, height: Dp, onClickTask: () -> Unit){
     Box(modifier = Modifier
         .fillMaxWidth()
+        .padding(2.dp)
         .height(height)
         .clickable { onClickTask() },
         contentAlignment = Alignment.Center
@@ -166,10 +187,12 @@ fun CustomProgressIndicator(description: String, amount: Int, required: Int, hei
         ){
             Box(modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White, RoundedCornerShape(10)))
+                .background(Color.White, RoundedCornerShape(15))
+                .border(1.dp, Color.Black, RoundedCornerShape(15)))
             Box(modifier = Modifier
                 .fillMaxHeight()
-                .background(Color(0xFFD3E9FF), RoundedCornerShape(10))
+                .background(Color(0xFFA3FF88), RoundedCornerShape(15))
+                .border(1.dp, Color.Black, RoundedCornerShape(15))
                 .fillMaxWidth(amount.toFloat() / required.toFloat()))
         }
 
@@ -388,16 +411,6 @@ fun MySkillsScreen(navController: NavHostController,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10))
-                    .background(color = Color(0XFFD9D9D9))
-                    .padding(20.dp)
-            ) {
-                Text(text = "My Skills", fontSize = 32.sp)
-            }
-
-
             SkillListBlock(listSkills = listCompleteStructures.value
             ) { index, task ->
 

@@ -34,7 +34,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -51,7 +50,6 @@ import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillModel
-import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
@@ -405,9 +403,6 @@ fun CreateScreen(
             ) {
 
                 item {
-                    Text(text = "Create a skill", fontSize = 32.sp)
-
-
                     //GeneralInfoBox(sharedViewModel, title = title, {title = it}, description, {description = it})
                     GeneralInfoBox(skill.value, {skill.value = skill.value.copy(titleSkill = it)}, {skill.value = skill.value.copy(skillDescription = it)})
                 }

@@ -90,7 +90,7 @@ const val EXPANSION_ANIMATION_DURATION = 300
 
 @Composable
 fun SectionElementBlock(
-    section: SkillSectionModel,
+    task: String,
     amount: Int,
     required: Int,
     sharedViewModel: SharedViewModel
@@ -99,7 +99,7 @@ fun SectionElementBlock(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp, 0.dp)
+            .padding(15.dp, 2.dp)
             .height(40.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -116,7 +116,7 @@ fun SectionElementBlock(
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .background(Color(0xFFD3E9FF), RoundedCornerShape(10))
+                    .background(Color(0xFFA3FF88), RoundedCornerShape(10))
                     .border(1.dp, Color.Black, RoundedCornerShape(10))
                     .fillMaxWidth(amount.toFloat() / required.toFloat())
             )
@@ -127,7 +127,7 @@ fun SectionElementBlock(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = section.titleSection,
+                text = task,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1.0f)
             )
@@ -496,10 +496,9 @@ fun SkillInfoPopUp_STARTED(
                                 thickness = 1.dp
                             )
 
-                            var sectionId = completeStructure.value.skillSection.id + 1
                             Text(
                                 modifier = Modifier.padding(8.dp),
-                                text = "Section $sectionId",
+                                text = "Current Section",
                                 fontSize = 18.sp
                             )
 
@@ -544,7 +543,7 @@ fun SkillInfoPopUp_STARTED(
 
                             Text(
                                 modifier = Modifier.padding(8.dp),
-                                text = "Section tasks",
+                                text = "Tasks",
                                 fontSize = 18.sp
                             )
 
@@ -557,7 +556,10 @@ fun SkillInfoPopUp_STARTED(
                             )
                         }
 
-                        sectionsList.value.forEach { section ->
+                        completeStructure.value.skillTasks.forEach {tasksMap->
+                            SectionElementBlock(tasksMap.key.taskDescription, tasksMap.value.first, tasksMap.key.requiredAmount, sharedViewModel)
+                        }
+                        /*sectionsList.value.forEach { section ->
                             val indexOfCurrent = skill.skillSectionsList.indexOf(section.id)
                             val indexOfProg =
                                 skill.skillSectionsList.indexOf(skillProgression.currentSectionId)
@@ -577,7 +579,7 @@ fun SkillInfoPopUp_STARTED(
                                     sharedViewModel = sharedViewModel
                                 )
                             }
-                        }
+                        }*/
                     }
 
                     Text(
@@ -782,7 +784,7 @@ fun SkillInfoPopUp_UNSTARTED(
                         }
                     }
 
-                    Column(modifier = Modifier
+                    /*Column(modifier = Modifier
                         .fillMaxWidth(),) {
                         Row(
                             modifier = Modifier
@@ -825,7 +827,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                 color = Color.Black
                             )
                         }
-                    }
+                    }*/
 
                     Column(modifier = Modifier
                         .fillMaxWidth(),) {
@@ -845,7 +847,7 @@ fun SkillInfoPopUp_UNSTARTED(
 
                             Text(
                                 modifier = Modifier.padding(8.dp),
-                                text = "Section tasks",
+                                text = "Section" + if (skill.skillSectionsList.count() > 1) "s" else "",
                                 fontSize = 18.sp
                             )
 
@@ -860,7 +862,7 @@ fun SkillInfoPopUp_UNSTARTED(
 
                         sectionsList.value.forEach { section ->
                             SectionElementBlock(
-                                section = section,
+                                section.titleSection,
                                 amount = 0,
                                 required = 1,
                                 sharedViewModel = sharedViewModel
