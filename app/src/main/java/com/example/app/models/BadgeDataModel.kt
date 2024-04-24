@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class BadgeDataModel(
     val badgeColor: BadgeColor = BadgeColor.BRONZE,
+    val badgeCreator: String = "",
     val badgeName: String = "",
     val skillId : String = "",
     val sectionId : String = "",

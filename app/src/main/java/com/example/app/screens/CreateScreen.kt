@@ -4,11 +4,14 @@ import android.content.Context
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,11 +23,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -38,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -45,10 +51,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
+import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
@@ -181,23 +192,30 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
 @Composable
 fun SectionBox(id:Int, section:SkillSectionModel,
                listTasks: List<SkillTaskModel>,
+               badge: BadgeDataModel?,
                onTitleChange: (String) -> Unit,
                onDescriptionChange: (String) -> Unit,
                onAddTask: (Int) -> Unit,
                onDeleteSection: (Int) -> Unit,
                onChangeTaskDescription: (Int, String) -> Unit,
                onChangeTaskAmount: (Int, Int) -> Unit,
-               onDeleteTask: (String, Int) -> Unit){
-
-    var sectionCounter by remember {
-        mutableStateOf(0)
-    }
+               onDeleteTask: (String, Int) -> Unit,
+               onAddBadgeProcess: (String) -> Unit) {
 
     Box(modifier = Modifier
         .background(color = Color(0xFFD9D9D9), shape = RoundedCornerShape(10.dp))
         .padding(15.dp)
     ){
         Column{
+            
+            Button(onClick = { onAddBadgeProcess(id.toString())  }) {
+                Text(text = "Add Badge")
+            }
+
+            if(badge != null){
+                Text(text = badge.badgeName)
+            }
+            
             Row (verticalAlignment = Alignment.CenterVertically)
             {
 
@@ -309,13 +327,72 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
     }
 }
 
+@Composable
+fun BadgePopUp(badge: BadgeDataModel, onBadgeNameChange: (String) -> Unit, onBadgeDescriptionChange: (String) -> Unit, onAddBadge: () -> Unit, onCloseClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Gray.copy(alpha = 0.5f))
+            .zIndex(10F)
+            .clickable { },
+        contentAlignment = Alignment.Center
+    ) {
+
+        Dialog(
+            onDismissRequest = onCloseClick,
+            ) {
+            Box(
+                Modifier
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.75f)
+                    .clip(shape = RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                //.verticalScroll(rememberScrollState()),
+            ) {
+                IconButton(
+                    onClick = {
+                        onCloseClick()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .zIndex(11F),
+                ) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "close")
+                }
+
+                Column {
+                    Text(text = "TITLE")
+
+                    TextFieldString(value = badge.badgeName, onValueChange = onBadgeNameChange, isSingleLine = true)
+
+                    Text(text = "DECRIPTION")
+
+                    TextFieldString(
+                        value = badge.description,
+                        onValueChange = onBadgeDescriptionChange,
+                        isSingleLine = false
+                    )
+
+                    Button(onClick = {onAddBadge()}) {
+                        Text(text = "ADD +")
+                    }
+                }
+            }
+        }
+    }
+
+
+}
+
+
 fun GenerateNewSkillID(): String{
     val db = FirebaseFirestore.getInstance()
     val newSkillRef = db.collection("skill").document()
     return newSkillRef.id
 }
 
-fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>){
+fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>, badgeList: Map<String, BadgeDataModel>){
 
     val db = FirebaseFirestore.getInstance()
     val skillRef = db.collection("skill").document(refId)
@@ -323,13 +400,22 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         it.id
     }))
 
+    badgeList.forEach{entry ->
+
+        sharedViewModel.saveBadgeData(entry.value, context)
+
+    }
+
     sections.forEach{
 
         val taskList = (tasks[it.id]?.toMutableList() ?: mutableListOf()).map{
             it.id
         }
 
-        sharedViewModel.saveSkillSection(it.copy(skillTasksList = taskList), context)
+        val badgeID = badgeList.getOrDefault(it.id, BadgeDataModel())
+        val hasBadge = badgeID.sectionId == it.id
+
+        sharedViewModel.saveSkillSection(it.copy(skillTasksList = taskList, badgeID = badgeID.skillId + badgeID.sectionId, hasBadge = hasBadge), context)
     }
 
     tasks.values.flatten().forEach{
@@ -339,7 +425,8 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
 
     sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), context){
         val createdSkillsIdList = it.createdSkillsId + skill.id
-        sharedViewModel.updateUserSub(it.copy(createdSkillsId = createdSkillsIdList), context)
+        val createdBadgesIdList = it.createdSkillsId + badgeList.values.map { it.skillId + it.sectionId }
+        sharedViewModel.updateUserSub(it.copy(createdSkillsId = createdSkillsIdList, createdBadges = createdBadgesIdList), context)
     }
 
 }
@@ -370,12 +457,28 @@ fun CreateScreen(
         mutableStateOf(mapOf())
     }
 
+    var badges: MutableState<MutableMap<String, BadgeDataModel>> = remember {
+        mutableStateOf(mutableMapOf())
+    }
+
     var sectionIdCounter: MutableState<Int> = remember {
         mutableStateOf(0)
     }
 
     var taskIdCounter: MutableState<Int> = remember {
         mutableStateOf(0)
+    }
+
+    var currentBadge: MutableState<BadgeDataModel> = remember {
+        mutableStateOf(BadgeDataModel())
+    }
+
+    var currentSectionBadge: MutableState<String> = remember {
+        mutableStateOf("")
+    }
+
+    var isBadgeEditActive: MutableState<Boolean> = remember {
+        mutableStateOf(false)
     }
 
     val context = LocalContext.current;
@@ -422,6 +525,7 @@ fun CreateScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SectionBox(id = index, section = section, skillTasks.value.get(section.id)?.toList() ?: mutableListOf(),
+                        badges.value.get(index.toString()),
                         {skillSections.value = skillSections.value.toMutableList().apply {
                             set(index, section.copy(titleSection = it))
                         }
@@ -476,8 +580,13 @@ fun CreateScreen(
                             updatedMapTasks.set(idSection, updatedListTasks!!.toMutableList())
 
                             skillTasks.value = updatedMapTasks
+                        },
+                        {currentBadgeSection ->
+                            currentSectionBadge.value = currentBadgeSection
+                            currentBadge.value = currentBadge.value.copy(sectionId = currentBadgeSection, skillId = skillID, badgeCreator = sharedViewModel.getCurrentUserMail())
+                            isBadgeEditActive.value = true
                         }
-                        )
+                    )
 
 
                 }
@@ -502,7 +611,7 @@ fun CreateScreen(
                             return@Button
                         }
 
-                        SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value)
+                        SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value, badges.value)
 
                         navController.navigate("MySkills")
                     }) {
@@ -512,7 +621,38 @@ fun CreateScreen(
 
             }
         }
+
+
+        if(isBadgeEditActive.value){
+
+            currentBadge.value =
+                if(currentBadge.value == BadgeDataModel()) badges.value.getOrDefault(currentSectionBadge.value, BadgeDataModel())
+                else currentBadge.value
+
+            BadgePopUp(
+                currentBadge.value,
+                {
+                    currentBadge.value = currentBadge.value.copy(badgeName = it)
+                },
+                {
+                    currentBadge.value = currentBadge.value.copy(description = it)
+                },
+                {
+                    badges.value.put(currentSectionBadge.value, currentBadge.value)
+                    currentBadge.value = BadgeDataModel()
+                    isBadgeEditActive.value = false
+                },
+                {
+                    currentBadge.value = BadgeDataModel()
+                    isBadgeEditActive.value = false
+                },
+            )
+
+        }
+
     }
+
+
 
     BackHandler {
         navController.navigate(Routes.Profile.route)

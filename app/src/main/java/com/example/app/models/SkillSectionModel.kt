@@ -12,5 +12,8 @@ data class SkillSectionModel(
 
     //var imageBadgeStep: Bitmap,
 
-    var skillTasksList:List<String> = mutableListOf()
+    var skillTasksList:List<String> = mutableListOf(),
+
+    var hasBadge: Boolean = false,
+    var badgeID: String = ""
 ): Parcelable

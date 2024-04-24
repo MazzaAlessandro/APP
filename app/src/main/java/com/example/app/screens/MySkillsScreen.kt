@@ -356,6 +356,22 @@ fun MySkillsScreen(navController: NavHostController,
         if(indexOfSection == updatedStructure.skill.skillSectionsList.size-1){
             sharedViewModel.saveSkillProgression(listCompleteStructures.value.get(currentStructureIndex.value).skillProgression.copy(isFinished = true), currentContext)
 
+
+
+            sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext){
+
+
+                val skillSection = listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+
+                var updatedBadges = it.badgesObtained
+
+                if(skillSection.hasBadge){
+                    updatedBadges = updatedBadges + skillSection.badgeID
+                }
+
+                sharedViewModel.saveUserSub(it.copy(badgesObtained = updatedBadges), context = currentContext)
+            }
+
             return@LaunchedEffect
         }
 
@@ -383,10 +399,21 @@ fun MySkillsScreen(navController: NavHostController,
                     Pair(it.id, 0)
                 })
 
-                Toast.makeText(currentContext, updatedProgression.mapNonCompletedTasks.size.toString(), Toast.LENGTH_SHORT).show()
-
                 sharedViewModel.saveSkillProgression(updatedProgression, currentContext)
 
+                sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext){
+
+
+                    val skillSection = listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+
+                    var updatedBadges = it.badgesObtained
+
+                    if(skillSection.hasBadge){
+                        updatedBadges = updatedBadges + skillSection.badgeID
+                    }
+
+                    sharedViewModel.saveUserSub(it.copy(badgesObtained = updatedBadges), context = currentContext)
+                }
 
                 updatedStructure = updatedStructure.copy(skillProgression = updatedProgression)
                 updatedList.set(currentStructureIndex.value, updatedStructure)
