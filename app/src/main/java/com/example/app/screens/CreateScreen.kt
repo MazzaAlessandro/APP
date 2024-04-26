@@ -19,9 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardHide
@@ -35,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +60,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.app.Routes
+import com.example.app.additionalUI.BadgeBanner
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.BadgeDataModel
@@ -328,7 +332,29 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
 }
 
 @Composable
-fun BadgePopUp(badge: BadgeDataModel, onBadgeNameChange: (String) -> Unit, onBadgeDescriptionChange: (String) -> Unit, onAddBadge: () -> Unit, onCloseClick: () -> Unit) {
+fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeNameChange: (String) -> Unit, onBadgeDescriptionChange: (String) -> Unit, onAddBadge: () -> Unit, onCloseClick: () -> Unit) {
+
+    val context = LocalContext.current
+
+
+    var listBadges: MutableState<List<BadgeDataModel>> = remember {
+        mutableStateOf(listOf())
+    }
+
+    LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
+        sharedViewModel.retrieveUserSkillSub(
+            sharedViewModel.getCurrentUserMail(),
+            context
+        ){userSkillSub ->
+            sharedViewModel.retrieveAllBadges(
+                userSkillSub.createdBadges,
+                context
+            ){
+                listBadges.value = it
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -361,7 +387,9 @@ fun BadgePopUp(badge: BadgeDataModel, onBadgeNameChange: (String) -> Unit, onBad
                     Icon(imageVector = Icons.Default.Close, contentDescription = "close")
                 }
 
-                Column {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
                     Text(text = "TITLE")
 
                     TextFieldString(value = badge.badgeName, onValueChange = onBadgeNameChange, isSingleLine = true)
@@ -377,6 +405,15 @@ fun BadgePopUp(badge: BadgeDataModel, onBadgeNameChange: (String) -> Unit, onBad
                     Button(onClick = {onAddBadge()}) {
                         Text(text = "ADD +")
                     }
+
+                    Toast.makeText(context, listBadges.value.count().toString(), Toast.LENGTH_SHORT).show()
+                    listBadges.value.forEach{
+                        Box(){
+                            Text(text = it.badgeName)
+
+                        }
+                    }
+
                 }
             }
         }
@@ -424,8 +461,11 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
 
 
     sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), context){
+
+        Toast.makeText(context, it.createdSkillsId.count().toString(), Toast.LENGTH_SHORT).show()
+
         val createdSkillsIdList = it.createdSkillsId + skill.id
-        val createdBadgesIdList = it.createdSkillsId + badgeList.values.map { it.skillId + it.sectionId }
+        val createdBadgesIdList = it.createdBadges + badgeList.values.filter { it != BadgeDataModel() }.map { it.skillId + it.sectionId }
         sharedViewModel.updateUserSub(it.copy(createdSkillsId = createdSkillsIdList, createdBadges = createdBadgesIdList), context)
     }
 
@@ -630,6 +670,7 @@ fun CreateScreen(
                 else currentBadge.value
 
             BadgePopUp(
+                sharedViewModel,
                 currentBadge.value,
                 {
                     currentBadge.value = currentBadge.value.copy(badgeName = it)

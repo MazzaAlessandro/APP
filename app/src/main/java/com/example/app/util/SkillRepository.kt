@@ -342,7 +342,7 @@ class SkillRepository {
                         for(d in documents){
 
                             val badge = d.toObject<BadgeDataModel>()!!
-                            if(badge.skillId + badge.sectionId in badgesList){
+                            if((badge.skillId + badge.sectionId).toString() in badgesList){
                                 badgeList += badge
                             }
 
