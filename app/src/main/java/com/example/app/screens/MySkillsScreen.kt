@@ -365,7 +365,7 @@ fun MySkillsScreen(navController: NavHostController,
 
                 var updatedBadges = it.badgesObtained
 
-                if(skillSection.hasBadge){
+                if(skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)){
                     updatedBadges = updatedBadges + skillSection.badgeID
                 }
 
@@ -375,6 +375,22 @@ fun MySkillsScreen(navController: NavHostController,
             return@LaunchedEffect
         }
 
+        //FIRST WE ADD THE BADGE
+        sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext){
+
+
+            val skillSection = listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+
+            var updatedBadges = it.badgesObtained
+
+            if(skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)){
+                updatedBadges = updatedBadges + skillSection.badgeID
+            }
+
+            sharedViewModel.saveUserSub(it.copy(badgesObtained = updatedBadges), context = currentContext)
+        }
+
+        //SECOND WE UPDATE THE STRUCT
         updatedProgression.currentSectionId = updatedStructure.skill.skillSectionsList.get(indexOfSection + 1)
 
         sharedViewModel.retrieveSkillSection(
@@ -400,20 +416,6 @@ fun MySkillsScreen(navController: NavHostController,
                 })
 
                 sharedViewModel.saveSkillProgression(updatedProgression, currentContext)
-
-                sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext){
-
-
-                    val skillSection = listCompleteStructures.value.get(currentStructureIndex.value).skillSection
-
-                    var updatedBadges = it.badgesObtained
-
-                    if(skillSection.hasBadge){
-                        updatedBadges = updatedBadges + skillSection.badgeID
-                    }
-
-                    sharedViewModel.saveUserSub(it.copy(badgesObtained = updatedBadges), context = currentContext)
-                }
 
                 updatedStructure = updatedStructure.copy(skillProgression = updatedProgression)
                 updatedList.set(currentStructureIndex.value, updatedStructure)
