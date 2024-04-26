@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +29,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +51,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -61,6 +65,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.app.Routes
 import com.example.app.additionalUI.BadgeBanner
+import com.example.app.additionalUI.BadgeColor
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.BadgeDataModel
@@ -210,14 +215,23 @@ fun SectionBox(id:Int, section:SkillSectionModel,
         .background(color = Color(0xFFD9D9D9), shape = RoundedCornerShape(10.dp))
         .padding(15.dp)
     ){
-        Column{
+        Column(verticalArrangement = Arrangement.spacedBy(5.dp)){
             
             Button(onClick = { onAddBadgeProcess(id.toString())  }) {
                 Text(text = "Add Badge")
             }
 
             if(badge != null){
-                Text(text = badge.badgeName)
+
+                BadgeBanner(
+                    badge = badge.badgeColor,
+                    skillName = badge.badgeName + " - " + "Skill name",
+                    description = badge.description,
+                    date = "01/20/5201"
+                ) {
+
+                }
+
             }
             
             Row (verticalAlignment = Alignment.CenterVertically)
@@ -332,13 +346,17 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
 }
 
 @Composable
-fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeNameChange: (String) -> Unit, onBadgeDescriptionChange: (String) -> Unit, onAddBadge: () -> Unit, onCloseClick: () -> Unit) {
+fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeNameChange: (String) -> Unit, onBadgeDescriptionChange: (String) -> Unit, onColorChange:(BadgeColor) -> Unit, onAddBadge: () -> Unit, onCloseClick: () -> Unit) {
 
     val context = LocalContext.current
 
 
     var listBadges: MutableState<List<BadgeDataModel>> = remember {
         mutableStateOf(listOf())
+    }
+
+    var isExpanded: MutableState<Boolean> = remember{
+        mutableStateOf(true)
     }
 
     LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
@@ -366,10 +384,11 @@ fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeN
 
         Dialog(
             onDismissRequest = onCloseClick,
+
             ) {
             Box(
                 Modifier
-                    .fillMaxWidth(0.9f)
+                    .fillMaxWidth()
                     .fillMaxHeight(0.75f)
                     .clip(shape = RoundedCornerShape(25.dp))
                     .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
@@ -392,6 +411,20 @@ fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeN
                 ) {
                     Text(text = "TITLE")
 
+                    DropdownMenu(expanded = isExpanded.value, onDismissRequest = { isExpanded.value = false }) {
+
+                        BadgeColor.values().forEachIndexed { index, badgeColor ->
+                            
+                            DropdownMenuItem(text = { Text(badgeColor.toString()) }, onClick = {
+                                isExpanded.value = false
+                                onColorChange(badgeColor) }
+                            )
+
+                        }
+
+
+                    }
+                    
                     TextFieldString(value = badge.badgeName, onValueChange = onBadgeNameChange, isSingleLine = true)
 
                     Text(text = "DECRIPTION")
@@ -408,10 +441,18 @@ fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeN
 
                     Toast.makeText(context, listBadges.value.count().toString(), Toast.LENGTH_SHORT).show()
                     listBadges.value.forEach{
-                        Box(){
-                            Text(text = it.badgeName)
-
+                        
+                        BadgeBanner(
+                            badge = it.badgeColor,
+                            skillName = it.badgeName,
+                            description = it.description,
+                            date = ""
+                        ) {
+                            onBadgeNameChange(it.badgeName)
+                            onBadgeDescriptionChange(it.description)
+                            onAddBadge()
                         }
+
                     }
 
                 }
@@ -677,6 +718,9 @@ fun CreateScreen(
                 },
                 {
                     currentBadge.value = currentBadge.value.copy(description = it)
+                },
+                {
+                    currentBadge.value = currentBadge.value.copy(badgeColor = it)
                 },
                 {
                     badges.value.put(currentSectionBadge.value, currentBadge.value)
