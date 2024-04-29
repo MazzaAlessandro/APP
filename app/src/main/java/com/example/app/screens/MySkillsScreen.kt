@@ -176,6 +176,15 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (
 
 @Composable
 fun CustomProgressIndicator(description: String, amount: Int, required: Int, height: Dp, onClickTask: () -> Unit){
+
+    val colorNum = amount.toFloat() / required
+
+    var colorRed = 255 + (163 - 255) * colorNum
+    var colorGreen = 130 + (255 - 130) * colorNum
+    var colorBlue: Float = 136 + (130 - 136) * colorNum
+
+    val color = Color(colorRed/255.0f, colorGreen/255.0f, colorBlue/255.0f)
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(2.dp)
@@ -192,7 +201,7 @@ fun CustomProgressIndicator(description: String, amount: Int, required: Int, hei
                 .border(1.dp, Color.Black, RoundedCornerShape(15)))
             Box(modifier = Modifier
                 .fillMaxHeight()
-                .background(Color(0xFFA3FF88), RoundedCornerShape(15))
+                .background(color, RoundedCornerShape(15))
                 .border(1.dp, Color.Black, RoundedCornerShape(15))
                 .fillMaxWidth(amount.toFloat() / required.toFloat()))
         }
