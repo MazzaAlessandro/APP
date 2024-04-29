@@ -119,15 +119,14 @@ fun BadgesScreen(
                     }
                 }
             }
-
-
-            if (selected.value){
-                BadgeCard(
-                    selectedBadge,
-                    onCloseClick = {
-                        selected.value = false
-                    })
-            }
         }
+    }
+
+    if (selected.value){
+        BadgeCard(
+            selectedBadge,
+            onCloseClick = {
+                selected.value = false
+            })
     }
 }

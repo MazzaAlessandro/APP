@@ -137,7 +137,7 @@ fun BadgeCard(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Gray.copy(alpha = 0.5f))
+            .background(Color.Gray.copy(alpha = 0.7f))
             .zIndex(10F)
             .clickable {  },
         contentAlignment = Alignment.Center

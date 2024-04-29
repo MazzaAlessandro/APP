@@ -25,6 +25,15 @@ fun rememberWindowInfo(): WindowInfo{
     )
 }
 
+@Composable
+fun relative(
+    size : Dp
+): Dp{
+    val windowInfo = rememberWindowInfo()
+
+    return size.times(windowInfo.screenHeight.div(814.0.dp))
+}
+
 data class  WindowInfo(
     val screenWidthInfo: WindowType,
     val screenHeightInfo: WindowType,

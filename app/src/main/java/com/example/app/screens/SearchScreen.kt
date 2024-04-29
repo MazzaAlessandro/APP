@@ -356,7 +356,7 @@ fun SkillInfoPopUp_STARTED(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Gray.copy(alpha = 0.5f))
+            .background(Color.Gray.copy(alpha = 0.7f))
             .zIndex(10F)
             .clickable { },
         contentAlignment = Alignment.Center
@@ -656,7 +656,7 @@ fun SkillInfoPopUp_UNSTARTED(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Gray.copy(alpha = 0.5f))
+            .background(Color.Gray.copy(alpha = 0.7f))
             .zIndex(10F)
             .clickable { },
         contentAlignment = Alignment.Center
@@ -1197,80 +1197,75 @@ fun SearchScreen(
             }
         }*/
 
-
-
-
-        if (isSkillSelected.value == SelectedSkillState.NEW_SELECTED || isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED) {
-            Box() {
-                SkillInfoPopUp_UNSTARTED(skillSelected.value, sharedViewModel,
-                    isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED,
-                    {
-                        sharedViewModel.retrieveSkillSection(
-                            skillSelected.value.id,
-                            skillSelected.value.skillSectionsList.get(0),
-                            currentContext,
-                        ) { section ->
-                            val mapNonCompletedTasks: Map<String, Int> =
-                                section.skillTasksList.associateWith { 0 }
-
-                            val skillProgression = SkillProgressionModel(
-                                sharedViewModel.getCurrentUserMail(),
-                                skillSelected.value.id,
-                                skillSelected.value.skillSectionsList.get(0),
-                                mapNonCompletedTasks
-                            )
-                            skillProgressions.value += skillProgression
-
-                            sharedViewModel.saveSkillProgression(skillProgression, currentContext)
-
-                            var startedSkillIds = skillProgressions.value.map {
-                                it.skillId
-                            }
-                            sharedViewModel.updateUserSub(
-                                currentUserSkillSubs.value.copy(
-                                    startedSkillsIDs = startedSkillIds
-                                ), currentContext
-                            )
-
-                            isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
-                        }
-                    },
-
-                    {
-                        isSkillSelected.value = SelectedSkillState.NOT_SELECTED
-                    },
-                    {
-                        //COMEBACK
-                        val regSkillIds = currentUserSkillSubs.value.registeredSkillsIDs
-
-                        currentUserSkillSubs.value =
-                            currentUserSkillSubs.value.copy(registeredSkillsIDs = regSkillIds + skillSelected.value.id)
-
-                        sharedViewModel.updateUserSub(currentUserSkillSubs.value, currentContext)
-
-                        skillModelsRegistered.value += skillSelected.value
-
-                        isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
-                    }
-                )
-            }
-        } else if (isSkillSelected.value == SelectedSkillState.STARTED_SELECTED) {
-            Box() {
-
-                SkillInfoPopUp_STARTED(
-                    sharedViewModel,
-                    skillSelected.value,
-                    skillProgressions.value?.find { it.skillId == skillSelected.value.id }
-                        ?: SkillProgressionModel(),
-                    {
-                        isSkillSelected.value = SelectedSkillState.NOT_SELECTED
-                    })
-            }
-        }
-
     }
 
+    if (isSkillSelected.value == SelectedSkillState.NEW_SELECTED || isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED) {
+        Box() {
+            SkillInfoPopUp_UNSTARTED(skillSelected.value, sharedViewModel,
+                isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED,
+                {
+                    sharedViewModel.retrieveSkillSection(
+                        skillSelected.value.id,
+                        skillSelected.value.skillSectionsList.get(0),
+                        currentContext,
+                    ) { section ->
+                        val mapNonCompletedTasks: Map<String, Int> =
+                            section.skillTasksList.associateWith { 0 }
 
+                        val skillProgression = SkillProgressionModel(
+                            sharedViewModel.getCurrentUserMail(),
+                            skillSelected.value.id,
+                            skillSelected.value.skillSectionsList.get(0),
+                            mapNonCompletedTasks
+                        )
+                        skillProgressions.value += skillProgression
+
+                        sharedViewModel.saveSkillProgression(skillProgression, currentContext)
+
+                        var startedSkillIds = skillProgressions.value.map {
+                            it.skillId
+                        }
+                        sharedViewModel.updateUserSub(
+                            currentUserSkillSubs.value.copy(
+                                startedSkillsIDs = startedSkillIds
+                            ), currentContext
+                        )
+
+                        isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
+                    }
+                },
+
+                {
+                    isSkillSelected.value = SelectedSkillState.NOT_SELECTED
+                },
+                {
+                    //COMEBACK
+                    val regSkillIds = currentUserSkillSubs.value.registeredSkillsIDs
+
+                    currentUserSkillSubs.value =
+                        currentUserSkillSubs.value.copy(registeredSkillsIDs = regSkillIds + skillSelected.value.id)
+
+                    sharedViewModel.updateUserSub(currentUserSkillSubs.value, currentContext)
+
+                    skillModelsRegistered.value += skillSelected.value
+
+                    isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+                }
+            )
+        }
+    } else if (isSkillSelected.value == SelectedSkillState.STARTED_SELECTED) {
+        Box() {
+
+            SkillInfoPopUp_STARTED(
+                sharedViewModel,
+                skillSelected.value,
+                skillProgressions.value?.find { it.skillId == skillSelected.value.id }
+                    ?: SkillProgressionModel(),
+                {
+                    isSkillSelected.value = SelectedSkillState.NOT_SELECTED
+                })
+        }
+    }
 
 
     BackHandler {

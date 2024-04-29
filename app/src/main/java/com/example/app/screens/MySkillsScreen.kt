@@ -1,7 +1,6 @@
 package com.example.app.screens
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,6 +50,7 @@ import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
+import com.example.app.util.relative
 
 
 //TODO MAKE THE USER CONNECTED TO THE SKILL
@@ -72,7 +72,7 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
 
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BadgeIcon(badge = BadgeColor.BRONZE, size = 65.dp)
+        BadgeIcon(badge = BadgeColor.BRONZE, size = relative(65.dp))
         Spacer(Modifier.width(10.dp)) // Space between the circle and the text
         Column(modifier = Modifier.weight(1f)) {
             Text(skillCompleteStructureModel.skillSection.titleSection, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -98,7 +98,8 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, i
         Text(
             skillCompleteStructureModel.skill.titleSkill,
             fontSize = 25.sp,
-            fontWeight = FontWeight.Bold)
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center)
 
         SkillTitleBlock(skillCompleteStructureModel)
 
