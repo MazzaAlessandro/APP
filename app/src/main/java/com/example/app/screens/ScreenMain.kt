@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.content.pm.ActivityInfo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -12,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.app.Routes
+import com.example.app.util.LockScreenOrientation
 import com.example.app.util.SharedViewModel
 import com.example.app.util.SkillRepository
 import com.example.app.util.UserRepository
@@ -24,7 +26,7 @@ fun ScreenMain(){
     val openDialog = remember { mutableStateOf(false) }
     val pendingRoute = remember { mutableStateOf<String?>(null) }
 
-
+    LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     NavHost(navController = navController, startDestination = "Login") {
 
