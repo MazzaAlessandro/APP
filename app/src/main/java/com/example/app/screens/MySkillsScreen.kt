@@ -90,7 +90,7 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
 }
 
 @Composable
-fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, index:Int,  onClickTask: (Int, SkillTaskModel) -> Unit, onValidateSkill: (Int) -> Unit){
+fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, index:Int,  onClickTask: (Int, SkillTaskModel) -> Unit, onValidateSkill: (Int) -> Unit, onOpenMenu :(Int) -> Unit){
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -109,7 +109,9 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, i
                 textAlign = TextAlign.Center)
 
             Button(
-                onClick = { /*TODO*/ }
+                onClick = {
+                    onOpenMenu(index)
+                }
             ) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
@@ -195,7 +197,7 @@ fun TaskListElement(progression: Int, task: SkillTaskModel, onClickTask: () -> U
 }
 
 @Composable
-fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (Int, SkillTaskModel) -> Unit, onValidateSkill: (Int) -> Unit){
+fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (Int, SkillTaskModel) -> Unit, onValidateSkill: (Int) -> Unit, onOpenMenu: (Int) -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -204,7 +206,7 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         listSkills.forEachIndexed{index, skillStructure ->
-            SkillListElement(skillCompleteStructureModel = skillStructure, index, onClickTask, onValidateSkill)
+            SkillListElement(skillCompleteStructureModel = skillStructure, index, onClickTask, onValidateSkill, onOpenMenu)
         }
     }
 }
@@ -382,6 +384,7 @@ fun MySkillsScreen(navController: NavHostController,
         mutableStateOf(false)
     }
 
+    // Pop up variables
     var isPopUpOpen : MutableState<Boolean> = remember {
         mutableStateOf(false)
     }
@@ -547,8 +550,22 @@ fun MySkillsScreen(navController: NavHostController,
 
                     FinishSkill(sharedViewModel, listCompleteStructures, currentStructureIndex, currentContext)
 
+                },
+                {index ->
+                    currentStructureIndex.value = index
+                    isPopUpOpen.value = true
                 }
             )
+        }
+
+        if(isPopUpOpen.value){
+            SkillInfoPopUp_STARTED(
+                sharedViewModel = sharedViewModel,
+                skill = listCompleteStructures.value.get(currentStructureIndex.value).skill,
+                skillProgression = listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
+            ) {
+                isPopUpOpen.value = false
+            }
         }
     }
 
