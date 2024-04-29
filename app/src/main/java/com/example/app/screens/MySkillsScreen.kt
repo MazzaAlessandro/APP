@@ -19,8 +19,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -95,11 +99,26 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, i
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)){
 
-        Text(
-            skillCompleteStructureModel.skill.titleSkill,
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center)
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                skillCompleteStructureModel.skill.titleSkill,
+                modifier = Modifier.weight(1.0f),
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center)
+
+            Button(
+                onClick = { /*TODO*/ }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = null
+                )
+            }
+
+
+        }
+
 
         SkillTitleBlock(skillCompleteStructureModel)
 
@@ -152,7 +171,7 @@ fun TaskListElement(progression: Int, task: SkillTaskModel, onClickTask: () -> U
         amount = progression,
         required = task.requiredAmount,
         height = 40.dp,
-        onClickTask
+        onClickTask = onClickTask
     )
 
 
@@ -175,7 +194,9 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (
 }
 
 @Composable
-fun CustomProgressIndicator(description: String, amount: Int, required: Int, height: Dp, onClickTask: () -> Unit){
+fun CustomProgressIndicator(description: String, amount: Int, required: Int, height: Dp, isUnstarted:Boolean = false, isClickable: Boolean = true, onClickTask: () -> Unit = {}){
+
+    val isDoneText = if(amount == required) "Done" else if(isUnstarted) "Unstarted" else amount.toString() + "/" + required.toString()
 
     val colorNum = amount.toFloat() / required
 
@@ -189,7 +210,7 @@ fun CustomProgressIndicator(description: String, amount: Int, required: Int, hei
         .fillMaxWidth()
         .padding(2.dp)
         .height(height)
-        .clickable { onClickTask() },
+        .clickable(isClickable) { onClickTask() },
         contentAlignment = Alignment.Center
     ){
         Box(modifier = Modifier
@@ -212,7 +233,7 @@ fun CustomProgressIndicator(description: String, amount: Int, required: Int, hei
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1.0f))
 
-            Text(text = amount.toString() + "/" + required.toString(),
+            Text(text = isDoneText,
                 modifier = Modifier.padding(horizontal = 20.dp))
 
         }
@@ -292,6 +313,11 @@ fun MySkillsScreen(navController: NavHostController,
     var triggerSectionSkip : MutableState<Boolean> = remember {
         mutableStateOf(false)
     }
+
+    var isPopUpOpen : MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
+
 
     LaunchedEffect(currentUser) {
         sharedViewModel.retrieveUserSkillProgressionList(

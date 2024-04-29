@@ -18,9 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -46,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -90,17 +94,19 @@ const val EXPANSION_ANIMATION_DURATION = 300
 
 @Composable
 fun SectionElementBlock(
-    task: String,
+    section: SkillSectionModel,
+    index: Int,
     amount: Int,
     required: Int,
-    sharedViewModel: SharedViewModel
 ) {
+
+    val isDoneText = if(amount == required) "Done" else amount.toString() + "/" + required.toString()
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp, 2.dp)
-            .height(40.dp),
+            .height(80.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -110,15 +116,8 @@ fun SectionElementBlock(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White, RoundedCornerShape(10))
+                    .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
                     .border(1.dp, Color.Black, RoundedCornerShape(10))
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .background(Color(0xFFA3FF88), RoundedCornerShape(10))
-                    .border(1.dp, Color.Black, RoundedCornerShape(10))
-                    .fillMaxWidth(amount.toFloat() / required.toFloat())
             )
         }
 
@@ -127,19 +126,22 @@ fun SectionElementBlock(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = task,
+                text = "Section " + index.toString() + ": " + section.titleSection,
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1.0f)
             )
 
             Text(
-                text = amount.toString() + "/" + required.toString(),
+                text = isDoneText,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
         }
     }
 
 }
+
 
 @Composable
 fun SkillSearchBlock(
@@ -188,7 +190,7 @@ fun SkillSearchBlock(
                     horizontalAlignment = Alignment.Start
                 ) {
 
-                    Text(skill.titleSkill, fontSize = 25.sp)
+                    Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 25.sp)
 
                     val sectionAmount = skill.skillSectionsList.size
 
@@ -394,9 +396,10 @@ fun SkillInfoPopUp_STARTED(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(0.dp, 0.dp, 0.dp, 15.dp),
+                        .padding(0.dp, 0.dp, 0.dp, 15.dp)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.spacedBy(100.dp)
                 ) {
 
 
@@ -436,7 +439,8 @@ fun SkillInfoPopUp_STARTED(
                     }
 
                     Column(modifier = Modifier
-                        .fillMaxWidth(),) {
+                        .fillMaxWidth(),
+                        ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -498,7 +502,7 @@ fun SkillInfoPopUp_STARTED(
 
                             Text(
                                 modifier = Modifier.padding(8.dp),
-                                text = "Current Section",
+                                text = "Sections",
                                 fontSize = 18.sp
                             )
 
@@ -510,6 +514,96 @@ fun SkillInfoPopUp_STARTED(
                                 thickness = 1.dp
                             )
                         }
+                        //SECTION ELEMENT
+
+                        sectionsList.value.forEachIndexed { index, section ->
+                            val indexOfCurrent = skill.skillSectionsList.indexOf(section.id)
+                            val indexOfProg =
+                                skill.skillSectionsList.indexOf(skillProgression.currentSectionId)
+
+                            if (indexOfCurrent < indexOfProg) {
+                                SectionElementBlock(section, index , 1, 1)
+                            } else if (indexOfCurrent == indexOfProg) {
+
+                                val amount = completeStructure.value.skillTasks.map { entry ->
+                                    entry.value.first
+                                }.sum()
+
+                                val total = completeStructure.value.skillTasks.map { entry ->
+                                    entry.value.second
+                                }.sum()
+
+                                val required = if(total == 0) 1 else total
+
+                                SectionElementBlock(section, index,  1, 1)
+
+
+                            } else {
+
+                                val total = completeStructure.value.skillTasks.map { entry ->
+                                    entry.value.second
+                                }.sum()
+
+                                SectionElementBlock(section, index, 0, total)
+                            }
+
+                            // THE TASKS
+
+                            Column(modifier = Modifier
+                                .fillMaxWidth(),) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(15.dp, 0.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                        color = Color.Black,
+                                        thickness = 1.dp
+                                    )
+
+                                    Text(
+                                        modifier = Modifier.padding(8.dp),
+                                        text = "Tasks",
+                                        fontSize = 18.sp
+                                    )
+
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                        color = Color.Black,
+                                        thickness = 1.dp
+                                    )
+                                }
+
+                                tasksMap.value.get(section.id)?.forEach {task->
+
+                                    val am: Int;
+                                    val req: Int;
+
+                                    if (indexOfCurrent < indexOfProg) {
+                                        am = task.requiredAmount
+                                        req = task.requiredAmount
+                                    } else {
+                                        am = completeStructure.value.skillTasks.get(task)?.first ?: 0
+                                        req = task.requiredAmount
+                                    }
+
+                                    CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false)
+                                }
+
+                                Spacer(modifier = Modifier.height(50.dp))
+
+                            }
+
+                        }
+
+
+                        /*
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -522,64 +616,10 @@ fun SkillInfoPopUp_STARTED(
                                 fontSize = 12.sp,
                                 color = Color.Black
                             )
-                        }
-                    }
-
-                    Column(modifier = Modifier
-                        .fillMaxWidth(),) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.Black,
-                                thickness = 1.dp
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = "Tasks",
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.Black,
-                                thickness = 1.dp
-                            )
-                        }
-
-                        completeStructure.value.skillTasks.forEach {tasksMap->
-                            SectionElementBlock(tasksMap.key.taskDescription, tasksMap.value.first, tasksMap.key.requiredAmount, sharedViewModel)
-                        }
-                        /*sectionsList.value.forEach { section ->
-                            val indexOfCurrent = skill.skillSectionsList.indexOf(section.id)
-                            val indexOfProg =
-                                skill.skillSectionsList.indexOf(skillProgression.currentSectionId)
-
-                            if (indexOfCurrent < indexOfProg) {
-                                SectionElementBlock(section, 1, 1, sharedViewModel)
-                            } else if (indexOfCurrent == indexOfProg) {
-
-
-                                SectionElementBlock(section, 1, 2, sharedViewModel)
-
-                            } else {
-                                SectionElementBlock(
-                                    section = section,
-                                    amount = 0,
-                                    required = 1,
-                                    sharedViewModel = sharedViewModel
-                                )
-                            }
                         }*/
+
+
+
                     }
 
                     Text(
@@ -860,12 +900,12 @@ fun SkillInfoPopUp_UNSTARTED(
                             )
                         }
 
-                        sectionsList.value.forEach { section ->
+                        sectionsList.value.forEachIndexed { index, section ->
                             SectionElementBlock(
-                                section.titleSection,
+                                section,
+                                index,
                                 amount = 0,
                                 required = 1,
-                                sharedViewModel = sharedViewModel
                             )
                         }
                     }
