@@ -13,6 +13,9 @@ data class UserSkillSubsModel(
     //the skills he registered for without starting
     var registeredSkillsIDs: List<String> = emptyList(),
 
+    //the skills he finished
+    var finishedSkills: List<String> = emptyList(),
+
     //the skills he created but didn't register nor start
     var createdSkillsId: List<String> = emptyList(),
 

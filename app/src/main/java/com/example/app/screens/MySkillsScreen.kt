@@ -50,6 +50,7 @@ import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillCompleteStructureModel
 import com.example.app.models.SkillModel
+import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
@@ -89,7 +90,7 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel){
 }
 
 @Composable
-fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, index:Int,  onClickTask: (Int, SkillTaskModel) -> Unit){
+fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, index:Int,  onClickTask: (Int, SkillTaskModel) -> Unit, onValidateSkill: (Int) -> Unit){
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -158,6 +159,21 @@ fun SkillListElement(skillCompleteStructureModel: SkillCompleteStructureModel, i
             skillCompleteStructureModel.skillTasks.forEach{
                 TaskListElement(progression = it.value.first, task = it.key, {onClickTask(index, it.key)})
             }
+            
+            if(skillCompleteStructureModel.skillProgression.isFinished){
+
+                Button(
+                    onClick = { onValidateSkill(index) },
+                    modifier = Modifier
+                        .padding(vertical = 20.dp)
+                ) {
+                    Text(
+                        fontSize = 20.sp,
+                        color = Color.White,
+                        text = "Finish"
+                    )
+                }
+            }
         }
 
     }
@@ -179,7 +195,7 @@ fun TaskListElement(progression: Int, task: SkillTaskModel, onClickTask: () -> U
 }
 
 @Composable
-fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (Int, SkillTaskModel) -> Unit){
+fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (Int, SkillTaskModel) -> Unit, onValidateSkill: (Int) -> Unit){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,7 +204,7 @@ fun SkillListBlock(listSkills: List<SkillCompleteStructureModel>, onClickTask: (
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         listSkills.forEachIndexed{index, skillStructure ->
-            SkillListElement(skillCompleteStructureModel = skillStructure, index, onClickTask)
+            SkillListElement(skillCompleteStructureModel = skillStructure, index, onClickTask, onValidateSkill)
         }
     }
 }
@@ -259,6 +275,9 @@ fun ComputeListTaskAdd1(context: Context, index: Int, task: SkillTaskModel, list
         updatedProgMap.set(task.id, minOf(basedNumber + 1, task.requiredAmount))
     }
 
+    if(updatedStructure.skill.skillSectionsList.indexOf(updatedStructure.skillProgression.currentSectionId) == updatedStructure.skill.skillSectionsList.size-1 && updatedProgMap.isEmpty()){
+        updatedProgression = updatedProgression.copy(isFinished = true)
+    }
 
     updatedProgression = updatedProgression.copy(mapNonCompletedTasks = updatedProgMap)
     updatedStructure = updatedStructure.copy(skillProgression = updatedProgression, skillTasks = updatedMap)
@@ -278,9 +297,58 @@ fun ComputeSkipSection(index: Int, listCompleteStructures: MutableList<SkillComp
 
     val mustSkipSection: Boolean = updatedStructure.skillTasks.all {
         it.value.first == it.value.second
-    }
+    } && (indexOfSection != updatedStructure.skill.skillSectionsList.size-1)
+
 
     return mustSkipSection
+}
+
+fun FinishSkill(sharedViewModel: SharedViewModel, listCompleteStructures: MutableState<List<SkillCompleteStructureModel>>, currentStructureIndex: MutableState<Int>, currentContext: Context){
+    var updatedList = listCompleteStructures.value.toMutableList()
+    var updatedStructure = updatedList.get(currentStructureIndex.value)
+
+
+    var updatedProgression = updatedStructure.skillProgression
+
+    val indexOfSection = updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
+
+    sharedViewModel.saveSkillProgression(listCompleteStructures.value.get(currentStructureIndex.value).skillProgression.copy(isFinished = true), currentContext)
+
+    updatedProgression = updatedProgression.copy(isFinished = true)
+
+    sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext) {
+
+
+        val skillSection =
+            listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+
+        var updatedBadges = it.badgesObtained
+        var updatedFinishedSkills = it.finishedSkills
+        var updatedStartedSkills = it.startedSkillsIDs
+
+        if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
+            updatedBadges = updatedBadges + skillSection.badgeID
+        }
+
+        if(updatedStructure.skill.id !in updatedFinishedSkills){
+            updatedFinishedSkills += updatedStructure.skill.id
+        }
+
+        if(updatedStructure.skill.id in updatedStartedSkills){
+            updatedStartedSkills -= updatedStructure.skill.id
+        }
+
+        sharedViewModel.saveUserSub(
+            it.copy(badgesObtained = updatedBadges, finishedSkills = updatedFinishedSkills, startedSkillsIDs = updatedStartedSkills),
+            context = currentContext
+        )
+
+        val skillProgressionModel = listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
+
+        sharedViewModel.removeSkillProgression(skillProgressionModel, currentContext)
+        listCompleteStructures.value -= listCompleteStructures.value.get(currentStructureIndex.value)
+    }
+
 }
 
 
@@ -389,27 +457,6 @@ fun MySkillsScreen(navController: NavHostController,
 
         val indexOfSection = updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
 
-        if(indexOfSection == updatedStructure.skill.skillSectionsList.size-1){
-            sharedViewModel.saveSkillProgression(listCompleteStructures.value.get(currentStructureIndex.value).skillProgression.copy(isFinished = true), currentContext)
-
-
-
-            sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext){
-
-
-                val skillSection = listCompleteStructures.value.get(currentStructureIndex.value).skillSection
-
-                var updatedBadges = it.badgesObtained
-
-                if(skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)){
-                    updatedBadges = updatedBadges + skillSection.badgeID
-                }
-
-                sharedViewModel.saveUserSub(it.copy(badgesObtained = updatedBadges), context = currentContext)
-            }
-
-            return@LaunchedEffect
-        }
 
         //FIRST WE ADD THE BADGE
         sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext){
@@ -476,8 +523,8 @@ fun MySkillsScreen(navController: NavHostController,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SkillListBlock(listSkills = listCompleteStructures.value
-            ) { index, task ->
+            SkillListBlock(listSkills = listCompleteStructures.value,
+                { index, task ->
 
                 val updatedList = ComputeListTaskAdd1(currentContext, index, task, listCompleteStructures.value.toMutableList())
 
@@ -492,7 +539,16 @@ fun MySkillsScreen(navController: NavHostController,
                 }
 
                 listCompleteStructures.value = updatedList
-            }
+                },
+                {index ->
+
+                    currentStructureIndex.value = index
+                    isStartRun.value = false
+
+                    FinishSkill(sharedViewModel, listCompleteStructures, currentStructureIndex, currentContext)
+
+                }
+            )
         }
     }
 

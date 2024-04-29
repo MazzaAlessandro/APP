@@ -269,6 +269,13 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.retrieveAllBadges(badgesList, context, data)
     }
 
+    fun removeSkillProgression(
+        skillProgression: SkillProgressionModel,
+        context: Context
+    ){
+        skillRepository.removeSkillProgression(skillProgression, context)
+    }
+
     fun popUpOn(){
         dialogShown = true
     }

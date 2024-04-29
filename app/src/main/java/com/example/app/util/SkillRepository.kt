@@ -624,6 +624,17 @@ class SkillRepository {
         }
     }
 
+    fun removeSkillProgression(
+        skillProgression: SkillProgressionModel,
+        context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val db = Firebase.firestore
+            .collection("skillprogression")
+            .document(skillProgression.userMail + skillProgression.skillId)
+
+        db.delete()
+    }
+
 
 
 }
