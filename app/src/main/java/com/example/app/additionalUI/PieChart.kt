@@ -21,7 +21,7 @@ data class PieChartData(
 )
 
 data class ArcData(
-    val animation : androidx.compose.animation.core.Animatable<Float, AnimationVector1D>,
+    val animation : Animatable<Float, AnimationVector1D>,
     val targetSweepAngle : Float,
     val color : Color,
 )

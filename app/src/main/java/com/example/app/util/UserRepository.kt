@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class UserRepository{
     private var currentUserMail: MutableStateFlow<String> = MutableStateFlow("")
-    var userMail: StateFlow<String> = currentUserMail.asStateFlow();
+    var userMail: StateFlow<String> = currentUserMail.asStateFlow()
 
     private var currentUserData: MutableStateFlow<UserDataModel> = MutableStateFlow(UserDataModel())
     var userData: StateFlow<UserDataModel> = currentUserData.asStateFlow()

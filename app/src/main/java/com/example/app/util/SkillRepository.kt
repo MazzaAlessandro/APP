@@ -20,15 +20,15 @@ import kotlinx.coroutines.launch
 
 class SkillRepository {
 
-    private var currentSkillProgression: MutableStateFlow<SkillProgressionModel> = MutableStateFlow(SkillProgressionModel());
+    private var currentSkillProgression: MutableStateFlow<SkillProgressionModel> = MutableStateFlow(SkillProgressionModel())
 
-    private var currentUserSub: MutableStateFlow<UserSkillSubsModel> = MutableStateFlow(UserSkillSubsModel());
+    private var currentUserSub: MutableStateFlow<UserSkillSubsModel> = MutableStateFlow(UserSkillSubsModel())
 
     private var currentSkillListProgression: MutableStateFlow<List<SkillProgressionModel>> = MutableStateFlow(emptyList())
-    var skillListProgression: StateFlow<List<SkillProgressionModel>> = currentSkillListProgression.asStateFlow();
+    var skillListProgression: StateFlow<List<SkillProgressionModel>> = currentSkillListProgression.asStateFlow()
 
     private var currentSkill: MutableStateFlow<SkillModel> = MutableStateFlow(SkillModel())
-    var skill: StateFlow<SkillModel> = currentSkill.asStateFlow();
+    var skill: StateFlow<SkillModel> = currentSkill.asStateFlow()
 
     private var currentSkillList: MutableStateFlow<List<SkillModel>> = MutableStateFlow(emptyList())
 
@@ -37,13 +37,13 @@ class SkillRepository {
     private var currentSectionList: MutableStateFlow<List<SkillSectionModel>> = MutableStateFlow(
         emptyList()
     )
-    var sectionList: StateFlow<List<SkillSectionModel>> = currentSectionList.asStateFlow();
+    var sectionList: StateFlow<List<SkillSectionModel>> = currentSectionList.asStateFlow()
 
     private var currentTask: MutableStateFlow<SkillTaskModel> = MutableStateFlow(SkillTaskModel())
     var task: StateFlow<SkillTaskModel> = currentTask.asStateFlow()
 
     private var currentSkillTaskList: MutableStateFlow<List<SkillTaskModel>> = MutableStateFlow(emptyList())
-    var skillTaskList: StateFlow<List<SkillTaskModel>> = currentSkillTaskList.asStateFlow();
+    var skillTaskList: StateFlow<List<SkillTaskModel>> = currentSkillTaskList.asStateFlow()
 
     private var currentBadge: MutableStateFlow<BadgeDataModel> = MutableStateFlow(BadgeDataModel())
 
@@ -81,13 +81,13 @@ class SkillRepository {
 
         val fireStoreRef = Firebase.firestore
             .collection("skill")
-            .whereEqualTo("creatorEmail", userEmail);
+            .whereEqualTo("creatorEmail", userEmail)
 
         try{
             fireStoreRef.get()
                 .addOnSuccessListener {documents ->
                     if (!documents.isEmpty){
-                        val currentSkillListLoc : MutableList<SkillModel> = mutableListOf();
+                        val currentSkillListLoc : MutableList<SkillModel> = mutableListOf()
 
                         for(d in documents){
 
@@ -97,7 +97,7 @@ class SkillRepository {
                             }
                             */
 
-                            currentSkillListLoc += d.toObject<SkillModel>()!!
+                            currentSkillListLoc += d.toObject<SkillModel>()
                         }
 
                         data(currentSkillListLoc)
@@ -125,7 +125,7 @@ class SkillRepository {
             fireStoreRef.get()
                 .addOnSuccessListener {documents ->
                     if (!documents.isEmpty){
-                        val currentSkillListLoc : MutableList<SkillModel> = mutableListOf();
+                        val currentSkillListLoc : MutableList<SkillModel> = mutableListOf()
 
                         for(d in documents){
 
@@ -135,8 +135,8 @@ class SkillRepository {
                             }
                             */
 
-                            if(d.toObject<SkillModel>()!!.id in listSkills){
-                                currentSkillListLoc += d.toObject<SkillModel>()!!
+                            if(d.toObject<SkillModel>().id in listSkills){
+                                currentSkillListLoc += d.toObject<SkillModel>()
                             }
                         }
 
@@ -188,13 +188,13 @@ class SkillRepository {
 
         val fireStoreRef = Firebase.firestore
             .collection("skillsection")
-            .whereEqualTo("idSkill", skillId);
+            .whereEqualTo("idSkill", skillId)
 
         try{
             fireStoreRef.get()
                 .addOnSuccessListener {documents ->
                     if (!documents.isEmpty){
-                        val currentSkillSectionList : MutableList<SkillSectionModel> = mutableListOf();
+                        val currentSkillSectionList : MutableList<SkillSectionModel> = mutableListOf()
 
                         for(d in documents){
 
@@ -204,7 +204,7 @@ class SkillRepository {
                             }
                             */
 
-                            currentSkillSectionList += d.toObject<SkillSectionModel>()!!
+                            currentSkillSectionList += d.toObject<SkillSectionModel>()
                         }
 
                         data(currentSkillSectionList)
@@ -337,11 +337,11 @@ class SkillRepository {
             fireStoreRef.get()
                 .addOnSuccessListener {documents ->
                     if (!documents.isEmpty){
-                        val badgeList : MutableList<BadgeDataModel> = mutableListOf();
+                        val badgeList : MutableList<BadgeDataModel> = mutableListOf()
 
                         for(d in documents){
 
-                            val badge = d.toObject<BadgeDataModel>()!!
+                            val badge = d.toObject<BadgeDataModel>()
                             if((badge.skillId + badge.sectionId).toString() in badgesList){
                                 badgeList += badge
                             }
@@ -366,13 +366,13 @@ class SkillRepository {
 
         val fireStoreRef = Firebase.firestore
             .collection("skillprogression")
-            .whereEqualTo("userMail", userEmail);
+            .whereEqualTo("userMail", userEmail)
 
         try{
             fireStoreRef.get()
                 .addOnSuccessListener {documents ->
                     if (!documents.isEmpty){
-                        val currentSkillListProg : MutableList<SkillProgressionModel> = mutableListOf();
+                        val currentSkillListProg : MutableList<SkillProgressionModel> = mutableListOf()
 
                         for(d in documents){
 
@@ -382,7 +382,7 @@ class SkillRepository {
                             }
                             */
 
-                            currentSkillListProg += d.toObject<SkillProgressionModel>()!!
+                            currentSkillListProg += d.toObject<SkillProgressionModel>()
                         }
 
                         data(currentSkillListProg)
@@ -413,7 +413,7 @@ class SkillRepository {
             fireStoreRef.get()
                 .addOnSuccessListener {documents ->
                     if (!documents.isEmpty){
-                        val currentSkillTaskListF : MutableList<SkillTaskModel> = mutableListOf();
+                        val currentSkillTaskListF : MutableList<SkillTaskModel> = mutableListOf()
 
                         for(d in documents){
 

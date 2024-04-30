@@ -24,5 +24,4 @@ data class UserSkillSubsModel(
 
     //the obtained badges
     var badgesObtained: List<String> = emptyList(),
-) : Parcelable {
-}
+) : Parcelable

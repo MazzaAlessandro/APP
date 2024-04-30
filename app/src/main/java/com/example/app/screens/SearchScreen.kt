@@ -71,6 +71,7 @@ import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
 import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
+import kotlin.math.max
 
 
 //TODO PROBLEMS WITH PROG SAVE
@@ -149,7 +150,7 @@ fun SkillSearchBlock(
     selectedSkillState: SelectedSkillState,
     onClick: () -> Unit
 ) {
-    val colorCircle = MaterialTheme.colorScheme.primary;
+    val colorCircle = MaterialTheme.colorScheme.primary
 
     Box(
         modifier = Modifier
@@ -302,8 +303,9 @@ fun SkillInfoPopUp_STARTED(
     sharedViewModel: SharedViewModel,
     skill: SkillModel,
     skillProgression: SkillProgressionModel,
+    onSubTask: (SkillTaskModel, SkillCompleteStructureModel) -> Unit,
     onResetSkillProgression: () -> Unit,
-    onCloseClick: () -> Unit
+    onCloseClick: () -> Unit,
 ) {
     val currentContext = LocalContext.current
 
@@ -323,7 +325,7 @@ fun SkillInfoPopUp_STARTED(
         )
     }
 
-    LaunchedEffect(skill, skillProgression) {
+    LaunchedEffect(skill) {
         sharedViewModel.retrieveAllSkillSection(skill.id, currentContext) { sectionModels ->
             sectionsList.value = sectionModels.sortedWith { a, b ->
                 if (skill.skillSectionsList.indexOf(a.id) < skill.skillSectionsList.indexOf(b.id)) -1 else 1
@@ -339,13 +341,13 @@ fun SkillInfoPopUp_STARTED(
 
                     completeStructure.value = SkillCompleteStructureModel(skillProgression,
                         skill,
-                        sectionsList.value?.find { it.id == skillProgression.currentSectionId }
+                        sectionsList.value.find { it.id == skillProgression.currentSectionId }
                             ?: sectionsList.value.get(0),
                         tasksMap.value.get(skillProgression.currentSectionId)?.associate {
 
 
                             var progressionNumer: Int =
-                                if (it.id in skillProgression.mapNonCompletedTasks.keys) skillProgression.mapNonCompletedTasks?.get(
+                                if (it.id in skillProgression.mapNonCompletedTasks.keys) skillProgression.mapNonCompletedTasks.get(
                                     it.id
                                 ) ?: 0 else it.requiredAmount
 
@@ -404,7 +406,7 @@ fun SkillInfoPopUp_STARTED(
                 ) {
 
 
-                    val colorCircle = MaterialTheme.colorScheme.primary;
+                    val colorCircle = MaterialTheme.colorScheme.primary
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -583,8 +585,8 @@ fun SkillInfoPopUp_STARTED(
 
                                 tasksMap.value.get(section.id)?.forEach {task->
 
-                                    val am: Int;
-                                    val req: Int;
+                                    val am: Int
+                                    val req: Int
 
                                     if (indexOfCurrent < indexOfProg) {
                                         am = task.requiredAmount
@@ -593,8 +595,26 @@ fun SkillInfoPopUp_STARTED(
                                         am = completeStructure.value.skillTasks.get(task)?.first ?: 0
                                         req = task.requiredAmount
                                     }
+                                    CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false, false, true){
 
-                                    CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false)
+                                        if(indexOfCurrent == indexOfProg){
+                                            var updatedCompleteStructureModel = completeStructure.value
+
+                                            val baseValue = max((updatedCompleteStructureModel.skillTasks.get(task)!!.first) - 1, 0)
+                                            var newTasks = updatedCompleteStructureModel.skillTasks.toMutableMap()
+
+                                            newTasks.put(task, Pair(baseValue, task.requiredAmount))
+
+                                            var updatedProgression = ComputeListTaskSub1(currentContext, task, updatedCompleteStructureModel.skillProgression)
+
+                                            updatedCompleteStructureModel = updatedCompleteStructureModel.copy(skillTasks = newTasks, skillProgression = updatedProgression)
+
+                                            completeStructure.value = updatedCompleteStructureModel
+
+                                            onSubTask(task, completeStructure.value)
+                                        }
+
+                                    }
                                 }
 
                                 Spacer(modifier = Modifier.height(50.dp))
@@ -602,8 +622,6 @@ fun SkillInfoPopUp_STARTED(
                             }
 
                         }
-
-
                         /*
                         Box(
                             modifier = Modifier
@@ -671,30 +689,12 @@ fun SkillInfoPopUp_STARTED(
                                         .padding(vertical = 4.dp, horizontal = 4.dp)
                                 )
                             }
-
                         }
-
                     }
-
-
-                    /*Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                            .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
-                    ) {
-                        Text(
-                            text = skill.skillDescription,
-                            modifier = Modifier.padding(15.dp),
-                            fontSize = 12.sp,
-                            color = Color.Black
-                        )
-                    }*/
                 }
             }
         }
     }
-
 }
 
 @Composable
@@ -784,7 +784,7 @@ fun SkillInfoPopUp_UNSTARTED(
                 ) {
 
 
-                    val colorCircle = MaterialTheme.colorScheme.primary;
+                    val colorCircle = MaterialTheme.colorScheme.primary
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1285,7 +1285,7 @@ fun SearchScreen(
     }
 
     if (isSkillSelected.value == SelectedSkillState.NEW_SELECTED || isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED) {
-        Box() {
+        Box {
             SkillInfoPopUp_UNSTARTED(skillSelected.value, sharedViewModel,
                 isSkillSelected.value == SelectedSkillState.REGISTERED_SELECTED,
                 {
@@ -1341,13 +1341,26 @@ fun SearchScreen(
     } else if (isSkillSelected.value == SelectedSkillState.STARTED_SELECTED) {
 
 
-        Box() {
+        Box {
 
             SkillInfoPopUp_STARTED(
                 sharedViewModel,
                 skillSelected.value,
                 skillProgressions.value.find { it.skillId == skillSelected.value.id }
                     ?: SkillProgressionModel(),
+                {task, completeStructure ->
+
+                    var updatedProgression = completeStructure.skillProgression
+
+                    val index = skillProgressions.value.indexOf(skillProgressions.value.find { it.skillId == skillSelected.value.id })
+
+                    var updatedList = skillProgressions.value.toMutableList()
+                    updatedList.set(index, updatedProgression)
+
+                    skillProgressions.value = updatedList.toList()
+
+                    sharedViewModel.updateSkillProgression(sharedViewModel.getCurrentUserMail(), skillSelected.value.id, updatedProgression, currentContext)
+                },
                 {
                     var updatedProgression = skillProgressions.value.find { it.skillId == skillSelected.value.id } ?: SkillProgressionModel()
                     var newSection = skillSelected.value.skillSectionsList.get(0)

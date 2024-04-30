@@ -219,7 +219,7 @@ fun BadgeCard(
     }
 }
 
-enum class BannerSize(){
+enum class BannerSize {
     SMALL,
     MEDIUM,
     LARGE

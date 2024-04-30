@@ -23,13 +23,13 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
     var dialogShown by mutableStateOf(false)
         private set
 
-    private val currentUserMail: StateFlow<String> = userRepository.userMail;
-    private val currentUserData : StateFlow<UserDataModel> = userRepository.userData;
+    private val currentUserMail: StateFlow<String> = userRepository.userMail
+    private val currentUserData : StateFlow<UserDataModel> = userRepository.userData
 
-    private var userData : MutableStateFlow<UserDataModel> = MutableStateFlow(UserDataModel());
-    private var userMail : MutableStateFlow<String> = MutableStateFlow("");
+    private var userData : MutableStateFlow<UserDataModel> = MutableStateFlow(UserDataModel())
+    private var userMail : MutableStateFlow<String> = MutableStateFlow("")
 
-    private val currentUserSkillProgressions: StateFlow<List<SkillProgressionModel>> = skillRepository.skillListProgression;
+    private val currentUserSkillProgressions: StateFlow<List<SkillProgressionModel>> = skillRepository.skillListProgression
 
     fun setCurrentUserMail(
         mail : String
@@ -59,7 +59,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         context: Context,
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        userRepository.saveData(userData, context);
+        userRepository.saveData(userData, context)
 
     }
 
@@ -68,7 +68,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         context: Context,
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        skillRepository.saveSkill(skillData, context);
+        skillRepository.saveSkill(skillData, context)
 
     }
 
@@ -77,7 +77,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         context: Context,
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        skillRepository.saveSkillSection(skillSectionData, context);
+        skillRepository.saveSkillSection(skillSectionData, context)
 
     }
 
@@ -87,7 +87,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         context: Context,
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        skillRepository.saveSkillTask(skillTaskData, context);
+        skillRepository.saveSkillTask(skillTaskData, context)
 
     }
 
@@ -96,7 +96,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         context: Context
     )= CoroutineScope(Dispatchers.IO).launch{
 
-        skillRepository.saveSkillProgression(skillProgressionData, context);
+        skillRepository.saveSkillProgression(skillProgressionData, context)
     }
 
     fun updateUserData(
@@ -105,7 +105,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         userData: UserDataModel
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        userRepository.updateData(mail, context, userData);
+        userRepository.updateData(mail, context, userData)
 
     }
 
@@ -115,7 +115,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         data: (UserDataModel) -> Unit
     ) = CoroutineScope(Dispatchers.IO).launch{
 
-        userRepository.retrieveData(mail, context, data);
+        userRepository.retrieveData(mail, context, data)
     }
 
     fun retrieveProfileStats(
@@ -142,7 +142,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         context: Context,
         ){
 
-        skillRepository.updateSkillProgression(userEmail, skillId, skillProgressionData, context);
+        skillRepository.updateSkillProgression(userEmail, skillId, skillProgressionData, context)
 
     }
 

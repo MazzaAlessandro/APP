@@ -562,7 +562,7 @@ fun CreateScreen(
         mutableStateOf(false)
     }
 
-    val context = LocalContext.current;
+    val context = LocalContext.current
 
 
     Scaffold(
@@ -619,7 +619,7 @@ fun CreateScreen(
                             val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
                             updatedList.add(it, SkillTaskModel(taskIdCounter.value.toString(), section.id, skillID, "", 0))
 
-                            taskIdCounter.value += 1;
+                            taskIdCounter.value += 1
 
                             val updatedMap = skillTasks.value.toMutableMap()
                             updatedMap[section.id] = updatedList
