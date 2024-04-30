@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -135,11 +136,11 @@ fun SectionElementBlock(
                     .background(color, RoundedCornerShape(10))
                     .border(1.dp, Color.Black, RoundedCornerShape(10))
                     .then(
-                        if(isResetable){
+                        if (isResetable) {
                             Modifier.clickable {
                                 onChangeSection(section)
                             }
-                        }else{
+                        } else {
                             Modifier
                         }
                     )
@@ -583,7 +584,6 @@ fun SkillInfoPopUp_STARTED(
 
                                 SectionElementBlock(section, index,  true, amount, required)
                                 {sectionArg ->
-
                                     var updatedCompleteStructureModel = completeStructure.value
 
 
@@ -655,26 +655,44 @@ fun SkillInfoPopUp_STARTED(
                                         am = completeStructure.value.skillTasks.get(task)?.first ?: 0
                                         req = task.requiredAmount
                                     }
-                                    CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false, false, true){
 
-                                        if(indexOfCurrent == indexOfProg){
-                                            var updatedCompleteStructureModel = completeStructure.value
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(
+                                            modifier = Modifier
+                                                .padding(horizontal = 2.dp)
+                                                .background(Color(255, 200, 200), RoundedCornerShape(15.dp))
+                                                .border(1.dp, Color.Black, RoundedCornerShape(15.dp))
+                                                .size(40.dp)
+                                                ,
+                                            onClick = {
+                                            if(indexOfCurrent == indexOfProg){
+                                                var updatedCompleteStructureModel = completeStructure.value
 
-                                            val baseValue = max((updatedCompleteStructureModel.skillTasks.get(task)!!.first) - 1, 0)
-                                            var newTasks = updatedCompleteStructureModel.skillTasks.toMutableMap()
+                                                val baseValue = max((updatedCompleteStructureModel.skillTasks.get(task)!!.first) - 1, 0)
+                                                var newTasks = updatedCompleteStructureModel.skillTasks.toMutableMap()
 
-                                            newTasks.put(task, Pair(baseValue, task.requiredAmount))
+                                                newTasks.put(task, Pair(baseValue, task.requiredAmount))
 
-                                            var updatedProgression = ComputeListTaskSub1(currentContext, task, updatedCompleteStructureModel.skillProgression)
+                                                var updatedProgression = ComputeListTaskSub1(currentContext, task, updatedCompleteStructureModel.skillProgression)
 
-                                            updatedCompleteStructureModel = updatedCompleteStructureModel.copy(skillTasks = newTasks, skillProgression = updatedProgression)
+                                                updatedCompleteStructureModel = updatedCompleteStructureModel.copy(skillTasks = newTasks, skillProgression = updatedProgression)
 
-                                            completeStructure.value = updatedCompleteStructureModel
+                                                completeStructure.value = updatedCompleteStructureModel
 
-                                            onSubTask(task, completeStructure.value)
+                                                onSubTask(task, completeStructure.value)
+                                            }
+                                            })
+                                        {
+                                                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "")
                                         }
 
+
+                                        Box(modifier = Modifier.weight(1.0f)){
+                                            CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false, false, false){}
+                                        }
                                     }
+
+
                                 }
 
                                 Spacer(modifier = Modifier.height(50.dp))
