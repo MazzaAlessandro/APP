@@ -1,6 +1,7 @@
 package com.example.app.screens
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,12 +51,12 @@ import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.SkillCompleteStructureModel
 import com.example.app.models.SkillModel
-import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
 import com.example.app.util.SharedViewModel
 import com.example.app.util.relative
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 //TODO MAKE THE USER CONNECTED TO THE SKILL
@@ -363,8 +364,8 @@ fun MySkillsScreen(navController: NavHostController,
 
 ){
 
-    var currentUser : MutableState<UserDataModel> = remember{mutableStateOf(UserDataModel())};
-    currentUser.value = UserDataModel("aaaa", "ee", "ee", "ee", emptyList(),)
+    var loadTrigger : MutableState<Boolean> = remember{mutableStateOf(false)};
+
 
     var listCompleteStructures:MutableState<List<SkillCompleteStructureModel>> = remember {
         mutableStateOf(listOf())
@@ -390,7 +391,8 @@ fun MySkillsScreen(navController: NavHostController,
     }
 
 
-    LaunchedEffect(currentUser) {
+    LaunchedEffect(loadTrigger.value) {
+        Toast.makeText(currentContext, "MAIS JE CRIE FRERE", Toast.LENGTH_SHORT).show()
         sharedViewModel.retrieveUserSkillProgressionList(
             sharedViewModel.getCurrentUserMail(),
             context = currentContext
@@ -437,7 +439,19 @@ fun MySkillsScreen(navController: NavHostController,
                                 }
                             )
 
-                            listCompleteStructures.value += structure
+                            if(listCompleteStructures.value.map { it.skill }.contains(structure.skill)){
+                                val updatedList = listCompleteStructures.value.toMutableList()
+
+                                val index = listCompleteStructures.value.indexOf(listCompleteStructures.value.find { it.skill == structure.skill })
+
+                                updatedList.set(index, structure)
+
+                                listCompleteStructures.value = updatedList.toList()
+
+                            }else{
+                                listCompleteStructures.value += structure
+                            }
+
                         }
                     }
                 }
@@ -559,13 +573,39 @@ fun MySkillsScreen(navController: NavHostController,
         }
 
         if(isPopUpOpen.value){
+
+            var listCompleteStructureModel = listCompleteStructures.value
+            var skillProgInterested = listCompleteStructureModel.get(currentStructureIndex.value).skillProgression
+
+
             SkillInfoPopUp_STARTED(
                 sharedViewModel = sharedViewModel,
                 skill = listCompleteStructures.value.get(currentStructureIndex.value).skill,
-                skillProgression = listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
-            ) {
-                isPopUpOpen.value = false
-            }
+                skillProgression = skillProgInterested,
+
+                {
+                    val baseStructure = listCompleteStructures.value.get(currentStructureIndex.value)
+
+                    var updatedProgression = baseStructure.skillProgression
+                    var newSection = baseStructure.skill.skillSectionsList.get(0)
+
+                    sharedViewModel.retrieveSkillSection(
+                        baseStructure.skill.id,
+                        newSection,
+                        currentContext,
+                    ){
+                        var newTasks = it.skillTasksList.associateWith { 0 }
+
+                        updatedProgression = updatedProgression.copy(currentSectionId =  newSection, isFinished = false, mapNonCompletedTasks = newTasks)
+
+                        sharedViewModel.updateSkillProgression(sharedViewModel.getCurrentUserMail(), baseStructure.skill.id, updatedProgression, currentContext)
+                        loadTrigger.value = !loadTrigger.value
+                    }
+                },
+                {
+                    isPopUpOpen.value = false
+                }
+            )
         }
     }
 

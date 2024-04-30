@@ -302,6 +302,7 @@ fun SkillInfoPopUp_STARTED(
     sharedViewModel: SharedViewModel,
     skill: SkillModel,
     skillProgression: SkillProgressionModel,
+    onResetSkillProgression: () -> Unit,
     onCloseClick: () -> Unit
 ) {
     val currentContext = LocalContext.current
@@ -322,7 +323,7 @@ fun SkillInfoPopUp_STARTED(
         )
     }
 
-    LaunchedEffect(skill) {
+    LaunchedEffect(skill, skillProgression) {
         sharedViewModel.retrieveAllSkillSection(skill.id, currentContext) { sectionModels ->
             sectionsList.value = sectionModels.sortedWith { a, b ->
                 if (skill.skillSectionsList.indexOf(a.id) < skill.skillSectionsList.indexOf(b.id)) -1 else 1
@@ -423,7 +424,7 @@ fun SkillInfoPopUp_STARTED(
                         )
                         Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier.weight(2f)) {
-                            Text(skill.titleSkill, fontSize = 30.sp)
+                            Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 30.sp)
                             Text(text = completeStructure.value.skillSection.titleSection, fontSize = 15.sp)
                         }
                         Text(
@@ -519,7 +520,7 @@ fun SkillInfoPopUp_STARTED(
                         sectionsList.value.forEachIndexed { index, section ->
                             val indexOfCurrent = skill.skillSectionsList.indexOf(section.id)
                             val indexOfProg =
-                                skill.skillSectionsList.indexOf(skillProgression.currentSectionId)
+                                skill.skillSectionsList.indexOf(completeStructure.value.skillSection.id)
 
                             if (indexOfCurrent < indexOfProg) {
                                 SectionElementBlock(section, index , 1, 1)
@@ -622,15 +623,59 @@ fun SkillInfoPopUp_STARTED(
 
                     }
 
-                    Text(
-                        "In Progress",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .background(color = greenColor, RoundedCornerShape(20))
-                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            Modifier
+                                .weight(1.0f)
+                                .padding(horizontal = 30.dp),
+                            contentAlignment = Alignment.TopStart
+                        ){
+                            Text(
+                                "In Progress",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .background(color = greenColor, RoundedCornerShape(20))
+                                    .padding(vertical = 4.dp, horizontal = 4.dp)
+                            )
+                        }
+
+                        Box(
+                            Modifier
+                                .weight(1.0f)
+                                .padding(horizontal = 30.dp),
+                            contentAlignment = Alignment.TopEnd
+                        ){
+
+                            Button(onClick = {
+                                var updatedCompleteStructureModel = completeStructure.value
+
+
+                                var newSection = sectionsList.value.get(0)
+                                var newTasks = tasksMap.value.get(newSection.id)!!.associateWith { Pair(0, it.requiredAmount) }
+
+                                updatedCompleteStructureModel = updatedCompleteStructureModel.copy(skillSection = newSection, skillTasks = newTasks)
+
+                                completeStructure.value = updatedCompleteStructureModel
+
+                                onResetSkillProgression()
+
+                            }) {
+                                Text(
+                                    "Restart",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                                )
+                            }
+
+                        }
+
+                    }
+
 
                     /*Box(
                         modifier = Modifier
@@ -1294,16 +1339,42 @@ fun SearchScreen(
             )
         }
     } else if (isSkillSelected.value == SelectedSkillState.STARTED_SELECTED) {
+
+
         Box() {
 
             SkillInfoPopUp_STARTED(
                 sharedViewModel,
                 skillSelected.value,
-                skillProgressions.value?.find { it.skillId == skillSelected.value.id }
+                skillProgressions.value.find { it.skillId == skillSelected.value.id }
                     ?: SkillProgressionModel(),
                 {
+                    var updatedProgression = skillProgressions.value.find { it.skillId == skillSelected.value.id } ?: SkillProgressionModel()
+                    var newSection = skillSelected.value.skillSectionsList.get(0)
+
+                    sharedViewModel.retrieveSkillSection(
+                        skillSelected.value.id,
+                        newSection,
+                        currentContext,
+                    ){
+                        var newTasks = it.skillTasksList.associateWith { 0 }
+
+                        updatedProgression = updatedProgression.copy(currentSectionId =  newSection, isFinished = false, mapNonCompletedTasks = newTasks)
+
+                        val index = skillProgressions.value.indexOf(skillProgressions.value.find { it.skillId == skillSelected.value.id })
+
+                        var updatedList = skillProgressions.value.toMutableList()
+                        updatedList.set(index, updatedProgression)
+
+                        skillProgressions.value = updatedList.toList()
+
+                        sharedViewModel.updateSkillProgression(sharedViewModel.getCurrentUserMail(), skillSelected.value.id, updatedProgression, currentContext)
+                    }
+                },
+                {
                     isSkillSelected.value = SelectedSkillState.NOT_SELECTED
-                })
+                }
+            )
         }
     }
 
