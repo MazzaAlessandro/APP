@@ -97,9 +97,24 @@ const val EXPANSION_ANIMATION_DURATION = 300
 fun SectionElementBlock(
     section: SkillSectionModel,
     index: Int,
+    isResetable: Boolean,
     amount: Int,
     required: Int,
+    onChangeSection:(SkillSectionModel) -> Unit
 ) {
+
+    val initialColor: Color = Color(180, 180, 255)
+    val endingColor: Color = Color(200, 255, 200)
+
+
+
+    val colorNum = amount.toFloat() / (required)
+
+    var colorRed = initialColor.red + (endingColor.red - initialColor.red) * colorNum
+    var colorGreen = initialColor.green + (endingColor.green - initialColor.green) * colorNum
+    var colorBlue: Float = initialColor.blue + (endingColor.blue - initialColor.blue) * colorNum
+
+    val color = Color(colorRed, colorGreen , colorBlue)
 
     val isDoneText = if(amount == required) "Done" else amount.toString() + "/" + required.toString()
 
@@ -117,8 +132,17 @@ fun SectionElementBlock(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
+                    .background(color, RoundedCornerShape(10))
                     .border(1.dp, Color.Black, RoundedCornerShape(10))
+                    .then(
+                        if(isResetable){
+                            Modifier.clickable {
+                                onChangeSection(section)
+                            }
+                        }else{
+                            Modifier
+                        }
+                    )
             )
         }
 
@@ -306,10 +330,11 @@ fun SkillInfoPopUp_STARTED(
     onSubTask: (SkillTaskModel, SkillCompleteStructureModel) -> Unit,
     onResetSkillProgression: () -> Unit,
     onCloseClick: () -> Unit,
+    onChangeSection: (SkillSectionModel) -> Unit,
 ) {
     val currentContext = LocalContext.current
 
-    var sectionsList: MutableState<List<SkillSectionModel>> = remember {
+    val sectionsList: MutableState<List<SkillSectionModel>> = remember {
         mutableStateOf(emptyList())
     }
 
@@ -525,7 +550,25 @@ fun SkillInfoPopUp_STARTED(
                                 skill.skillSectionsList.indexOf(completeStructure.value.skillSection.id)
 
                             if (indexOfCurrent < indexOfProg) {
-                                SectionElementBlock(section, index , 1, 1)
+
+                                val amount = completeStructure.value.skillTasks.map { it.value.second }.sum()
+
+                                SectionElementBlock(section, index , true,  1, 1)
+                                {sectionArg ->
+
+                                    var updatedCompleteStructureModel = completeStructure.value
+
+
+                                    var newSection = sectionArg
+                                    var newTasks = tasksMap.value.get(newSection.id)!!.associateWith { Pair(0, it.requiredAmount) }
+
+                                    updatedCompleteStructureModel = updatedCompleteStructureModel.copy(skillSection = newSection, skillTasks = newTasks)
+
+                                    completeStructure.value = updatedCompleteStructureModel
+
+                                    onChangeSection(sectionArg)
+
+                                }
                             } else if (indexOfCurrent == indexOfProg) {
 
                                 val amount = completeStructure.value.skillTasks.map { entry ->
@@ -538,7 +581,22 @@ fun SkillInfoPopUp_STARTED(
 
                                 val required = if(total == 0) 1 else total
 
-                                SectionElementBlock(section, index,  1, 1)
+                                SectionElementBlock(section, index,  true, amount, required)
+                                {sectionArg ->
+
+                                    var updatedCompleteStructureModel = completeStructure.value
+
+
+                                    var newSection = sectionArg
+                                    var newTasks = tasksMap.value.get(newSection.id)!!.associateWith { Pair(0, it.requiredAmount) }
+
+                                    updatedCompleteStructureModel = updatedCompleteStructureModel.copy(skillSection = newSection, skillTasks = newTasks)
+
+                                    completeStructure.value = updatedCompleteStructureModel
+
+                                    onChangeSection(sectionArg)
+
+                                }
 
 
                             } else {
@@ -547,7 +605,9 @@ fun SkillInfoPopUp_STARTED(
                                     entry.value.second
                                 }.sum()
 
-                                SectionElementBlock(section, index, 0, total)
+                                val required = if(total == 0) 1 else total
+
+                                SectionElementBlock(section, index, false, 0, 2, onChangeSection)
                             }
 
                             // THE TASKS
@@ -949,9 +1009,12 @@ fun SkillInfoPopUp_UNSTARTED(
                             SectionElementBlock(
                                 section,
                                 index,
+                                false,
                                 amount = 0,
                                 required = 1,
-                            )
+                            ){
+
+                            }
                         }
                     }
 
@@ -1386,6 +1449,31 @@ fun SearchScreen(
                 },
                 {
                     isSkillSelected.value = SelectedSkillState.NOT_SELECTED
+                },
+                {section ->
+
+                    var updatedProgression = skillProgressions.value.find { it.skillId == section.idSkill } ?: SkillProgressionModel()
+                    var newSection = section.id
+
+                    sharedViewModel.retrieveSkillSection(
+                        skillSelected.value.id,
+                        newSection,
+                        currentContext,
+                    ){
+                        var newTasks = it.skillTasksList.associateWith { 0 }
+
+                        updatedProgression = updatedProgression.copy(currentSectionId =  newSection, isFinished = false, mapNonCompletedTasks = newTasks)
+
+                        val index = skillProgressions.value.indexOf(skillProgressions.value.find { it.skillId == skillSelected.value.id })
+
+                        var updatedList = skillProgressions.value.toMutableList()
+                        updatedList.set(index, updatedProgression)
+
+                        skillProgressions.value = updatedList.toList()
+
+                        sharedViewModel.updateSkillProgression(sharedViewModel.getCurrentUserMail(), skillSelected.value.id, updatedProgression, currentContext)
+                    }
+
                 }
             )
         }

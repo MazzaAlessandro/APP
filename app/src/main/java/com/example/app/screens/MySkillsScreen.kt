@@ -765,6 +765,35 @@ fun MySkillsScreen(
                 {
                     isPopUpOpen.value = false
                     loadTrigger.value = !loadTrigger.value
+                },
+                {section ->
+                    val baseStructure =
+                        listCompleteStructures.value.get(currentStructureIndex.value)
+
+                    var updatedProgression = baseStructure.skillProgression
+                    var newSection = section.id
+
+                    sharedViewModel.retrieveSkillSection(
+                        baseStructure.skill.id,
+                        newSection,
+                        currentContext,
+                    ) {
+                        var newTasks = it.skillTasksList.associateWith { 0 }
+
+                        updatedProgression = updatedProgression.copy(
+                            currentSectionId = newSection,
+                            isFinished = false,
+                            mapNonCompletedTasks = newTasks
+                        )
+
+                        sharedViewModel.updateSkillProgression(
+                            sharedViewModel.getCurrentUserMail(),
+                            baseStructure.skill.id,
+                            updatedProgression,
+                            currentContext
+                        )
+                        loadTrigger.value = !loadTrigger.value
+                    }
                 }
             )
         }
