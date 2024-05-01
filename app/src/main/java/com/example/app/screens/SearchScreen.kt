@@ -1391,10 +1391,17 @@ fun SearchScreen(
                         var startedSkillIds = skillProgressions.value.map {
                             it.skillId
                         }
+
+                        var skillCustomOrdering = currentUserSkillSubs.value.customOrdering.toMutableList()
+                        skillCustomOrdering.add(0, skillProgression.skillId)
+
+                        currentUserSkillSubs.value = currentUserSkillSubs.value.copy(
+                            startedSkillsIDs = startedSkillIds,
+                            customOrdering = skillCustomOrdering,
+                        )
+
                         sharedViewModel.updateUserSub(
-                            currentUserSkillSubs.value.copy(
-                                startedSkillsIDs = startedSkillIds
-                            ), currentContext
+                            currentUserSkillSubs.value, currentContext
                         )
 
                         isSkillSelected.value = SelectedSkillState.STARTED_SELECTED

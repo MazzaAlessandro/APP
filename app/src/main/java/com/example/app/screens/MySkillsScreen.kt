@@ -22,12 +22,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +61,7 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
+import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
 import com.example.app.util.relative
 import kotlin.math.max
@@ -65,6 +71,9 @@ import kotlin.math.max
 //TODO MAKE IT POSSIBLE FOR A USER TO SEARCH FOR THE SKILL HE CREATED
 //TODO MAKE IT NON AUTOMATIC TO START A SKILL
 
+enum class SortingType{
+    DateAsc, DateDesc, Custom
+}
 
 @Composable
 fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel) {
@@ -102,9 +111,11 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel) {
 fun SkillListElement(
     skillCompleteStructureModel: SkillCompleteStructureModel,
     index: Int,
+    sortingType: SortingType,
     onClickTask: (Int, SkillTaskModel) -> Unit,
     onValidateSkill: (Int) -> Unit,
-    onOpenMenu: (Int) -> Unit
+    onOpenMenu: (Int) -> Unit,
+    onSwapRequest: (Int, Boolean) -> Unit
 ) {
 
     Column(
@@ -116,6 +127,26 @@ fun SkillListElement(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+
+        if(sortingType == SortingType.Custom){
+            Row (modifier = Modifier.fillMaxWidth()){
+                IconButton(
+                    modifier = Modifier.weight(1.0f),
+                    onClick = { onSwapRequest(index, true) }
+                )
+                {
+                    Icon(imageVector = Icons.Default.ArrowUpward, contentDescription = "")
+                }
+
+                IconButton(
+                    modifier = Modifier.weight(1.0f),
+                    onClick = { onSwapRequest(index, false) }
+                )
+                {
+                    Icon(imageVector = Icons.Default.ArrowDownward, contentDescription = "")
+                }
+            }
+        }
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -220,9 +251,11 @@ fun TaskListElement(progression: Int, task: SkillTaskModel, onClickTask: () -> U
 @Composable
 fun SkillListBlock(
     listSkills: List<SkillCompleteStructureModel>,
+    sortingType: SortingType,
     onClickTask: (Int, SkillTaskModel) -> Unit,
     onValidateSkill: (Int) -> Unit,
-    onOpenMenu: (Int) -> Unit
+    onOpenMenu: (Int) -> Unit,
+    onSwapRequest: (Int, Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -235,9 +268,11 @@ fun SkillListBlock(
             SkillListElement(
                 skillCompleteStructureModel = skillStructure,
                 index,
+                sortingType,
                 onClickTask,
                 onValidateSkill,
-                onOpenMenu
+                onOpenMenu,
+                onSwapRequest
             )
         }
     }
@@ -405,6 +440,7 @@ fun ComputeSkipSection(
 fun FinishSkill(
     sharedViewModel: SharedViewModel,
     listCompleteStructures: MutableState<List<SkillCompleteStructureModel>>,
+    userSkillSub: MutableState<UserSkillSubsModel>,
     currentStructureIndex: MutableState<Int>,
     currentContext: Context
 ) {
@@ -425,44 +461,73 @@ fun FinishSkill(
 
     updatedProgression = updatedProgression.copy(isFinished = true)
 
-    sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext) {
+    val it = userSkillSub.value
 
+    val skillSection =
+        listCompleteStructures.value.get(currentStructureIndex.value).skillSection
 
-        val skillSection =
-            listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+    var updatedBadges = it.badgesObtained
+    var updatedFinishedSkills = it.finishedSkills
+    var updatedStartedSkills = it.startedSkillsIDs
+    var updatedCustomOrder = it.customOrdering
 
-        var updatedBadges = it.badgesObtained
-        var updatedFinishedSkills = it.finishedSkills
-        var updatedStartedSkills = it.startedSkillsIDs
-
-        if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
-            updatedBadges = updatedBadges + skillSection.badgeID
-        }
-
-        if (updatedStructure.skill.id !in updatedFinishedSkills) {
-            updatedFinishedSkills += updatedStructure.skill.id
-        }
-
-        if (updatedStructure.skill.id in updatedStartedSkills) {
-            updatedStartedSkills -= updatedStructure.skill.id
-        }
-
-        sharedViewModel.saveUserSub(
-            it.copy(
-                badgesObtained = updatedBadges,
-                finishedSkills = updatedFinishedSkills,
-                startedSkillsIDs = updatedStartedSkills
-            ),
-            context = currentContext
-        )
-
-        val skillProgressionModel =
-            listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
-
-        sharedViewModel.removeSkillProgression(skillProgressionModel, currentContext)
-        listCompleteStructures.value -= listCompleteStructures.value.get(currentStructureIndex.value)
+    if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
+        updatedBadges = updatedBadges + skillSection.badgeID
     }
 
+    if (updatedStructure.skill.id !in updatedFinishedSkills) {
+        updatedFinishedSkills += updatedStructure.skill.id
+    }
+
+    if (updatedStructure.skill.id in updatedStartedSkills) {
+        updatedStartedSkills -= updatedStructure.skill.id
+    }
+
+    if (updatedStructure.skill.id in updatedCustomOrder) {
+        updatedCustomOrder -= updatedStructure.skill.id
+    }
+
+    userSkillSub.value = it.copy(
+        badgesObtained = updatedBadges,
+        finishedSkills = updatedFinishedSkills,
+        startedSkillsIDs = updatedStartedSkills,
+        customOrdering = updatedCustomOrder,
+    )
+
+    sharedViewModel.saveUserSub(
+        userSkillSub.value,
+        context = currentContext
+    )
+
+    val skillProgressionModel =
+        listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
+
+    sharedViewModel.removeSkillProgression(skillProgressionModel, currentContext)
+    listCompleteStructures.value -= listCompleteStructures.value.get(currentStructureIndex.value)
+
+}
+
+fun RecomputeList(listCompleteStructures: List<SkillCompleteStructureModel>, sortingType: SortingType, customOrdering: List<String>): List<SkillCompleteStructureModel>{
+     val result =  listCompleteStructures.sortedWith{struct1, struct2 ->
+
+        if(sortingType == SortingType.DateAsc){
+            if (struct1.skill.id > struct2.skill.id){
+                1
+            }else{
+                -1
+            }
+        }else if(sortingType == SortingType.Custom){
+            if(customOrdering.indexOf(struct1.skill.id) > customOrdering.indexOf(struct2.skill.id)) 1 else -1
+        }else{
+            if (struct1.skill.id > struct2.skill.id){
+                -1
+            }else{
+                1
+            }
+        }
+    }
+
+    return result
 }
 
 
@@ -478,8 +543,11 @@ fun MySkillsScreen(
 
     var loadTrigger: MutableState<Boolean> = remember { mutableStateOf(false) }
 
+    var userSkillSub: MutableState<UserSkillSubsModel> = remember {
+        mutableStateOf(UserSkillSubsModel())
+    }
 
-    var listCompleteStructures: MutableState<List<SkillCompleteStructureModel>> = remember {
+    val listCompleteStructures: MutableState<List<SkillCompleteStructureModel>> = remember {
         mutableStateOf(listOf())
     }
 
@@ -502,9 +570,20 @@ fun MySkillsScreen(
         mutableStateOf(false)
     }
 
+    val sortingType: MutableState<SortingType> = remember {
+        mutableStateOf(SortingType.Custom)
+    }
+
 
     LaunchedEffect(loadTrigger.value) {
-        Toast.makeText(currentContext, "MAIS JE CRIE FRERE", Toast.LENGTH_SHORT).show()
+
+        sharedViewModel.retrieveUserSkillSub(
+            sharedViewModel.getCurrentUserMail(),
+            currentContext
+        ){
+            userSkillSub.value = it
+        }
+
         sharedViewModel.retrieveUserSkillProgressionList(
             sharedViewModel.getCurrentUserMail(),
             context = currentContext
@@ -653,6 +732,7 @@ fun MySkillsScreen(
             BottomNavigationBar(navController = navController, openDialog, pendingRoute)
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -661,7 +741,46 @@ fun MySkillsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            SkillListBlock(listSkills = listCompleteStructures.value,
+
+            Row {
+                
+                Column(modifier = Modifier.weight(1.0f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    RadioButton(selected = sortingType.value == SortingType.DateAsc, onClick = {
+                        sortingType.value = SortingType.DateAsc
+
+                        listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+
+                    })
+                    
+                    Text(text = "Date Asc. (arbitrary)", textAlign = TextAlign.Center)
+                }
+                
+                
+                Column(modifier = Modifier.weight(1.0f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    RadioButton(selected = sortingType.value == SortingType.DateDesc, onClick = {
+                        sortingType.value = SortingType.DateDesc
+
+                        listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+
+                    })
+                    
+                    Text(text = "Date Desc. (arbitrary)", textAlign = TextAlign.Center)
+                }
+                
+                Column(modifier = Modifier.weight(1.0f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    RadioButton(selected = sortingType.value == SortingType.Custom, onClick = {
+                        sortingType.value = SortingType.Custom
+
+                        listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+
+                    })
+
+                    Text(text = "Custom Order (working)", textAlign = TextAlign.Center)
+                }
+
+            }
+
+            SkillListBlock(listSkills = listCompleteStructures.value, sortingType.value,
                 { index, task ->
 
                     val updatedList = ComputeListTaskAdd1(
@@ -694,6 +813,7 @@ fun MySkillsScreen(
                     FinishSkill(
                         sharedViewModel,
                         listCompleteStructures,
+                        userSkillSub,
                         currentStructureIndex,
                         currentContext
                     )
@@ -702,6 +822,24 @@ fun MySkillsScreen(
                 { index ->
                     currentStructureIndex.value = index
                     isPopUpOpen.value = true
+                },
+                { index, isUpwards ->
+                    if(index == 0 && isUpwards) return@SkillListBlock
+                    if((index == listCompleteStructures.value.size - 1) && !isUpwards) return@SkillListBlock
+
+                    val offset = if(isUpwards) -1 else 1
+
+                    var updatedList = userSkillSub.value.customOrdering.toMutableList()
+
+                    val temp = updatedList.get(index + offset)
+
+                    updatedList[index + offset] = updatedList.get(index)
+                    updatedList[index] = temp
+
+                    userSkillSub.value = userSkillSub.value.copy(customOrdering = updatedList.toList())
+                    sharedViewModel.updateUserSub(userSkillSub.value, currentContext)
+
+                    listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
                 }
             )
         }

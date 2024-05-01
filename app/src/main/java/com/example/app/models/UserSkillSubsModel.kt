@@ -24,4 +24,7 @@ data class UserSkillSubsModel(
 
     //the obtained badges
     var badgesObtained: List<String> = emptyList(),
+
+    //the custom ordering of the skills
+    var customOrdering: List<String> = emptyList(),
 ) : Parcelable
