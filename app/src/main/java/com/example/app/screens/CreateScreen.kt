@@ -698,7 +698,7 @@ fun CreateScreen(
 
                         SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value, badges.value)
 
-                        navController.navigate("MySkills")
+                        navController.navigate("Search")
                     }) {
                         Text(text = "SAVE")
                     }
