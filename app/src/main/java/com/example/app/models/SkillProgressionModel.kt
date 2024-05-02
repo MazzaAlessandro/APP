@@ -12,5 +12,5 @@ data class  SkillProgressionModel (
     var currentSectionId: String = "",
     var mapNonCompletedTasks: Map<String, Int> = mutableMapOf(),
     var isFinished: Boolean = mapNonCompletedTasks.isEmpty(),
-    var dateTime: String = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    var dateTime: String = ""
 ): Parcelable

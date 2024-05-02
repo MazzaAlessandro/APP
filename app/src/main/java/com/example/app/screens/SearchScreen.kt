@@ -1129,7 +1129,16 @@ fun SearchScreen(
             sharedViewModel.getCurrentUserMail(),
             currentContext,
         ) {
-            skillProgressions.value = it
+            skillProgressions.value = it.sortedByDescending {
+                ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
+
+            sharedViewModel.retrieveSkillsFromList(
+                currentContext,
+                it.map { it.skillId }
+            ) {
+                skillModelsStarted.value = it.sortedBy { skillProgressions.value.map { it.skillId }.indexOf(it.id) }
+            }
+
         }
 
         sharedViewModel.retrieveUserSkillSub(
@@ -1138,24 +1147,19 @@ fun SearchScreen(
         ) {
             currentUserSkillSubs.value = it
 
+
+
             sharedViewModel.retrieveSkillsFromList(
                 currentContext,
                 currentUserSkillSubs.value.registeredSkillsIDs
             ) {
-                skillModelsRegistered.value = it
-            }
-
-            sharedViewModel.retrieveSkillsFromList(
-                currentContext,
-                currentUserSkillSubs.value.startedSkillsIDs
-            ) {
-                skillModelsStarted.value = it
+                skillModelsRegistered.value = it.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
             }
 
             sharedViewModel.retrieveSkillsFromList(
                 currentContext,
                 currentUserSkillSubs.value.createdSkillsId) {
-                skillModelsCreated.value = it
+                skillModelsCreated.value = it.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
             }
         }
     }
@@ -1223,7 +1227,7 @@ fun SearchScreen(
 
 
             items(skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
-                .sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }) {
+                ) {
                 SkillSearchBlock(it, SelectedSkillState.STARTED_SELECTED)
                 {
                     skillSelected.value = it
@@ -1264,7 +1268,7 @@ fun SearchScreen(
             }
 
             items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() && it.id !in skillModelsStarted.value.map { it.id }}
-                .sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }) {
+                ) {
                 SkillSearchBlock(it, SelectedSkillState.REGISTERED_SELECTED)
                 {
                     skillSelected.value = it
@@ -1305,7 +1309,7 @@ fun SearchScreen(
             }
 
             items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
-                .sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }) {
+                ) {
                 SkillSearchBlock(
                     it,
                     if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
@@ -1344,9 +1348,12 @@ fun SearchScreen(
                             sharedViewModel.getCurrentUserMail(),
                             skillSelected.value.id,
                             skillSelected.value.skillSectionsList.get(0),
-                            mapNonCompletedTasks
+                            mapNonCompletedTasks,
+                            dateTime = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
                         )
                         skillProgressions.value += skillProgression
+                        skillProgressions.value = skillProgressions.value.sortedByDescending {
+                            ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
 
                         sharedViewModel.saveSkillProgression(skillProgression, currentContext)
 

@@ -454,12 +454,6 @@ fun FinishSkill(
     val indexOfSection =
         updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
 
-    sharedViewModel.saveSkillProgression(
-        listCompleteStructures.value.get(currentStructureIndex.value).skillProgression.copy(
-            isFinished = true
-        ), currentContext
-    )
-
     updatedProgression = updatedProgression.copy(isFinished = true)
 
     val it = userSkillSub.value
