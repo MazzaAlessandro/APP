@@ -72,6 +72,8 @@ import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
 import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
 
@@ -1152,7 +1154,7 @@ fun SearchScreen(
 
             sharedViewModel.retrieveSkillsFromList(
                 currentContext,
-                currentUserSkillSubs.value.createdSkillsId.filter { !(it in currentUserSkillSubs.value.startedSkillsIDs) }) {
+                currentUserSkillSubs.value.createdSkillsId) {
                 skillModelsCreated.value = it
             }
         }
@@ -1220,7 +1222,8 @@ fun SearchScreen(
             }
 
 
-            items(skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }) {
+            items(skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                .sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }) {
                 SkillSearchBlock(it, SelectedSkillState.STARTED_SELECTED)
                 {
                     skillSelected.value = it
@@ -1260,7 +1263,8 @@ fun SearchScreen(
                 )
             }
 
-            items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }) {
+            items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() && it.id !in skillModelsStarted.value.map { it.id }}
+                .sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }) {
                 SkillSearchBlock(it, SelectedSkillState.REGISTERED_SELECTED)
                 {
                     skillSelected.value = it
@@ -1273,7 +1277,7 @@ fun SearchScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp, 0.dp),
+                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1300,68 +1304,26 @@ fun SearchScreen(
                 )
             }
 
-            items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }) {
+            items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                .sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }) {
                 SkillSearchBlock(
                     it,
-                    if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                    if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
                 )
                 {
                     skillSelected.value = it
                     isSkillSelected.value =
-                        if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                        else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
                         else SelectedSkillState.NEW_SELECTED
                 }
             }
 
 
-            /*
-            SearchBar(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                query = skillTitleEditText,
-                onQueryChange = {
-                                skillTitleEditText = it
-                },
-                onSearch = {
-                    //items.add(text)
-                    active = false
-                },
-                active = active,
-                onActiveChange = {
-                    active = it
-                },
-                placeholder = {
-                    Text(text = "Search")
-                },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon")
-                },
-                trailingIcon = {
-                    if(active){
-                        Icon(
-                            modifier = Modifier.clickable {
-                                if(skillTitleEditText.isNotEmpty())
-                                    skillTitleEditText = ""
-                                else
-                                    active = false
-                            },
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close Icon"
-                        )
-                    }
-                })*/
+
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-
-        /*
-        Column {
-            skillModelsRegistered.forEach{
-                SkillSearchBlock(skill = it, isInProgress = false) {
-                    
-                }
-            }
-        }*/
 
     }
 

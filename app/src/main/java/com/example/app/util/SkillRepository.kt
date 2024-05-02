@@ -103,7 +103,7 @@ class SkillRepository {
                         data(currentSkillListLoc)
                         currentSkillList.value = currentSkillListLoc
                     } else {
-                        Toast.makeText(context, "Data not HAHA found", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Data not HIHI found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){

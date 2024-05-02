@@ -74,6 +74,8 @@ import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -474,7 +476,9 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
 
     val db = FirebaseFirestore.getInstance()
     val skillRef = db.collection("skill").document(refId)
-    skillRef.set(skill.copy(creatorEmail = sharedViewModel.getCurrentUserMail(), skillSectionsList = sections.map{
+    skillRef.set(skill.copy(creatorEmail = sharedViewModel.getCurrentUserMail(),
+        dateTime = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+        skillSectionsList = sections.map{
         it.id
     }))
 
