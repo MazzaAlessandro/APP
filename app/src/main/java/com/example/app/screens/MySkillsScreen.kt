@@ -65,6 +65,7 @@ import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
 import com.example.app.util.relative
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
 
@@ -503,24 +504,25 @@ fun FinishSkill(
 }
 
 fun RecomputeList(listCompleteStructures: List<SkillCompleteStructureModel>, sortingType: SortingType, customOrdering: List<String>): List<SkillCompleteStructureModel>{
-     val result =  listCompleteStructures.sortedWith{struct1, struct2 ->
-
-        if(sortingType == SortingType.DateAsc){
-            if (struct1.skill.id > struct2.skill.id){
-                1
-            }else{
-                -1
+     val result = listCompleteStructures.sortedWith(Comparator { a, b ->
+        when(sortingType) {
+            SortingType.Custom -> {
+                val indexA = customOrdering.indexOf(a.skill.id)
+                val indexB = customOrdering.indexOf(b.skill.id)
+                indexA.compareTo(indexB)
             }
-        }else if(sortingType == SortingType.Custom){
-            if(customOrdering.indexOf(struct1.skill.id) > customOrdering.indexOf(struct2.skill.id)) 1 else -1
-        }else{
-            if (struct1.skill.id > struct2.skill.id){
-                -1
-            }else{
-                1
+            SortingType.DateAsc -> {
+                val dateA = ZonedDateTime.parse(a.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                val dateB = ZonedDateTime.parse(b.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                dateA.compareTo(dateB)
+            }
+            SortingType.DateDesc -> {
+                val dateA = ZonedDateTime.parse(a.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                val dateB = ZonedDateTime.parse(b.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                dateB.compareTo(dateA)  // Reverse the comparison for descending order
             }
         }
-    }
+    })
 
     return result
 }
@@ -577,74 +579,80 @@ fun MySkillsScreen(
             currentContext
         ){
             userSkillSub.value = it
-        }
+            sharedViewModel.retrieveUserSkillProgressionList(
+                sharedViewModel.getCurrentUserMail(),
+                context = currentContext
+            ) { skillProgList ->
 
-        sharedViewModel.retrieveUserSkillProgressionList(
-            sharedViewModel.getCurrentUserMail(),
-            context = currentContext
-        ) { skillProgList ->
+                skillProgList.forEach { skillProg ->
+                    var skill: SkillModel
+                    var skillSection: SkillSectionModel
+                    var structure: SkillCompleteStructureModel
 
-            skillProgList.forEach { skillProg ->
-                var skill: SkillModel
-                var skillSection: SkillSectionModel
-                var structure: SkillCompleteStructureModel
+                    sharedViewModel.retrieveSkill(skillProg.skillId, currentContext) { data ->
+                        skill = data
+                        sharedViewModel.retrieveSkillSection(
+                            skillProg.skillId,
+                            skillProg.currentSectionId,
+                            currentContext,
+                        ) { data ->
+                            skillSection = data
 
-                sharedViewModel.retrieveSkill(skillProg.skillId, currentContext) { data ->
-                    skill = data
-                    sharedViewModel.retrieveSkillSection(
-                        skillProg.skillId,
-                        skillProg.currentSectionId,
-                        currentContext,
-                    ) { data ->
-                        skillSection = data
+                            structure =
+                                SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
 
-                        structure =
-                            SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
-
-                        sharedViewModel.retrieveAllSkillTasks(
-                            skill.id,
-                            skillSection.id,
-                            skillSection.skillTasksList,
-                            currentContext
-                        ) { listTasks ->
-                            structure = SkillCompleteStructureModel(
-                                skillProg, skill, skillSection, listTasks.associate { task ->
-                                    if (skillProg.mapNonCompletedTasks.containsKey(task.id)) {
-                                        Pair(
-                                            task,
+                            sharedViewModel.retrieveAllSkillTasks(
+                                skill.id,
+                                skillSection.id,
+                                skillSection.skillTasksList,
+                                currentContext
+                            ) { listTasks ->
+                                structure = SkillCompleteStructureModel(
+                                    skillProg, skill, skillSection, listTasks.associate { task ->
+                                        if (skillProg.mapNonCompletedTasks.containsKey(task.id)) {
                                             Pair(
-                                                skillProg.mapNonCompletedTasks.getOrDefault(
-                                                    task.id,
-                                                    0
-                                                ), task.requiredAmount
+                                                task,
+                                                Pair(
+                                                    skillProg.mapNonCompletedTasks.getOrDefault(
+                                                        task.id,
+                                                        0
+                                                    ), task.requiredAmount
+                                                )
                                             )
-                                        )
-                                    } else {
-                                        Pair(task, Pair(task.requiredAmount, task.requiredAmount))
+                                        } else {
+                                            Pair(task, Pair(task.requiredAmount, task.requiredAmount))
+                                        }
                                     }
+                                )
+
+                                if (listCompleteStructures.value.map { it.skill }
+                                        .contains(structure.skill)) {
+                                    val updatedList = listCompleteStructures.value.toMutableList()
+
+                                    val index =
+                                        listCompleteStructures.value.indexOf(listCompleteStructures.value.find { it.skill == structure.skill })
+
+                                    updatedList.set(index, structure)
+
+                                    listCompleteStructures.value = updatedList.toList()
+
+                                } else {
+                                    listCompleteStructures.value += structure
                                 }
-                            )
 
-                            if (listCompleteStructures.value.map { it.skill }
-                                    .contains(structure.skill)) {
-                                val updatedList = listCompleteStructures.value.toMutableList()
+                                listCompleteStructures.value = RecomputeList(
+                                    listCompleteStructures.value,
+                                    sortingType.value,
+                                    userSkillSub.value.customOrdering
+                                )
 
-                                val index =
-                                    listCompleteStructures.value.indexOf(listCompleteStructures.value.find { it.skill == structure.skill })
-
-                                updatedList.set(index, structure)
-
-                                listCompleteStructures.value = updatedList.toList()
-
-                            } else {
-                                listCompleteStructures.value += structure
                             }
-
                         }
                     }
                 }
             }
         }
+
     }
 
     LaunchedEffect(triggerSectionSkip.value) {
@@ -747,7 +755,7 @@ fun MySkillsScreen(
 
                     })
                     
-                    Text(text = "Date Asc. (arbitrary)", textAlign = TextAlign.Center)
+                    Text(text = "Date Asc.", textAlign = TextAlign.Center)
                 }
                 
                 
@@ -759,7 +767,7 @@ fun MySkillsScreen(
 
                     })
                     
-                    Text(text = "Date Desc. (arbitrary)", textAlign = TextAlign.Center)
+                    Text(text = "Date Desc.", textAlign = TextAlign.Center)
                 }
                 
                 Column(modifier = Modifier.weight(1.0f), horizontalAlignment = Alignment.CenterHorizontally) {
