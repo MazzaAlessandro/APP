@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.Routes
 import com.example.app.util.SharedViewModel
+import com.example.app.util.relative
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,7 +87,7 @@ fun LoginScreen(
 
             Text(text = "Login", style = TextStyle(fontSize = 40.sp))
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(relative(20.dp)))
 
             TextField(
                 label = { Text(text = "Mail") },
@@ -104,7 +105,7 @@ fun LoginScreen(
                 enabled = !authenticating.value
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(relative(20.dp)))
             TextField(
                 label = { Text(text = "Password") },
                 value = password.value,
@@ -126,7 +127,7 @@ fun LoginScreen(
             )
 
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(relative(20.dp)))
 
             Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                 Button(
@@ -168,7 +169,7 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(relative(20.dp)))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -198,7 +199,7 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(relative(20.dp)))
 
             ClickableText(
                 text = AnnotatedString("Create a new Account"),

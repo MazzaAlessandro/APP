@@ -1,8 +1,10 @@
 package com.example.app.screens
 
 import android.content.Context
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,10 +16,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -26,15 +26,22 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -51,28 +58,32 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.app.Routes
 import com.example.app.additionalUI.BadgeBanner
 import com.example.app.additionalUI.BadgeColor
+import com.example.app.additionalUI.BadgeIcon
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
+import com.example.app.ui.theme.greenColor
+import com.example.app.ui.theme.redColor
+import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
+import com.example.app.util.relative
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -162,10 +173,36 @@ fun TextFieldInt(value: Int, onValueChange: (String) -> Unit){
 fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit){
 
     Box(modifier = Modifier
-        .background(color = Color(0xFFD9D9D9), shape = RoundedCornerShape(10.dp))
-        .padding(15.dp)
+        .padding(15.dp, 10.dp)
     ){
         Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    color = Color.Black,
+                    thickness = 1.dp
+                )
+
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = "General Information",
+                    fontSize = 20.sp
+                )
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    color = Color.Black,
+                    thickness = 1.dp
+                )
+            }
             Row (verticalAlignment = Alignment.CenterVertically)
             {
 
@@ -173,8 +210,19 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                     fontSize = 25.sp,
                     modifier = Modifier.padding(2.dp))
 
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    label = { Text(text = "Enter a Title") },
+                    value = skill.titleSkill,
+                    onValueChange = onTitleChange,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1
+                )
 
-                Box(
+                /*Box(
                     modifier = Modifier
                         .background(color = Color(0xFFF0F0F0), shape = RoundedCornerShape(10))
                 ){
@@ -183,23 +231,36 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                         onValueChange = onTitleChange,
                         isSingleLine = true
                     )
-                }
+                }*/
             }
 
+            Spacer(modifier = Modifier.size(relative(size = 10.dp)))
+            
             Text(text = "Description:",
                 fontSize = 15.sp,
                 modifier = Modifier.padding(2.dp))
 
-            Box(
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp),
+                label = { Text(text = "Enter a Description") },
+                value = skill.skillDescription,
+                onValueChange = onDescriptionChange,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                singleLine = false
+            )
+            /*Box(
                 modifier = Modifier
                     .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
             ){
                 TextFieldString(value = skill.skillDescription, onValueChange = onDescriptionChange, false)
-            }
+            }*/
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SectionBox(id:Int, section:SkillSectionModel,
                listTasks: List<SkillTaskModel>,
@@ -213,13 +274,31 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                onDeleteTask: (String, Int) -> Unit,
                onAddBadgeProcess: (String) -> Unit) {
 
+    var done = remember { mutableStateOf(false) }
+
     Box(modifier = Modifier
-        .background(color = Color(0xFFD9D9D9), shape = RoundedCornerShape(10.dp))
-        .padding(15.dp)
+        .fillMaxWidth()
+        .padding(5.dp)
+        .background(color = Color.Gray.copy(0.25f), shape = RoundedCornerShape(10.dp))
     ){
-        Column(verticalArrangement = Arrangement.spacedBy(5.dp)){
+        /*IconButton(
+            onClick = {
+                onDeleteSection(id)
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(relative(size = 50.dp))
+                .zIndex(11F),
+        ) {
+            Icon(imageVector = Icons.Default.Close, contentDescription = "close", tint = redColor)
+        }*/
+
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally){
             
-            Button(onClick = { onAddBadgeProcess(id.toString())  }) {
+            /*Button(onClick = { onAddBadgeProcess(id.toString())  }) {
                 Text(text = "Add Badge")
             }
 
@@ -234,75 +313,184 @@ fun SectionBox(id:Int, section:SkillSectionModel,
 
                 }
 
+            }*/
+            val i = id + 1;
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = "Section $i",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            
-            Row (verticalAlignment = Alignment.CenterVertically)
-            {
 
-                Text(text = "Title section $id:",
-                    fontSize = 19.sp,
-                    modifier = Modifier.padding(2.dp))
+            Row(horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically){
 
+                var expanded by remember { mutableStateOf(false) }
 
-                Box(
-                    modifier = Modifier
-                        .background(color = Color(0xFFF0F0F0), shape = RoundedCornerShape(10))
-                ){
-                    TextFieldString(
+                Box(modifier = Modifier.clickable { /*onAddBadgeProcess(id.toString())*/ expanded = !expanded }){
+                    Icon(modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .zIndex(11F),
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "badge")
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ){
+                        BadgeColor.values().forEachIndexed { index, badgeColor ->
+
+                            DropdownMenuItem(text = { Text(badgeColor.toString()) }, onClick = {
+                                expanded = false
+                            }
+                            )
+
+                        }
+                    }
+
+                    BadgeIcon(badge = BadgeColor.BRONZE, size = relative(100.dp))
+                }
+
+                Column {
+                    Text(text = "Name:",
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(2.dp, 2.dp, 2.dp, 0.dp))
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp, 0.dp, 2.dp, 2.dp),
+                        label = { Text(text = "Enter a Name") },
                         value = section.titleSection,
                         onValueChange = onTitleChange,
-                        isSingleLine = true
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                        enabled = !done.value,
+                        singleLine = true,
+                        maxLines = 1,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor = Color.White)
+                    )
+
+                    Text(text = "Description:",
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(2.dp, 2.dp, 2.dp, 0.dp))
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp, 0.dp, 2.dp, 2.dp),
+                        label = { Text(text = "Enter a Description") },
+                        value = section.descriptionSection,
+                        onValueChange = onDescriptionChange,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        enabled = !done.value,
+                        singleLine = false,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            disabledContainerColor = Color.White,
+                        )
                     )
                 }
             }
 
-            Text(text = "Description:",
-                fontSize = 15.sp,
-                modifier = Modifier.padding(2.dp))
-
-            Box(
+            Row(
                 modifier = Modifier
-                    .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
-            ){
-                TextFieldString(value = section.descriptionSection, onValueChange = onDescriptionChange, false)
-            }
+                    .fillMaxWidth()
+                    .padding(10.dp, 2.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Tasks", fontSize = 20.sp)
 
-            Spacer(modifier = Modifier
-                .size(400.dp, 15.dp)
+                var num = listTasks.size
+
+                Text(
+                    text = "$num element" + if(num > 1) "s" else "",
+                    fontSize = 15.sp,
+                    color = Color.Gray
+                )
+
+                IconButton(onClick = { onAddTask(num) }, enabled = !done.value) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = "AddTask", tint = greenColor)
+                }
+            }
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 2.dp),
+                color = Color.Black
             )
 
-            listTasks.forEachIndexed{index, task ->
-
-                Button(onClick = {onAddTask(index)}) {
-                    Text(text = "ADD TASK +")
-                }
-
-                Spacer(modifier = Modifier
-                    .height(10.dp)
+            if(listTasks.isEmpty()){
+                Text(
+                    "You need at least one task",
+                    fontSize = 18.sp,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center
                 )
-                
-                TaskBox(id = index, task = task, onDescriptionChange = { onChangeTaskDescription(index, it) }, onAmountChange = { onChangeTaskAmount(index, it.toInt()) }, {
-                    onDeleteTask(section.id, it)
-                }
+            }
+            else{
+                listTasks.forEachIndexed{index, task ->
+                    TaskBox(id = index,
+                        task = task,
+                        enabled = !done.value,
+                        onDescriptionChange = { onChangeTaskDescription(index, it) },
+                        onAmountChange = { onChangeTaskAmount(index, it.toInt()) },
+                        onDeleteTask = {
+                            onDeleteTask(section.id, it)
+                        }
                     )
 
-                Spacer(modifier = Modifier
-                    .height(10.dp)
-                )
-
+                }
             }
 
-            Button(onClick = {onAddTask(listTasks.size)}) {
-                Text(text = "ADD TASK +")
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround){
+
+                Button(onClick = {onDeleteSection(id)},
+                    colors = ButtonDefaults.buttonColors(containerColor = redColor)) {
+                    Row{
+                        Text(text = "DELETE", modifier = Modifier.padding(2.dp))
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "delete")
+                    }
+                }
+
+                if(done.value){
+                    Button(onClick = {done.value = false},
+                        colors = ButtonDefaults.buttonColors(containerColor = yellowColor)) {
+                        Row{
+                            Text(text = "EDIT", modifier = Modifier.padding(2.dp))
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                        }
+                    }
+                }
+                else{
+                    Button(onClick = {done.value = true},
+                        colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                        enabled = !(section.titleSection.isBlank() ||
+                                section.descriptionSection.isBlank() ||
+                                listTasks.isEmpty() ||
+                                listTasks.any { it.taskDescription.isBlank() || it.requiredAmount == 0 })) {
+                        Row{
+                            Text(text = "DONE", modifier = Modifier.padding(2.dp))
+                            Icon(imageVector = Icons.Default.Done, contentDescription = "done")
+                        }
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier
-                .height(10.dp)
-            )
-
-            Button(onClick = {onDeleteSection(id)}) {
-                Text(text = "DELETE SECTION -")
-            }
 
         }
     }
@@ -310,13 +498,69 @@ fun SectionBox(id:Int, section:SkillSectionModel,
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, onAmountChange: (String) -> Unit, onDeleteTask: (Int) -> Unit){
+fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, enabled : Boolean, onAmountChange: (String) -> Unit, onDeleteTask: (Int) -> Unit){
 
-    Box(modifier = Modifier
-        .background(color = Color(0xFFD3E9FF), shape = RoundedCornerShape(10.dp))
-        .padding(15.dp)
-    ){
-        Column {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .weight(4f, true),
+                label = { Text(text = "Task Description") },
+                value = task.taskDescription,
+                onValueChange = onDescriptionChange,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                maxLines = 1,
+                singleLine = true,
+                enabled = enabled,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
+                )
+            )
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .weight(1.5f),
+                label = { Text(text = "Amount") },
+                placeholder = { Text(text = "0") },
+                value = task.requiredAmount.toString(),
+                onValueChange = {
+                    try{
+                        val value = it.toLong()
+                        if(value < Int.MAX_VALUE && value > 0){
+                            onAmountChange(it)
+                        }
+                    } catch (e: NumberFormatException){
+                        if(it == "") onAmountChange((0).toString())
+                    }
+
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                maxLines = 1,
+                singleLine = true,
+                enabled = enabled,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
+                )
+            )
+
+            IconButton(modifier = Modifier.weight(0.5f),
+                onClick = { onDeleteTask(id) },
+                enabled = enabled,) {
+                Icon(imageVector = Icons.Filled.Close, contentDescription = "DeleteTask", tint = redColor)
+            }
+
+
+        /*Column {
             Text(text = "Description task $id:",
                 fontSize = 18.sp,
                 modifier = Modifier.padding(2.dp))
@@ -343,7 +587,7 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
             Button(onClick = {onDeleteTask(id)}) {
                 Text(text = "DELETE TASK -")
             }
-        }
+        }*/
     }
 }
 
@@ -472,6 +716,7 @@ fun GenerateNewSkillID(): String{
     return newSkillRef.id
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>, badgeList: Map<String, BadgeDataModel>){
 
     val db = FirebaseFirestore.getInstance()
@@ -517,6 +762,7 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateScreen(
@@ -585,106 +831,204 @@ fun CreateScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
 
             ) {
 
                 item {
                     //GeneralInfoBox(sharedViewModel, title = title, {title = it}, description, {description = it})
-                    GeneralInfoBox(skill.value, {skill.value = skill.value.copy(titleSkill = it)}, {skill.value = skill.value.copy(skillDescription = it)})
-                }
-
-                itemsIndexed(skillSections.value){index, section ->
-                    Button(onClick = {
-
-                        var updatedSkillSections = skillSections.value.toMutableList()
-                        updatedSkillSections.add(index, SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf()))
-
-                        skillSections.value = updatedSkillSections
-                        sectionIdCounter.value += 1
-                    }) {
-                        Text(text = "ADD SECTION +")
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    SectionBox(id = index, section = section, skillTasks.value.get(section.id)?.toList() ?: mutableListOf(),
-                        badges.value.get(index.toString()),
-                        {skillSections.value = skillSections.value.toMutableList().apply {
-                            set(index, section.copy(titleSection = it))
-                        }
+                    GeneralInfoBox(skill.value,
+                        {skill.value = skill.value.copy(titleSkill = it)
                         },
-                        {skillSections.value = skillSections.value.toMutableList().apply {
-                            set(index, section.copy(descriptionSection = it))
-                        }
-                        },
-                        {
-                            val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
-                            updatedList.add(it, SkillTaskModel(taskIdCounter.value.toString(), section.id, skillID, "", 0))
-
-                            taskIdCounter.value += 1
-
-                            val updatedMap = skillTasks.value.toMutableMap()
-                            updatedMap[section.id] = updatedList
-
-                            skillTasks.value = updatedMap
-                        },
-                        {
-                            skillTasks.value = skillTasks.value - skillSections.value.get(it).id
-
-                            skillSections.value = skillSections.value - skillSections.value.get(it)
-
-                        },
-                        {id, description ->
-                            val updatedTask = skillTasks.value[section.id]?.get(id)?.copy(taskDescription = description) ?: SkillTaskModel()
-
-                            val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
-                            updatedList.set(id, updatedTask)
-
-                            val updatedMap = skillTasks.value.toMutableMap()
-                            updatedMap[section.id] = updatedList
-
-                            skillTasks.value = updatedMap
-                        },
-                        {id, amount ->
-                            val updatedTask = skillTasks.value[section.id]?.get(id)?.copy(requiredAmount = amount) ?: SkillTaskModel()
-
-                            val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
-                            updatedList.set(id, updatedTask)
-
-                            val updatedMap = skillTasks.value.toMutableMap()
-                            updatedMap[section.id] = updatedList
-
-                            skillTasks.value = updatedMap
-                        },
-                        {idSection, idTask ->
-                            val updatedListTasks = skillTasks.value.get(idSection)
-                                ?.minus(skillTasks.value.get(idSection)!!.get(idTask))
-                            var updatedMapTasks = skillTasks.value.toMutableMap()
-                            updatedMapTasks.set(idSection, updatedListTasks!!.toMutableList())
-
-                            skillTasks.value = updatedMapTasks
-                        },
-                        {currentBadgeSection ->
-                            currentSectionBadge.value = currentBadgeSection
-                            currentBadge.value = currentBadge.value.copy(sectionId = currentBadgeSection, skillId = skillID, badgeCreator = sharedViewModel.getCurrentUserMail())
-                            isBadgeEditActive.value = true
-                        }
+                        {skill.value = skill.value.copy(skillDescription = it)}
                     )
-
-
                 }
+
+                item{
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp, 0.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "Sections", fontSize = 20.sp)
+
+                        var num = skillSections.value.size
+
+                        Text(
+                            text = "$num element" + if(num > 1) "s" else "",
+                            fontSize = 15.sp,
+                            color = Color.Gray
+                        )
+                    }
+
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp, 2.dp),
+                        color = Color.Black
+                    )
+                    /*Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(15.dp, 0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            color = Color.Black,
+                            thickness = 1.dp
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(8.dp),
+                            text = "Skill Sections",
+                            fontSize = 20.sp
+                        )
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f),
+                            color = Color.Black,
+                            thickness = 1.dp
+                        )
+                    }*/
+                }
+
+                if(skillSections.value.isEmpty()){
+                    item {
+                        Column(modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(relative(10.dp))) {
+
+                            Text("You need at least one section to create a Skill",
+                                fontSize = 18.sp,
+                                color = Color.Gray,
+                                textAlign = TextAlign.Center)
+
+                            Button(onClick = {
+
+                                var updatedSkillSections = skillSections.value.toMutableList()
+                                updatedSkillSections.add(0, SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf()))
+
+                                skillSections.value = updatedSkillSections
+                                sectionIdCounter.value += 1
+                            }) {
+                                Text(text = "ADD A SECTION")
+                            }
+                        }
+                    }
+                }
+                else{
+                    itemsIndexed(skillSections.value){index, section ->
+                        /*Button(onClick = {
+
+                            var updatedSkillSections = skillSections.value.toMutableList()
+                            updatedSkillSections.add(index, SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf()))
+
+                            skillSections.value = updatedSkillSections
+                            sectionIdCounter.value += 1
+                        }) {
+                            Text(text = "ADD SECTION +")
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))*/
+
+                        SectionBox(id = index,
+                            section = section,
+                            skillTasks.value.get(section.id)?.toList() ?: mutableListOf(),
+                            badges.value.get(index.toString()),
+                            {skillSections.value = skillSections.value.toMutableList().apply {
+                                set(index, section.copy(titleSection = it))
+                            }
+                            },
+                            {skillSections.value = skillSections.value.toMutableList().apply {
+                                set(index, section.copy(descriptionSection = it))
+                            }
+                            },
+                            {
+                                val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
+                                updatedList.add(it, SkillTaskModel(taskIdCounter.value.toString(), section.id, skillID, "", 0))
+
+                                taskIdCounter.value += 1
+
+                                val updatedMap = skillTasks.value.toMutableMap()
+                                updatedMap[section.id] = updatedList
+
+                                skillTasks.value = updatedMap
+                            },
+                            {
+                                skillTasks.value = skillTasks.value - skillSections.value.get(it).id
+
+                                skillSections.value = skillSections.value - skillSections.value.get(it)
+
+                            },
+                            {id, description ->
+                                val updatedTask = skillTasks.value[section.id]?.get(id)?.copy(taskDescription = description) ?: SkillTaskModel()
+
+                                val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
+                                updatedList.set(id, updatedTask)
+
+                                val updatedMap = skillTasks.value.toMutableMap()
+                                updatedMap[section.id] = updatedList
+
+                                skillTasks.value = updatedMap
+                            },
+                            {id, amount ->
+                                val updatedTask = skillTasks.value[section.id]?.get(id)?.copy(requiredAmount = amount) ?: SkillTaskModel()
+
+                                val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
+                                updatedList.set(id, updatedTask)
+
+                                val updatedMap = skillTasks.value.toMutableMap()
+                                updatedMap[section.id] = updatedList
+
+                                skillTasks.value = updatedMap
+                            },
+                            {idSection, idTask ->
+                                val updatedListTasks = skillTasks.value.get(idSection)
+                                    ?.minus(skillTasks.value.get(idSection)!!.get(idTask))
+                                var updatedMapTasks = skillTasks.value.toMutableMap()
+                                updatedMapTasks.set(idSection, updatedListTasks!!.toMutableList())
+
+                                skillTasks.value = updatedMapTasks
+                            },
+                            {currentBadgeSection ->
+                                currentSectionBadge.value = currentBadgeSection
+                                currentBadge.value = currentBadge.value.copy(sectionId = currentBadgeSection, skillId = skillID, badgeCreator = sharedViewModel.getCurrentUserMail())
+                                isBadgeEditActive.value = true
+                            }
+                        )
+
+
+                    }
+
+                    item{
+                        Button(onClick = {
+                            skillSections.value = skillSections.value + SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf())
+                            sectionIdCounter.value += 1
+                        }) {
+                            Text(text = "ADD A SECTION")
+                        }
+                    }
+                }
+
+
 
                 item {
                     //TaskBox(1, SkillTaskModel("ddee", "dddd", skillID, "assad dadad dedurica", 2), {}, {})
 
-                    Button(onClick = {
+                    /*Button(onClick = {
                         skillSections.value = skillSections.value + SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf())
                         sectionIdCounter.value += 1
                     }) {
                         Text(text = "ADD SECTION +")
-                    }
+                    }*/
 
                     Button(onClick = {
 
@@ -699,8 +1043,16 @@ fun CreateScreen(
                         SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value, badges.value)
 
                         navController.navigate("Search")
-                    }) {
-                        Text(text = "SAVE")
+                    },
+                        colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                        enabled = !(skillSections.value.isEmpty() ||
+                                skillTasks.value.any { it.value.isEmpty() ||
+                                        it.value.any { it.taskDescription.isBlank() || it.requiredAmount == 0 } } ||
+                                skillSections.value.any{ !skillTasks.value.keys.contains(it.id) } ||
+                                skill.value.skillDescription.isBlank() ||
+                                skill.value.titleSkill.isBlank()
+                                )) {
+                        Text(text = "DONE")
                     }
                 }
 
