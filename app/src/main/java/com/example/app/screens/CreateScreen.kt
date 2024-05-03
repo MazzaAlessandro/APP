@@ -530,7 +530,7 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                     .weight(1.5f),
                 label = { Text(text = "Amount") },
                 placeholder = { Text(text = "0") },
-                value = task.requiredAmount.toString(),
+                value = if (task.requiredAmount != 0) task.requiredAmount.toString() else "",
                 onValueChange = {
                     try{
                         val value = it.toLong()
