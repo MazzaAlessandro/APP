@@ -1140,6 +1140,10 @@ fun SearchScreen(
         mutableStateOf(UserSkillSubsModel())
     }
 
+    var loadPublic: MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(currentUserSkillSubs.value) {
         sharedViewModel.retrieveUserSkillProgressionList(
             sharedViewModel.getCurrentUserMail(),
@@ -1178,12 +1182,13 @@ fun SearchScreen(
                 skillModelsCreated.value = it.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
             }
         }
+    }
 
+    LaunchedEffect(loadPublic.value) {
         sharedViewModel.retrieveOnlineSkills(currentContext){
             onlineFetchedSkills.value = it.filter { it.creatorEmail != sharedViewModel.getCurrentUserMail() }
         }
     }
-
 
     Scaffold(
         topBar = { AppToolBar(title = "Search a Skill", navController, sharedViewModel) },
@@ -1346,59 +1351,71 @@ fun SearchScreen(
 
             // ONLINE SKILLS
 
-            filteredOnlineFetchedSkills.value = onlineFetchedSkills.value.filter { (skillTitleEditText in it.titleSkill) && (it !in skillModelsCreated.value) }.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Public Skills", fontSize = 25.sp)
+            if(loadPublic.value == true){
+                filteredOnlineFetchedSkills.value = onlineFetchedSkills.value.filter { (skillTitleEditText in it.titleSkill) && (it !in skillModelsCreated.value) }.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 50.dp, start = 10.dp, end = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "Public Skills", fontSize = 25.sp)
 
-                    Text(
-                        text = filteredOnlineFetchedSkills.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
-                            .count().toString() + " elements",
-                        fontSize = 15.sp,
-                        color = Color.Gray
+                        Text(
+                            text = filteredOnlineFetchedSkills.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                                .count().toString() + " elements",
+                            fontSize = 15.sp,
+                            color = Color.Gray
+                        )
+
+                        /*Icon(imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = null,
+                            Modifier.clickable {  })*/
+
+                    }
+
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp, 2.dp),
+                        color = Color.Black
                     )
-
-                    /*Icon(imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = null,
-                        Modifier.clickable {  })*/
-
                 }
 
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp, 2.dp),
-                    color = Color.Black
-                )
-            }
-
-            items( filteredOnlineFetchedSkills.value
-            ) {
-                SkillSearchBlock(
-                    it,
-                    if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
-                )
-                {
-                    skillSelected.value = it
-                    isSkillSelected.value =
-                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
-                        else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
-                        else SelectedSkillState.NEW_SELECTED
+                items( filteredOnlineFetchedSkills.value
+                ) {
+                    SkillSearchBlock(
+                        it,
+                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                    )
+                    {
+                        skillSelected.value = it
+                        isSkillSelected.value =
+                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                            else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                            else SelectedSkillState.NEW_SELECTED
+                    }
                 }
             }
+            else{
+                item {
+
+                    Box(modifier = Modifier.fillMaxWidth().padding(top = 50.dp, start = 10.dp, end = 10.dp),
+                        contentAlignment = Alignment.Center){
+                        Button(
+                            onClick = {loadPublic.value = true}
+                        ) {
+                            Text(text = "Search Online")
+                        }
+                    }
 
 
-
-
-
-
+                }
+            }
         }
+
 
         Spacer(modifier = Modifier.height(20.dp))
 
