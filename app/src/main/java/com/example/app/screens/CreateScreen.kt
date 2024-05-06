@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -170,7 +171,7 @@ fun TextFieldInt(value: Int, onValueChange: (String) -> Unit){
 }
 
 @Composable
-fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit){
+fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit, onCheckChange: (Boolean) -> Unit){
 
     Box(modifier = Modifier
         .padding(15.dp, 10.dp)
@@ -256,6 +257,11 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
             ){
                 TextFieldString(value = skill.skillDescription, onValueChange = onDescriptionChange, false)
             }*/
+            
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(checked = skill.isPublic, onCheckedChange = onCheckChange)
+                Text(text = "Public Skill")
+            }
         }
     }
 }
@@ -841,7 +847,8 @@ fun CreateScreen(
                     GeneralInfoBox(skill.value,
                         {skill.value = skill.value.copy(titleSkill = it)
                         },
-                        {skill.value = skill.value.copy(skillDescription = it)}
+                        {skill.value = skill.value.copy(skillDescription = it)},
+                        {skill.value = skill.value.copy(isPublic = it)}
                     )
                 }
 

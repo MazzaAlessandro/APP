@@ -276,6 +276,13 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.removeSkillProgression(skillProgression, context)
     }
 
+    fun retrieveOnlineSkills(
+        context: Context,
+        data: (List<SkillModel>) -> Unit
+    ){
+        skillRepository.retrieveOnlineSkills(context, data)
+    }
+
     fun popUpOn(){
         dialogShown = true
     }

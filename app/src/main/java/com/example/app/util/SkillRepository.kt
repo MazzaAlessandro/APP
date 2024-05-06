@@ -32,6 +32,8 @@ class SkillRepository {
 
     private var currentSkillList: MutableStateFlow<List<SkillModel>> = MutableStateFlow(emptyList())
 
+    private var onlineSkilList: MutableStateFlow<List<SkillModel>> = MutableStateFlow(emptyList())
+
     private var currentSection: MutableStateFlow<SkillSectionModel> = MutableStateFlow(SkillSectionModel())
 
     private var currentSectionList: MutableStateFlow<List<SkillSectionModel>> = MutableStateFlow(
@@ -633,6 +635,35 @@ class SkillRepository {
             .document(skillProgression.userMail + skillProgression.skillId)
 
         db.delete()
+    }
+
+    fun retrieveOnlineSkills(
+        context: Context,
+        data: (List<SkillModel>) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("skill")
+            .whereEqualTo("public", true)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {documents ->
+                    if (!documents.isEmpty){
+                        val currOnlineSkilList : MutableList<SkillModel> = mutableListOf()
+
+                        for(d in documents){
+
+                            currOnlineSkilList += d.toObject<SkillModel>()
+
+                        }
+
+                        data(currOnlineSkilList)
+                        onlineSkilList.value = currOnlineSkilList
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 
 

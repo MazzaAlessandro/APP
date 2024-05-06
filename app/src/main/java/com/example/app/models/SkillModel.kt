@@ -19,6 +19,7 @@ data class SkillModel(
     var titleSkill: String = " ",
     var skillDescription: String = "",
     var dateTime: String = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+    var isPublic: Boolean = false,
     var skillSectionsList:List<String> = mutableListOf(),
 
 

@@ -662,8 +662,15 @@ fun SkillInfoPopUp_STARTED(
                                         IconButton(
                                             modifier = Modifier
                                                 .padding(horizontal = 2.dp)
-                                                .background(Color(255, 200, 200), RoundedCornerShape(15.dp))
-                                                .border(1.dp, Color.Black, RoundedCornerShape(15.dp))
+                                                .background(
+                                                    Color(255, 200, 200),
+                                                    RoundedCornerShape(15.dp)
+                                                )
+                                                .border(
+                                                    1.dp,
+                                                    Color.Black,
+                                                    RoundedCornerShape(15.dp)
+                                                )
                                                 .size(40.dp)
                                                 ,
                                             onClick = {
@@ -981,6 +988,7 @@ fun SkillInfoPopUp_UNSTARTED(
                         }
                         Box(
                             modifier = Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(15.dp, 0.dp)
                                 .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
@@ -1108,6 +1116,14 @@ fun SearchScreen(
         mutableStateOf(mutableListOf())
     }
 
+    val onlineFetchedSkills: MutableState<List<SkillModel>> = remember {
+        mutableStateOf(mutableListOf())
+    }
+
+    val filteredOnlineFetchedSkills: MutableState<List<SkillModel>> = remember {
+        mutableStateOf(mutableListOf())
+    }
+
     val skillProgressions: MutableState<List<SkillProgressionModel>> = remember {
         mutableStateOf(mutableListOf())
     }
@@ -1161,6 +1177,10 @@ fun SearchScreen(
                 currentUserSkillSubs.value.createdSkillsId) {
                 skillModelsCreated.value = it.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
             }
+        }
+
+        sharedViewModel.retrieveOnlineSkills(currentContext){
+            onlineFetchedSkills.value = it.filter { it.creatorEmail != sharedViewModel.getCurrentUserMail() }
         }
     }
 
@@ -1324,10 +1344,64 @@ fun SearchScreen(
             }
 
 
+            // ONLINE SKILLS
+
+            filteredOnlineFetchedSkills.value = onlineFetchedSkills.value.filter { (skillTitleEditText in it.titleSkill) && (it !in skillModelsCreated.value) }.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Public Skills", fontSize = 25.sp)
+
+                    Text(
+                        text = filteredOnlineFetchedSkills.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                            .count().toString() + " elements",
+                        fontSize = 15.sp,
+                        color = Color.Gray
+                    )
+
+                    /*Icon(imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = null,
+                        Modifier.clickable {  })*/
+
+                }
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 2.dp),
+                    color = Color.Black
+                )
+            }
+
+            items( filteredOnlineFetchedSkills.value
+            ) {
+                SkillSearchBlock(
+                    it,
+                    if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                )
+                {
+                    skillSelected.value = it
+                    isSkillSelected.value =
+                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                        else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                        else SelectedSkillState.NEW_SELECTED
+                }
+            }
+
+
+
+
+
 
         }
 
         Spacer(modifier = Modifier.height(20.dp))
+
 
     }
 
@@ -1361,11 +1435,14 @@ fun SearchScreen(
                             it.skillId
                         }
 
+                        var registeredSkillIds  = currentUserSkillSubs.value.registeredSkillsIDs - skillSelected.value.id
+
                         var skillCustomOrdering = currentUserSkillSubs.value.customOrdering.toMutableList()
                         skillCustomOrdering.add(0, skillProgression.skillId)
 
                         currentUserSkillSubs.value = currentUserSkillSubs.value.copy(
                             startedSkillsIDs = startedSkillIds,
+                            registeredSkillsIDs = registeredSkillIds,
                             customOrdering = skillCustomOrdering,
                         )
 
