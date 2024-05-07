@@ -271,7 +271,6 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
 fun SectionBox(id:Int,
                section:SkillSectionModel,
                listTasks: List<SkillTaskModel>,
-               badge: BadgeDataModel?,
                onTitleChange: (String) -> Unit,
                onDescriptionChange: (String) -> Unit,
                onAddTask: (Int) -> Unit,
@@ -743,7 +742,14 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
 
     badgeList.forEach{entry ->
 
-        sharedViewModel.saveBadgeData(entry.value, context)
+        val section = sections.find { it.id == entry.key }
+
+        val badgeEditted = entry.value.copy(
+            badgeName = skill.titleSkill + " - " + section!!.titleSection,
+            description = section!!.descriptionSection
+        )
+
+        sharedViewModel.saveBadgeData(badgeEditted, context)
 
     }
 
@@ -957,14 +963,13 @@ fun CreateScreen(
                         SectionBox(id = index,
                             section = section,
                             skillTasks.value.get(section.id)?.toList() ?: mutableListOf(),
-                            badges.value.get(index.toString()),
                             {skillSections.value = skillSections.value.toMutableList().apply {
                                 set(index, section.copy(titleSection = it))
-                            }
+                                }
                             },
                             {skillSections.value = skillSections.value.toMutableList().apply {
                                 set(index, section.copy(descriptionSection = it))
-                            }
+                                }
                             },
                             {
                                 val updatedList = skillTasks.value[section.id]?.toMutableList() ?: mutableListOf()
@@ -1016,13 +1021,13 @@ fun CreateScreen(
                             {currentBadge ->
                                 //badges.value.get(index.toString()) =
 
-                                badges.value.put(index.toString(),
+                                badges.value.put(section.id,
                                     BadgeDataModel(currentBadge,
                                         sharedViewModel.getCurrentUsername(),
-                                        skill.value.titleSkill,
+                                        skill.value.titleSkill + " - " + section.descriptionSection,
                                         skill.value.id,
                                         section.id,
-                                        section.titleSection))
+                                        section.descriptionSection))
                             }
                         )
 
