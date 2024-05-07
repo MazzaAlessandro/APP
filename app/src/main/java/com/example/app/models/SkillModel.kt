@@ -21,6 +21,7 @@ data class SkillModel(
     var dateTime: String = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
     var isPublic: Boolean = false,
     var skillSectionsList:List<String> = mutableListOf(),
+    var creatorUserName: String = "",
 
 
-) : Parcelable
+    ) : Parcelable

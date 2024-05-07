@@ -80,6 +80,7 @@ import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
+import com.example.app.models.UserDataModel
 import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
 import com.example.app.ui.theme.yellowColor
@@ -730,12 +731,13 @@ fun GenerateNewSkillID(): String{
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>, badgeList: Map<String, BadgeDataModel>){
+fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, user: UserDataModel, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>, badgeList: Map<String, BadgeDataModel>){
 
     val db = FirebaseFirestore.getInstance()
     val skillRef = db.collection("skill").document(refId)
     skillRef.set(skill.copy(creatorEmail = sharedViewModel.getCurrentUserMail(),
         dateTime = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
+        creatorUserName = user.username,
         skillSectionsList = sections.map{
         it.id
     }))
@@ -796,6 +798,10 @@ fun CreateScreen(
         mutableStateOf(GenerateNewSkillID())
     }
 
+    val currentUser: MutableState<UserDataModel> = remember {
+        mutableStateOf(UserDataModel())
+    }
+
     var skill : MutableState<SkillModel> = remember {
         mutableStateOf(SkillModel(id = skillID))
     }
@@ -833,6 +839,16 @@ fun CreateScreen(
     }
 
     val context = LocalContext.current
+
+    //LOAD USER DATA IN MEMORY
+    LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
+        sharedViewModel.retrieveUserData(
+            sharedViewModel.getCurrentUserMail(),
+            context,
+        ){
+            currentUser.value = it
+        }
+    }
 
 
     Scaffold(
@@ -1066,7 +1082,7 @@ fun CreateScreen(
                             return@Button
                         }
 
-                        SaveEverything(skillID, sharedViewModel, context, skill.value, skillSections.value, skillTasks.value, badges.value)
+                        SaveEverything(skillID, sharedViewModel, context, currentUser.value, skill.value, skillSections.value, skillTasks.value, badges.value)
 
                         navController.navigate("Search")
                     },

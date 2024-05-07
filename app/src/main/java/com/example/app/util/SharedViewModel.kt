@@ -37,6 +37,8 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         userMail.value = mail
     }
 
+
+
     fun resetSession(){
         setCurrentUserMail("")
         currentUserData.value
