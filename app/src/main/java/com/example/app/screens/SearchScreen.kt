@@ -49,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -430,7 +429,7 @@ fun SkillInfoPopUp_STARTED(
                         .padding(0.dp, 0.dp, 0.dp, 15.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(100.dp)
+                    //verticalArrangement = Arrangement.spacedBy(100.dp)
                 ) {
 
 
@@ -867,7 +866,7 @@ fun SkillInfoPopUp_UNSTARTED(
                         .fillMaxSize()
                         .padding(0.dp, 0.dp, 0.dp, 15.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
+                    //verticalArrangement = Arrangement.SpaceBetween
                 ) {
 
 
@@ -1306,7 +1305,7 @@ fun SearchScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
+                        .padding(10.dp, 0.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {

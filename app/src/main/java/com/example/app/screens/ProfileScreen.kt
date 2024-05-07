@@ -1,6 +1,5 @@
 package com.example.app.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,6 +53,7 @@ import com.example.app.models.SkillProgressionModel
 import com.example.app.models.UserDataModel
 import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
+import com.example.app.util.relative
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -79,7 +79,6 @@ fun ProfileScreen(navController: NavHostController,
     }
 
     //val userId = FirebaseAuth.getInstance().currentUser?.uid
-    var totSkills = 0
     val mail = sharedViewModel.getCurrentUserMail()
     var userData by remember(mail){
         mutableStateOf(UserDataModel())
@@ -116,6 +115,7 @@ fun ProfileScreen(navController: NavHostController,
                 }
 
             }
+
         }
     }
 
@@ -151,13 +151,13 @@ fun ProfileScreen(navController: NavHostController,
 
      */
 
-
-
     val stat = listOf(
         StatData("Total days using the app:", 356),
         //StatData("Consecutive days using the app:", 21),
         StatData("Badges obtained:", userData.badgeCounter.sum()),
-        StatData("Total Skills:", totSkills)
+        StatData("Total Skills:", skillProgressionList.value.filter { it.isFinished }.count() +
+                skillProgressionList.value.filter { !it.isFinished }.count() +
+                userSkillSubsModel.value.registeredSkillsIDs.count())
     )
 
     Scaffold(
@@ -178,7 +178,7 @@ fun ProfileScreen(navController: NavHostController,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ProfileImage(userData.pfpUri, false, 100.dp){
+                ProfileImage(userData.pfpUri, false, relative(100.dp)){
                 }
 
                 Text(text = userData.username, fontWeight = FontWeight.W600, style = TextStyle(fontSize = 35.sp))
@@ -215,25 +215,25 @@ fun ProfileScreen(navController: NavHostController,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.GOLD, 90.dp)
+                        BadgeIcon(BadgeColor.GOLD, relative(90.dp))
 
-                        Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(modifier = Modifier.height(relative(5.dp)))
 
                         Text(userData.badgeCounter[0].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.SILVER, 90.dp)
+                        BadgeIcon(BadgeColor.SILVER, relative(90.dp))
 
-                        Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(modifier = Modifier.height(relative(5.dp)))
 
                         Text(userData.badgeCounter[1].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
-                        BadgeIcon(BadgeColor.BRONZE, 90.dp)
+                        BadgeIcon(BadgeColor.BRONZE, relative(90.dp))
 
-                        Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(modifier = Modifier.height(relative(5.dp)))
 
                         Text(userData.badgeCounter[2].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
@@ -279,13 +279,13 @@ fun ProfileScreen(navController: NavHostController,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(modifier = Modifier
-                                .size(15.dp)
+                                .size(relative(15.dp))
                                 .clip(RoundedCornerShape(5.dp))
                                 .background(it.color))
                             Text(text = it.label, fontWeight = FontWeight.W600)
                             Text(text = it.value.toString())
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(relative(2.dp)))
                     }
                 }
             }
@@ -299,9 +299,6 @@ fun ProfileScreen(navController: NavHostController,
 
             Column(
                 modifier = Modifier
-                    .clickable {
-                        navController.navigate(Routes.Stats.route)
-                    }
                     .fillMaxHeight()
                     .padding(10.dp, 0.dp, 10.dp, 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,

@@ -268,7 +268,8 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SectionBox(id:Int, section:SkillSectionModel,
+fun SectionBox(id:Int,
+               section:SkillSectionModel,
                listTasks: List<SkillTaskModel>,
                badge: BadgeDataModel?,
                onTitleChange: (String) -> Unit,
@@ -278,9 +279,11 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                onChangeTaskDescription: (Int, String) -> Unit,
                onChangeTaskAmount: (Int, Int) -> Unit,
                onDeleteTask: (String, Int) -> Unit,
-               onAddBadgeProcess: (String) -> Unit) {
+               onBadgeUpdate: (BadgeColor) -> Unit) {
 
     var done = remember { mutableStateOf(false) }
+    var filled = remember { mutableStateOf(false) }
+    var color = remember { mutableStateOf(BadgeColor.BRONZE) }
 
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -355,14 +358,19 @@ fun SectionBox(id:Int, section:SkillSectionModel,
                         BadgeColor.values().forEachIndexed { index, badgeColor ->
 
                             DropdownMenuItem(text = { Text(badgeColor.toString()) }, onClick = {
+                                color.value = badgeColor
                                 expanded = false
+                                filled.value = true
+                                onBadgeUpdate(badgeColor)
                             }
                             )
 
                         }
                     }
 
-                    BadgeIcon(badge = BadgeColor.BRONZE, size = relative(100.dp))
+
+                    BadgeIcon(badge = color.value, size = relative(100.dp), filled.value)
+
                 }
 
                 Column {
@@ -534,7 +542,7 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                 modifier = Modifier
                     .padding(2.dp)
                     .weight(1.5f),
-                label = { Text(text = "Amount") },
+                label = { Text(text = "Times") },
                 placeholder = { Text(text = "0") },
                 value = if (task.requiredAmount != 0) task.requiredAmount.toString() else "",
                 onValueChange = {
@@ -679,7 +687,7 @@ fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeN
                     
                     TextFieldString(value = badge.badgeName, onValueChange = onBadgeNameChange, isSingleLine = true)
 
-                    Text(text = "DECRIPTION")
+                    Text(text = "DESCRIPTION")
 
                     TextFieldString(
                         value = badge.description,
@@ -1005,10 +1013,16 @@ fun CreateScreen(
 
                                 skillTasks.value = updatedMapTasks
                             },
-                            {currentBadgeSection ->
-                                currentSectionBadge.value = currentBadgeSection
-                                currentBadge.value = currentBadge.value.copy(sectionId = currentBadgeSection, skillId = skillID, badgeCreator = sharedViewModel.getCurrentUserMail())
-                                isBadgeEditActive.value = true
+                            {currentBadge ->
+                                //badges.value.get(index.toString()) =
+
+                                badges.value.put(index.toString(),
+                                    BadgeDataModel(currentBadge,
+                                        sharedViewModel.getCurrentUsername(),
+                                        skill.value.titleSkill,
+                                        skill.value.id,
+                                        section.id,
+                                        section.titleSection))
                             }
                         )
 
