@@ -684,11 +684,13 @@ fun MySkillsScreen(
             if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
                 updatedBadges = updatedBadges + skillSection.badgeID
             }
+            userSkillSub.value = it.copy(badgesObtained = updatedBadges)
 
             sharedViewModel.saveUserSub(
-                it.copy(badgesObtained = updatedBadges),
+                userSkillSub.value,
                 context = currentContext
             )
+
         }
 
         //SECOND WE UPDATE THE STRUCT

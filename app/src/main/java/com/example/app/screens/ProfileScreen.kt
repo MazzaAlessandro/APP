@@ -49,6 +49,7 @@ import com.example.app.additionalUI.PieChartData
 import com.example.app.additionalUI.StatData
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
+import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.UserDataModel
 import com.example.app.models.UserSkillSubsModel
@@ -94,6 +95,10 @@ fun ProfileScreen(navController: NavHostController,
         mutableStateOf(UserSkillSubsModel())
     }
 
+    val badges : MutableState<List<BadgeDataModel>> = remember {
+        mutableStateOf(listOf())
+    }
+
     LaunchedEffect(userData) {
         sharedViewModel.retrieveUserData(
             mail,
@@ -106,6 +111,13 @@ fun ProfileScreen(navController: NavHostController,
                 context
             ){
                 userSkillSubsModel.value = it
+
+                sharedViewModel.retrieveAllBadges(
+                    it.badgesObtained,
+                    context
+                ){
+                    badges.value = it
+                }
 
                 sharedViewModel.retrieveUserSkillProgressionList(
                     mail,
@@ -219,7 +231,7 @@ fun ProfileScreen(navController: NavHostController,
 
                         Spacer(modifier = Modifier.height(relative(5.dp)))
 
-                        Text(userData.badgeCounter[0].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                        Text(badges.value.filter { it.badgeColor == BadgeColor.GOLD }.count().toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
@@ -227,7 +239,7 @@ fun ProfileScreen(navController: NavHostController,
 
                         Spacer(modifier = Modifier.height(relative(5.dp)))
 
-                        Text(userData.badgeCounter[1].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                        Text(badges.value.filter { it.badgeColor == BadgeColor.SILVER }.count().toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
 
                     Column (horizontalAlignment = Alignment.CenterHorizontally){
@@ -235,7 +247,7 @@ fun ProfileScreen(navController: NavHostController,
 
                         Spacer(modifier = Modifier.height(relative(5.dp)))
 
-                        Text(userData.badgeCounter[2].toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                        Text(badges.value.filter { it.badgeColor == BadgeColor.BRONZE }.count().toString(), fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
                     }
 
                 }
@@ -257,7 +269,7 @@ fun ProfileScreen(navController: NavHostController,
             ) {
 
                 var pieData = mutableListOf(
-                    PieChartData("Completed Skills: ", skillProgressionList.value.filter { it.isFinished }.count(), primaryColor),
+                    PieChartData("Completed Skills: ", userSkillSubsModel.value.finishedSkills.count(), primaryColor),
                     PieChartData("Skills In progress: ", skillProgressionList.value.filter { !it.isFinished }.count(), primaryColor.copy(alpha = 0.5f)),
                     PieChartData("Unstarted Skills: ", userSkillSubsModel.value.registeredSkillsIDs.count(), color = Color.Gray.copy(alpha = 0.5f))
                 )

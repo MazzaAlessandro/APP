@@ -38,7 +38,6 @@ fun BadgesScreen(
 ){
     val currentContext: Context = LocalContext.current
 
-
     val selected = remember { mutableStateOf(false) }
 
     var selectedBadge : BadgeDataModel = BadgeDataModel(
