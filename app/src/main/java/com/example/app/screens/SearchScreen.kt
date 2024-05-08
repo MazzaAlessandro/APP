@@ -221,11 +221,21 @@ fun SkillSearchBlock(
 
                     val sectionAmount = skill.skillSectionsList.size
 
-                    Text(
-                        text = sectionAmount.toString() + " section" + if (sectionAmount > 1) "s" else "",
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.Center
-                    )
+                    Row(horizontalArrangement = Arrangement.Start){
+                        Text(
+                            text = sectionAmount.toString() + " section" + if (sectionAmount > 1) "s" else "",
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "Creator: " + skill.creatorUserName,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1.0f),
+                            textAlign = TextAlign.End
+                        )
+                    }
+
                 }
 
                 if (selectedSkillState == SelectedSkillState.STARTED_SELECTED) {
@@ -441,6 +451,7 @@ fun SkillInfoPopUp_STARTED(
                                 Color(0XFFF0F0F0),
                                 RoundedCornerShape(10)
                             ) // Use the color of the background in your image
+                            .border(1.dp, Color.Black, RoundedCornerShape(10))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -454,7 +465,7 @@ fun SkillInfoPopUp_STARTED(
                         Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier.weight(2f)) {
                             Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 30.sp)
-                            Text(text = completeStructure.value.skillSection.titleSection, fontSize = 15.sp)
+                            Text(text = "Creator: " + skill.creatorUserName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         }
                         Text(
                             skill.skillSectionsList.count().toString() + " section" + if (skill.skillSectionsList.count() > 1) "s" else "",
@@ -794,20 +805,20 @@ fun SkillInfoPopUp_UNSTARTED(
 ) {
     val currentContext = LocalContext.current
 
-    var sectionModel: MutableState<SkillSectionModel> = remember {
-        mutableStateOf(SkillSectionModel())
-    }
-
-    var sectionsList: MutableState<List<SkillSectionModel>> = remember {
+    val sectionsList: MutableState<List<SkillSectionModel>> = remember {
         mutableStateOf(emptyList())
     }
+
     var tasksMap: MutableState<Map<String, List<SkillTaskModel>>> = remember {
         mutableStateOf(emptyMap())
     }
 
+
     LaunchedEffect(skill) {
         sharedViewModel.retrieveAllSkillSection(skill.id, currentContext) { sectionModels ->
-            sectionsList.value = sectionModels
+            sectionsList.value = sectionModels.sortedWith { a, b ->
+                if (skill.skillSectionsList.indexOf(a.id) < skill.skillSectionsList.indexOf(b.id)) -1 else 1
+            }
             sectionModels.forEach { section ->
                 sharedViewModel.retrieveAllSkillTasks(
                     skill.id,
@@ -817,12 +828,10 @@ fun SkillInfoPopUp_UNSTARTED(
                 ) { taskModels ->
                     tasksMap.value += Pair(section.id, taskModels)
                 }
-                if (section.id == "0"){
-                    sectionModel.value = section
-                }
             }
         }
     }
+
 
     Box(
         modifier = Modifier
@@ -864,7 +873,7 @@ fun SkillInfoPopUp_UNSTARTED(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(0.dp, 0.dp, 0.dp, 15.dp),
+                        .padding(0.dp, 0.dp, 0.dp, 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -878,6 +887,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                 Color(0XFFF0F0F0),
                                 RoundedCornerShape(10)
                             ) // Use the color of the background in your image
+                            .border(1.dp, Color.Black, RoundedCornerShape(10))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -890,8 +900,8 @@ fun SkillInfoPopUp_UNSTARTED(
                         )
                         Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier.weight(2f)) {
-                            Text(skill.titleSkill, fontSize = 30.sp)
-                            Text(text = sectionModel.value.titleSection, fontSize = 15.sp)
+                            Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 30.sp)
+                            Text(text = "Creator: " + skill.creatorUserName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         }
                         Text(
                             skill.skillSectionsList.count().toString() + " section" + if (skill.skillSectionsList.count() > 1) "s" else "",
@@ -955,52 +965,6 @@ fun SkillInfoPopUp_UNSTARTED(
                         }
                     }
 
-                    /*Column(modifier = Modifier
-                        .fillMaxWidth(),) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.Black,
-                                thickness = 1.dp
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = "Section 1",
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.Black,
-                                thickness = 1.dp
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(15.dp, 0.dp)
-                                .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
-                        ) {
-                            Text(
-                                text = sectionModel.value.descriptionSection,
-                                modifier = Modifier.padding(15.dp),
-                                fontSize = 12.sp,
-                                color = Color.Black
-                            )
-                        }
-                    }*/
-
                     Column(modifier = Modifier
                         .fillMaxWidth(),) {
                         Row(
@@ -1019,7 +983,7 @@ fun SkillInfoPopUp_UNSTARTED(
 
                             Text(
                                 modifier = Modifier.padding(8.dp),
-                                text = "Section" + if (skill.skillSectionsList.count() > 1) "s" else "",
+                                text = "Sections",
                                 fontSize = 18.sp
                             )
 
@@ -1031,18 +995,84 @@ fun SkillInfoPopUp_UNSTARTED(
                                 thickness = 1.dp
                             )
                         }
+                        //SECTION ELEMENT
 
                         sectionsList.value.forEachIndexed { index, section ->
-                            SectionElementBlock(
-                                section,
-                                index,
-                                false,
-                                amount = 0,
-                                required = 1,
-                            ){
+                            val indexOfCurrent = skill.skillSectionsList.indexOf(section.id)
+
+                            val total = (tasksMap.value.get(section.id)?.map { entry ->
+                                entry.requiredAmount
+                            } ?: listOf(1)).sum()
+
+                            val required = if(total == 0) 1 else total
+
+                            SectionElementBlock(section, index,  false, 0, required)
+                            {}
+
+                            // THE TASKS
+
+                            Column(modifier = Modifier
+                                .fillMaxWidth(),) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(15.dp, 0.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                        color = Color.Black,
+                                        thickness = 1.dp
+                                    )
+
+                                    Text(
+                                        modifier = Modifier.padding(8.dp),
+                                        text = "Tasks",
+                                        fontSize = 18.sp
+                                    )
+
+                                    Divider(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                        color = Color.Black,
+                                        thickness = 1.dp
+                                    )
+                                }
+
+                                tasksMap.value.get(section.id)?.forEach {task->
+
+                                    val am = 0
+                                    val req = task.requiredAmount
+
+                                    CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false, false, false){}
+
+                                }
+
+                                Spacer(modifier = Modifier.height(50.dp))
 
                             }
+
                         }
+                        /*
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp, 0.dp)
+                                .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
+                        ) {
+                            Text(
+                                text = completeStructure.value.skillSection.descriptionSection,
+                                modifier = Modifier.padding(15.dp),
+                                fontSize = 12.sp,
+                                color = Color.Black
+                            )
+                        }*/
+
+
+
                     }
 
                     if (!isRegistered) {
@@ -1301,11 +1331,12 @@ fun SearchScreen(
             }
 
 
+
             item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp, 0.dp),
+                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1401,7 +1432,9 @@ fun SearchScreen(
             else{
                 item {
 
-                    Box(modifier = Modifier.fillMaxWidth().padding(top = 50.dp, start = 10.dp, end = 10.dp),
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
                         contentAlignment = Alignment.Center){
                         Button(
                             onClick = {loadPublic.value = true}
