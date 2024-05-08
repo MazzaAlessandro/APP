@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -97,7 +99,7 @@ fun BadgeBanner(
         .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
         .background(Color.Gray.copy(alpha = 0.2f))
         .clickable {
-                onClick()
+            onClick()
         },
     ){
         Row(modifier = Modifier
@@ -139,7 +141,7 @@ fun BadgeCard(
             .fillMaxSize()
             .background(Color.Gray.copy(alpha = 0.7f))
             .zIndex(10F)
-            .clickable {  },
+            .clickable { },
         contentAlignment = Alignment.Center
     ){
         Popup(
@@ -153,7 +155,7 @@ fun BadgeCard(
             Box(
                 Modifier
                     .fillMaxWidth(0.9f)
-                    .fillMaxHeight(0.75f)
+                    .fillMaxHeight(0.5f)
                     .clip(shape = RoundedCornerShape(25.dp))
                     .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface),
@@ -169,48 +171,89 @@ fun BadgeCard(
                 }
 
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(0.dp, 0.dp, 0.dp, 20.dp)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
+                    //verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    BadgeIcon(badge.badgeColor, 100.dp, badge.done)
 
-                    Text(
-                        text = badge.badgeName,
+
+                    val colorCircle = MaterialTheme.colorScheme.primary
+                    Row(
                         modifier = Modifier
-                            .padding(10.dp),
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                            .fillMaxWidth()
+                            .background(
+                                Color(0XFFF0F0F0),
+                                RoundedCornerShape(10)
+                            ) // Use the color of the background in your image
+                            .border(1.dp, Color.Black, RoundedCornerShape(10))
+                            .padding(horizontal = 20.dp, vertical = 17.dp),
 
-                    Text(
-                        text = badge.description,
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        BadgeIcon(badge.badgeColor, 75.dp, badge.done)
+                        /*Box(
                         modifier = Modifier
-                            .padding(15.dp, 0.dp, 15.dp, 10.dp),
-                        textAlign = TextAlign.Center
+                            .size(50.dp) // Set the size of the circle
+                            .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
                     )
+                    Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
+                        Column(modifier = Modifier.weight(2f).padding(horizontal = 10.dp),
+                            horizontalAlignment = Alignment.Start) {
+                            Text(badge.badgeName, fontWeight = FontWeight.Bold, fontSize = 30.sp, textAlign = TextAlign.Start)
+                            Text(
+                                text = "Obtained on: 20/12/2024" + badge.date,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
+                        }
+                    }
 
-                    if(badge.done){
-                        val date = badge.date
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+
                         Text(
-                            "Achieved on: $date",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
+                            text = badge.badgeName,
                             modifier = Modifier
-                                .padding(15.dp, 10.dp, 15.dp, 20.dp),
+                                .padding(10.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = badge.description,
+                            modifier = Modifier
+                                .padding(15.dp, 0.dp, 15.dp, 10.dp),
                             textAlign = TextAlign.Center
                         )
-                    }
-                    else{
-                        Button(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .padding(0.dp, 0.dp, 0.dp, 10.dp)
-                                .width(120.dp)
-                        ) {
-                            Text("START", fontSize = 20.sp)
+
+                        if (badge.done) {
+                            val date = badge.date
+                            Text(
+                                "Achieved on: $date",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(15.dp, 10.dp, 15.dp, 20.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        } else {
+                            Button(
+                                onClick = { /*TODO*/ },
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(0.dp, 0.dp, 0.dp, 10.dp)
+                                    .width(120.dp)
+                            ) {
+                                Text("START", fontSize = 20.sp)
+                            }
                         }
                     }
                 }

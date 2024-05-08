@@ -736,6 +736,8 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
     val db = FirebaseFirestore.getInstance()
     val skillRef = db.collection("skill").document(refId)
     skillRef.set(skill.copy(creatorEmail = sharedViewModel.getCurrentUserMail(),
+        skillDescription = skill.skillDescription.trim(),
+        titleSkill = skill.titleSkill.trim(),
         dateTime = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
         creatorUserName = user.username,
         skillSectionsList = sections.map{
@@ -747,8 +749,8 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         val section = sections.find { it.id == entry.key }
 
         val badgeEditted = entry.value.copy(
-            badgeName = skill.titleSkill + " - " + section!!.titleSection,
-            description = section!!.descriptionSection
+            badgeName = skill.titleSkill.trim() + " - " + section!!.titleSection.trim(),
+            description = section!!.descriptionSection.trim()
         )
 
         sharedViewModel.saveBadgeData(badgeEditted, context)
@@ -764,11 +766,11 @@ fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Con
         val badgeID = badgeList.getOrDefault(it.id, BadgeDataModel())
         val hasBadge = badgeID.sectionId == it.id
 
-        sharedViewModel.saveSkillSection(it.copy(skillTasksList = taskList, badgeID = badgeID.skillId + badgeID.sectionId, hasBadge = hasBadge), context)
+        sharedViewModel.saveSkillSection(it.copy(skillTasksList = taskList, titleSection = it.titleSection.trim(), descriptionSection = it.descriptionSection.trim(), badgeID = badgeID.skillId + badgeID.sectionId, hasBadge = hasBadge), context)
     }
 
     tasks.values.flatten().forEach{
-        sharedViewModel.saveSkillTask(it, context)
+        sharedViewModel.saveSkillTask(it.copy(taskDescription = it.taskDescription.trim()), context)
     }
 
 

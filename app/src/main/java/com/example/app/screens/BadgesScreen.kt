@@ -40,11 +40,15 @@ fun BadgesScreen(
 
     val selected = remember { mutableStateOf(false) }
 
-    var selectedBadge : BadgeDataModel = BadgeDataModel(
-        BadgeColor.BRONZE,
-        "",
-        ""
-    )
+    var selectedBadge : MutableState<BadgeDataModel> = remember {
+        mutableStateOf(
+            BadgeDataModel(
+                BadgeColor.BRONZE,
+                "",
+                ""
+            )
+        )
+    }
 
     val badgeList:MutableState<List<BadgeDataModel>> = remember {
         mutableStateOf(listOf())
@@ -94,7 +98,7 @@ fun BadgesScreen(
                         it.date,
                         it.done,
                         onClick = {
-                            selectedBadge = it
+                            selectedBadge.value = it
                             selected.value = true
                         })
                 }
@@ -123,7 +127,7 @@ fun BadgesScreen(
 
     if (selected.value){
         BadgeCard(
-            selectedBadge,
+            selectedBadge.value,
             onCloseClick = {
                 selected.value = false
             })
