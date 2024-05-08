@@ -71,6 +71,8 @@ import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
 import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
+import com.example.app.util.WindowInfo
+import com.example.app.util.rememberWindowInfo
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
@@ -1111,6 +1113,7 @@ fun SearchScreen(
 ) {
 
     val currentContext = LocalContext.current
+    val windowInfo = rememberWindowInfo()
 
 
     /*
@@ -1280,15 +1283,51 @@ fun SearchScreen(
                 )
             }
 
+            if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                var list = skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                var listA : List<SkillModel>
+                var listB : List<SkillModel>
 
-            items(skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
-                ) {
-                SkillSearchBlock(it, SelectedSkillState.STARTED_SELECTED)
-                {
-                    skillSelected.value = it
-                    isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
+                if(list.isNotEmpty()){
+                    listA = list.subList(0, list.size/2)
+                    listB = list.subList(list.size/2, list.size)
+
+                    item{
+                        Row(){
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                listB.map{
+                                    SkillSearchBlock(it, SelectedSkillState.STARTED_SELECTED)
+                                    {
+                                        skillSelected.value = it
+                                        isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
+                                    }
+                                }
+                            }
+
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                listA.map{
+                                    SkillSearchBlock(it, SelectedSkillState.STARTED_SELECTED)
+                                    {
+                                        skillSelected.value = it
+                                        isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+            else{
+                items(skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                ) {
+                    SkillSearchBlock(it, SelectedSkillState.STARTED_SELECTED)
+                    {
+                        skillSelected.value = it
+                        isSkillSelected.value = SelectedSkillState.STARTED_SELECTED
+                    }
+                }
+            }
+
 
 
             item {
@@ -1296,14 +1335,15 @@ fun SearchScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp, 0.dp),
+                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = "Registered Skills", fontSize = 25.sp)
 
                     Text(
-                        text = skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                        text = skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase()
+                                && it.id !in skillModelsStarted.value.map { it.id }}
                             .count().toString() + " elements",
                         fontSize = 15.sp,
                         color = Color.Gray
@@ -1322,14 +1362,55 @@ fun SearchScreen(
                 )
             }
 
-            items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() && it.id !in skillModelsStarted.value.map { it.id }}
-                ) {
-                SkillSearchBlock(it, SelectedSkillState.REGISTERED_SELECTED)
-                {
-                    skillSelected.value = it
-                    isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+            if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                var list = skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase()
+                        && it.id !in skillModelsStarted.value.map { it.id }}
+                var listA : List<SkillModel>
+                var listB : List<SkillModel>
+
+                if(list.isNotEmpty()){
+                    listA = list.subList(0, list.size/2)
+                    listB = list.subList(list.size/2, list.size)
+
+                    item{
+                        Row(){
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f),
+                                verticalArrangement = Arrangement.Top){
+                                listB.map{
+                                    SkillSearchBlock(it, SelectedSkillState.REGISTERED_SELECTED)
+                                    {
+                                        skillSelected.value = it
+                                        isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+                                    }
+                                }
+                            }
+
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f),
+                                verticalArrangement = Arrangement.Top){
+                                listA.map{
+                                    SkillSearchBlock(it, SelectedSkillState.REGISTERED_SELECTED)
+                                    {
+                                        skillSelected.value = it
+                                        isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+            else{
+                items(skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() && it.id !in skillModelsStarted.value.map { it.id }}
+                ) {
+                    SkillSearchBlock(it, SelectedSkillState.REGISTERED_SELECTED)
+                    {
+                        skillSelected.value = it
+                        isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+                    }
+                }
+            }
+
+
 
 
 
@@ -1364,25 +1445,73 @@ fun SearchScreen(
                 )
             }
 
-            items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+            if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                var list = skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
+                var listA : List<SkillModel>
+                var listB : List<SkillModel>
+
+                if(list.isNotEmpty()){
+                    listA = list.subList(0, list.size/2)
+                    listB = list.subList(list.size/2, list.size)
+
+                    item{
+                        Row(){
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                listB.map{
+                                    SkillSearchBlock(
+                                        it,
+                                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                                    )
+                                    {
+                                        skillSelected.value = it
+                                        isSkillSelected.value =
+                                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                                            else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                                            else SelectedSkillState.NEW_SELECTED
+                                    }
+                                }
+                            }
+
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                listA.map{
+                                    SkillSearchBlock(
+                                        it,
+                                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                                    )
+                                    {
+                                        skillSelected.value = it
+                                        isSkillSelected.value =
+                                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                                            else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                                            else SelectedSkillState.NEW_SELECTED
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else{
+                items(skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
                 ) {
-                SkillSearchBlock(
-                    it,
-                    if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
-                )
-                {
-                    skillSelected.value = it
-                    isSkillSelected.value =
-                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
-                        else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
-                        else SelectedSkillState.NEW_SELECTED
+                    SkillSearchBlock(
+                        it,
+                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                    )
+                    {
+                        skillSelected.value = it
+                        isSkillSelected.value =
+                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                            else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                            else SelectedSkillState.NEW_SELECTED
+                    }
                 }
             }
 
 
             // ONLINE SKILLS
 
-            if(loadPublic.value == true){
+            if(loadPublic.value){
                 filteredOnlineFetchedSkills.value = onlineFetchedSkills.value.filter { (skillTitleEditText in it.titleSkill) && (it !in skillModelsCreated.value) }.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
                 item {
                     Row(
@@ -1415,18 +1544,67 @@ fun SearchScreen(
                     )
                 }
 
-                items( filteredOnlineFetchedSkills.value
-                ) {
-                    SkillSearchBlock(
-                        it,
-                        if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
-                    )
-                    {
-                        skillSelected.value = it
-                        isSkillSelected.value =
-                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
-                            else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
-                            else SelectedSkillState.NEW_SELECTED
+                if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                    var list = onlineFetchedSkills.value.filter { (skillTitleEditText in it.titleSkill)
+                            && (it !in skillModelsCreated.value) }.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
+                    var listA : List<SkillModel>
+                    var listB : List<SkillModel>
+
+                    if(list.isNotEmpty()){
+                        listA = list.subList(0, list.size/2)
+                        listB = list.subList(list.size/2, list.size)
+
+                        item{
+                            Row(){
+                                Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                    listB.map{
+                                        SkillSearchBlock(
+                                            it,
+                                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                                        )
+                                        {
+                                            skillSelected.value = it
+                                            isSkillSelected.value =
+                                                if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                                                else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                                                else SelectedSkillState.NEW_SELECTED
+                                        }
+                                    }
+                                }
+
+                                Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                    listA.map{
+                                        SkillSearchBlock(
+                                            it,
+                                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                                        )
+                                        {
+                                            skillSelected.value = it
+                                            isSkillSelected.value =
+                                                if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                                                else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                                                else SelectedSkillState.NEW_SELECTED
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    items( filteredOnlineFetchedSkills.value
+                    ) {
+                        SkillSearchBlock(
+                            it,
+                            if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED else SelectedSkillState.NEW_SELECTED
+                        )
+                        {
+                            skillSelected.value = it
+                            isSkillSelected.value =
+                                if(it in skillModelsStarted.value) SelectedSkillState.STARTED_SELECTED
+                                else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
+                                else SelectedSkillState.NEW_SELECTED
+                        }
                     }
                 }
             }
