@@ -128,6 +128,7 @@ fun BadgesScreen(
     if (selected.value){
         BadgeCard(
             selectedBadge.value,
+            sharedViewModel,
             onCloseClick = {
                 selected.value = false
             })
