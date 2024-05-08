@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,15 +22,21 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +48,10 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import com.example.app.R
 import com.example.app.models.BadgeDataModel
+import com.example.app.models.SkillModel
+import com.example.app.models.SkillSectionModel
+import com.example.app.models.SkillTaskModel
+import com.example.app.util.SharedViewModel
 
 //This is the round icon of a Badge that can be used on its own
 @Composable
@@ -134,8 +145,51 @@ fun BadgeBanner(
 @Composable
 fun BadgeCard(
     badge: BadgeDataModel,
+    sharedViewModel: SharedViewModel,
     onCloseClick: () -> Unit
 ){
+    val context = LocalContext.current
+
+    var skillInfo: MutableState<SkillModel> = remember {
+        mutableStateOf(SkillModel())
+    }
+
+    var sectionInfo: MutableState<SkillSectionModel> = remember {
+        mutableStateOf(SkillSectionModel())
+    }
+
+    var taskList: MutableState<List<SkillTaskModel>> = remember {
+        mutableStateOf(listOf())
+    }
+
+    LaunchedEffect(badge) {
+        sharedViewModel.retrieveSkill(
+            badge.skillId,
+            context,
+        ){
+            skillInfo.value = it
+        }
+
+        sharedViewModel.retrieveSkillSection(
+            badge.skillId,
+            badge.sectionId,
+            context
+        ){
+            sectionInfo.value = it
+
+            sharedViewModel.retrieveAllSkillTasks(
+                badge.skillId,
+                badge.sectionId,
+                it.skillTasksList,
+                context
+            ){
+                taskList.value = it
+            }
+        }
+    }
+
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -155,25 +209,26 @@ fun BadgeCard(
             Box(
                 Modifier
                     .fillMaxWidth(0.9f)
-                    .fillMaxHeight(0.5f)
+                    .fillMaxHeight(0.6f)
                     .clip(shape = RoundedCornerShape(25.dp))
                     .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface),
-                contentAlignment = Alignment.Center
             ) {
                 IconButton(
                     onClick = {
                         onCloseClick()
                     },
-                    modifier = Modifier.align(Alignment.TopEnd),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .zIndex(11F),
                 ) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "close")
                 }
 
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(0.dp, 0.dp, 0.dp, 20.dp)
+                        .fillMaxWidth()
+                        .padding(0.dp, 0.dp, 0.dp, 10.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.SpaceBetween
@@ -201,7 +256,9 @@ fun BadgeCard(
                             .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
                     )
                     Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
-                        Column(modifier = Modifier.weight(2f).padding(horizontal = 10.dp),
+                        Column(modifier = Modifier
+                            .weight(2f)
+                            .padding(horizontal = 10.dp),
                             horizontalAlignment = Alignment.Start) {
                             Text(badge.badgeName, fontWeight = FontWeight.Bold, fontSize = 30.sp, textAlign = TextAlign.Start)
                             Text(
@@ -209,53 +266,157 @@ fun BadgeCard(
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp
                             )
+                            
+                            Spacer(modifier = Modifier.height(5.dp))
+
+                            Text(
+                                text = "Creator: " + skillInfo.value.creatorUserName,
+                                color = Color.White,
+                                fontSize = 15.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .background(color = colorCircle, RoundedCornerShape(20))
+                                    .padding(vertical = 3.dp, horizontal = 4.dp)
+                            )
                         }
                     }
 
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
+                    
+                    Column(modifier = Modifier
+                        .padding(top = 10.dp)) {
 
-                        Text(
-                            text = badge.badgeName,
+                        Row(
                             modifier = Modifier
-                                .padding(10.dp),
-                            textAlign = TextAlign.Center,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Text(
-                            text = badge.description,
-                            modifier = Modifier
-                                .padding(15.dp, 0.dp, 15.dp, 10.dp),
-                            textAlign = TextAlign.Center
-                        )
-
-                        if (badge.done) {
-                            val date = badge.date
-                            Text(
-                                "Achieved on: $date",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
+                                .fillMaxWidth()
+                                .padding(15.dp, 0.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Divider(
                                 modifier = Modifier
-                                    .padding(15.dp, 10.dp, 15.dp, 20.dp),
-                                textAlign = TextAlign.Center
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                color = Color.Black,
+                                thickness = 1.dp
                             )
-                        } else {
-                            Button(
-                                onClick = { /*TODO*/ },
+
+                            Text(
+                                modifier = Modifier.padding(8.dp),
+                                text = "Badge Description",
+                                fontSize = 18.sp
+                            )
+
+                            Divider(
                                 modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .padding(0.dp, 0.dp, 0.dp, 10.dp)
-                                    .width(120.dp)
-                            ) {
-                                Text("START", fontSize = 20.sp)
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                color = Color.Black,
+                                thickness = 1.dp
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(15.dp, 0.dp)
+                                .background(Color(0xFFF0F0F0), RoundedCornerShape(10)),
+                            contentAlignment = Alignment.Center
+
+                        ) {
+                            Text(
+                                text = badge.description,
+                                modifier = Modifier.padding(15.dp),
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                color = Color.Black
+                            )
+                        }
+                    }
+
+                    //DETAILS ON SUCCESS
+
+                    Column{
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp, 0.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                color = Color.Black,
+                                thickness = 1.dp
+                            )
+
+                            Text(
+                                modifier = Modifier.padding(8.dp),
+                                text = "Success Details",
+                                fontSize = 18.sp
+                            )
+
+                            Divider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                color = Color.Black,
+                                thickness = 1.dp
+                            )
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                                .fillMaxWidth()
+                                .background(
+                                    Color(0XFFF0F0F0),
+                                    RoundedCornerShape(10)
+                                ) // Use the color of the background in your image
+                                .border(1.dp, Color.Black, RoundedCornerShape(10))
+                                .padding(horizontal = 40.dp, vertical = 17.dp),
+
+                            verticalArrangement = Arrangement.SpaceAround,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row {
+                                Text(
+                                    text = "Skill: ",
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = skillInfo.value.titleSkill,
+                                    modifier = Modifier
+                                        .weight(1.0f)
+                                        .fillMaxWidth(),
+                                    textAlign = TextAlign.End,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Row {
+                                Text(
+                                    text = "Section " + skillInfo.value.skillSectionsList.indexOf(sectionInfo.value.id) + ": ",
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 18.sp,
+                                )
+                                Text(
+                                    text = sectionInfo.value.titleSection,
+                                    modifier = Modifier
+                                        .weight(1.0f)
+                                        .fillMaxWidth(),
+                                    textAlign = TextAlign.End,
+                                    fontSize = 18.sp,
+                                )
                             }
                         }
+
                     }
+
+
+                    
                 }
             }
         }
