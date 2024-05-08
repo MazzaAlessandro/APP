@@ -873,7 +873,8 @@ fun SkillInfoPopUp_UNSTARTED(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(0.dp, 0.dp, 0.dp, 20.dp),
+                        .padding(0.dp, 0.dp, 0.dp, 20.dp)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.SpaceBetween
                 ) {
