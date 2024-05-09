@@ -1728,7 +1728,15 @@ fun SearchScreen(
                             it.skillId
                         }
 
+                        val indexOfTime = currentUserSkillSubs.value.registeredSkillsIDs.indexOf(skillSelected.value.id)
+
                         var registeredSkillIds  = currentUserSkillSubs.value.registeredSkillsIDs - skillSelected.value.id
+                        var timesRegisterSkills = currentUserSkillSubs.value.timeRegistered.toMutableList()
+
+                        if(indexOfTime >= 0){
+                            timesRegisterSkills.removeAt(indexOfTime)
+                        }
+
 
                         var skillCustomOrdering = currentUserSkillSubs.value.customOrdering.toMutableList()
                         skillCustomOrdering.add(0, skillProgression.skillId)
@@ -1737,6 +1745,7 @@ fun SearchScreen(
                             startedSkillsIDs = startedSkillIds,
                             registeredSkillsIDs = registeredSkillIds,
                             customOrdering = skillCustomOrdering,
+                            timeRegistered = timesRegisterSkills,
                         )
 
                         sharedViewModel.updateUserSub(
@@ -1753,9 +1762,11 @@ fun SearchScreen(
                 {
                     //COMEBACK
                     val regSkillIds = currentUserSkillSubs.value.registeredSkillsIDs
+                    val timeRegistered = currentUserSkillSubs.value.timeRegistered
+                    val timeToAdd = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
                     currentUserSkillSubs.value =
-                        currentUserSkillSubs.value.copy(registeredSkillsIDs = regSkillIds + skillSelected.value.id)
+                        currentUserSkillSubs.value.copy(registeredSkillsIDs = regSkillIds + skillSelected.value.id, timeRegistered = timeRegistered + timeToAdd)
 
                     sharedViewModel.updateUserSub(currentUserSkillSubs.value, currentContext)
 

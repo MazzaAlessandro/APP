@@ -12,9 +12,11 @@ data class UserSkillSubsModel(
 
     //the skills he registered for without starting
     var registeredSkillsIDs: List<String> = emptyList(),
+    var timeRegistered: List<String> = emptyList(),
 
     //the skills he finished
     var finishedSkills: List<String> = emptyList(),
+    var timeFinishedFirstTime: List<String> = emptyList(),
 
     //the skills he created but didn't register nor start
     var createdSkillsId: List<String> = emptyList(),
@@ -24,7 +26,9 @@ data class UserSkillSubsModel(
 
     //the obtained badges
     var badgesObtained: List<String> = emptyList(),
+    var timeBadgeObtained: List<String> = emptyList(),
 
     //the custom ordering of the skills
     var customOrdering: List<String> = emptyList(),
+
 ) : Parcelable

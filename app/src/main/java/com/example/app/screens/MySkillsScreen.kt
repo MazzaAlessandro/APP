@@ -460,16 +460,20 @@ fun FinishSkill(
         listCompleteStructures.value.get(currentStructureIndex.value).skillSection
 
     var updatedBadges = it.badgesObtained
+    var updatedTimeBadge = it.timeBadgeObtained
     var updatedFinishedSkills = it.finishedSkills
+    var updatedTimesFinishSkills = it.timeFinishedFirstTime
     var updatedStartedSkills = it.startedSkillsIDs
     var updatedCustomOrder = it.customOrdering
 
     if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
         updatedBadges = updatedBadges + skillSection.badgeID
+        updatedTimeBadge = updatedTimeBadge + ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
     }
 
     if (updatedStructure.skill.id !in updatedFinishedSkills) {
         updatedFinishedSkills += updatedStructure.skill.id
+        updatedTimesFinishSkills += ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
     }
 
     if (updatedStructure.skill.id in updatedStartedSkills) {
@@ -482,7 +486,9 @@ fun FinishSkill(
 
     userSkillSub.value = it.copy(
         badgesObtained = updatedBadges,
+        timeBadgeObtained = updatedTimeBadge,
         finishedSkills = updatedFinishedSkills,
+        timeFinishedFirstTime = updatedTimesFinishSkills,
         startedSkillsIDs = updatedStartedSkills,
         customOrdering = updatedCustomOrder,
     )
@@ -729,11 +735,13 @@ fun MySkillsScreen(
                 listCompleteStructures.value.get(currentStructureIndex.value).skillSection
 
             var updatedBadges = it.badgesObtained
+            var updatedTimeBadge = it.timeBadgeObtained
 
             if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
                 updatedBadges = updatedBadges + skillSection.badgeID
+                updatedTimeBadge += ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             }
-            userSkillSub.value = it.copy(badgesObtained = updatedBadges)
+            userSkillSub.value = it.copy(badgesObtained = updatedBadges, timeBadgeObtained = updatedTimeBadge)
 
             sharedViewModel.saveUserSub(
                 userSkillSub.value,
