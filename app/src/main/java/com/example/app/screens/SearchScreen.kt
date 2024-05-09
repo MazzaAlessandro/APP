@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
@@ -78,6 +78,9 @@ import com.example.app.util.rememberWindowInfo
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.max
+
+
+
 
 
 //TODO PROBLEMS WITH PROG SAVE
@@ -221,7 +224,11 @@ fun SkillSearchBlock(
                     horizontalAlignment = Alignment.Start
                 ) {
 
-                    Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 25.sp)
+                    Text(skill.titleSkill,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 25.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis)
 
                     val sectionAmount = skill.skillSectionsList.size
 
