@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -503,6 +500,58 @@ fun FinishSkill(
 
 }
 
+
+//TODO SOLVE
+fun StopSkillProgressionMS(
+    sharedViewModel: SharedViewModel,
+    listCompleteStructures: MutableState<List<SkillCompleteStructureModel>>,
+    userSkillSub: MutableState<UserSkillSubsModel>,
+    currentStructureIndex: MutableState<Int>,
+    currentContext: Context
+) {
+    var updatedList = listCompleteStructures.value.toMutableList()
+    var updatedStructure = updatedList.get(currentStructureIndex.value)
+
+
+    var updatedProgression = updatedStructure.skillProgression
+
+    val indexOfSection =
+        updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
+
+    val it = userSkillSub.value
+
+    val skillSection =
+        listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+
+    var updatedStartedSkills = it.startedSkillsIDs
+    var updatedCustomOrder = it.customOrdering
+
+    if (updatedStructure.skill.id in updatedStartedSkills) {
+        updatedStartedSkills -= updatedStructure.skill.id
+    }
+
+    if (updatedStructure.skill.id in updatedCustomOrder) {
+        updatedCustomOrder -= updatedStructure.skill.id
+    }
+
+    userSkillSub.value = it.copy(
+        startedSkillsIDs = updatedStartedSkills,
+        customOrdering = updatedCustomOrder,
+    )
+
+    sharedViewModel.saveUserSub(
+        userSkillSub.value,
+        context = currentContext
+    )
+
+    val skillProgressionModel =
+        listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
+
+    sharedViewModel.removeSkillProgression(skillProgressionModel, currentContext)
+    listCompleteStructures.value -= listCompleteStructures.value.get(currentStructureIndex.value)
+
+}
+
 fun RecomputeList(listCompleteStructures: List<SkillCompleteStructureModel>, sortingType: SortingType, customOrdering: List<String>): List<SkillCompleteStructureModel>{
      val result = listCompleteStructures.sortedWith(Comparator { a, b ->
         when(sortingType) {
@@ -937,6 +986,19 @@ fun MySkillsScreen(
                         )
                         loadTrigger.value = !loadTrigger.value
                     }
+                },
+                {skillProgression ->
+
+                    isStartRun.value = false
+                    isPopUpOpen.value = false
+
+                    StopSkillProgressionMS(
+                        sharedViewModel,
+                        listCompleteStructures,
+                        userSkillSub,
+                        currentStructureIndex,
+                        currentContext
+                    )
                 }
             )
         }

@@ -640,18 +640,18 @@ class SkillRepository {
     fun retrieveOnlineSkills(
         context: Context,
         data: (List<SkillModel>) -> Unit
-    ) = CoroutineScope(Dispatchers.IO).launch{
+    ) = CoroutineScope(Dispatchers.IO).launch {
         val fireStoreRef = Firebase.firestore
             .collection("skill")
             .whereEqualTo("public", true)
 
-        try{
+        try {
             fireStoreRef.get()
-                .addOnSuccessListener {documents ->
-                    if (!documents.isEmpty){
-                        val currOnlineSkilList : MutableList<SkillModel> = mutableListOf()
+                .addOnSuccessListener { documents ->
+                    if (!documents.isEmpty) {
+                        val currOnlineSkilList: MutableList<SkillModel> = mutableListOf()
 
-                        for(d in documents){
+                        for (d in documents) {
 
                             currOnlineSkilList += d.toObject<SkillModel>()
 
@@ -661,11 +661,10 @@ class SkillRepository {
                         onlineSkilList.value = currOnlineSkilList
                     }
                 }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
 }

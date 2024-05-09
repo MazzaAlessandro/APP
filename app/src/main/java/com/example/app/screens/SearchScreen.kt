@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -345,6 +347,7 @@ fun SkillInfoPopUp_STARTED(
     onResetSkillProgression: () -> Unit,
     onCloseClick: () -> Unit,
     onChangeSection: (SkillSectionModel) -> Unit,
+    onStopSkillProgression: (SkillProgressionModel)->Unit
 ) {
     val currentContext = LocalContext.current
 
@@ -744,8 +747,8 @@ fun SkillInfoPopUp_STARTED(
                         Box(
                             Modifier
                                 .weight(1.0f)
-                                .padding(horizontal = 30.dp),
-                            contentAlignment = Alignment.TopStart
+                                .padding(horizontal = 0.dp),
+                            contentAlignment = Alignment.Center
                         ){
                             Text(
                                 "In Progress",
@@ -761,8 +764,8 @@ fun SkillInfoPopUp_STARTED(
                         Box(
                             Modifier
                                 .weight(1.0f)
-                                .padding(horizontal = 30.dp),
-                            contentAlignment = Alignment.TopEnd
+                                .padding(horizontal = 0.dp),
+                            contentAlignment = Alignment.Center
                         ){
 
                             Button(onClick = {
@@ -779,10 +782,35 @@ fun SkillInfoPopUp_STARTED(
                                 onResetSkillProgression()
 
                             }) {
+
+                                val initialColor: Color = Color(180, 180, 255)
+
                                 Text(
                                     "Restart",
                                     color = Color.White,
                                     fontSize = 16.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                                )
+                            }
+                        }
+
+                        Box(
+                            Modifier
+                                .weight(1.0f)
+                                .padding(horizontal = 0.dp),
+                            contentAlignment = Alignment.Center
+                        ){
+
+                            Button(
+                                onClick = {
+                                onStopSkillProgression(skillProgression)
+                            }) {
+                                Text(
+                                    "Stop Skill",
+                                    color =  Color.White,
+                                    fontSize = 12.sp,
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier
                                         .padding(vertical = 4.dp, horizontal = 4.dp)
@@ -1100,6 +1128,36 @@ fun SkillInfoPopUp_UNSTARTED(
         }
     }
 
+}
+
+
+fun StopSkillProgressionSS(
+    sharedViewModel: SharedViewModel,
+    skillProgression: SkillProgressionModel,
+    skillModelsStarted: MutableState<List<SkillModel>>,
+    onlineFetchedSkills: MutableState<List<SkillModel>>,
+    skillProgressions: MutableState<List<SkillProgressionModel>>,
+    isSkillSelected: MutableState<SelectedSkillState>,
+    currentUserSkillSubs: MutableState<UserSkillSubsModel>,
+    context: Context,
+){
+    sharedViewModel.removeSkillProgression(skillProgression, context)
+
+    skillModelsStarted.value = skillModelsStarted.value.filter { it.id != skillProgression.skillId }
+
+    onlineFetchedSkills.value = onlineFetchedSkills.value.filter { it.id != skillProgression.skillId }
+
+    skillProgressions.value -= skillProgression
+
+    isSkillSelected.value = SelectedSkillState.NOT_SELECTED
+
+    var updatedStartedSkills = skillModelsStarted.value.map { it.id }
+    var updatedCustomOrdering = currentUserSkillSubs.value.customOrdering.toMutableList()
+    updatedCustomOrdering.remove(skillProgression.skillId)
+
+    currentUserSkillSubs.value = currentUserSkillSubs.value.copy(startedSkillsIDs = updatedStartedSkills, customOrdering = updatedCustomOrdering)
+
+    sharedViewModel.saveUserSub(currentUserSkillSubs.value, context)
 }
 
 
@@ -1773,6 +1831,18 @@ fun SearchScreen(
                         sharedViewModel.updateSkillProgression(sharedViewModel.getCurrentUserMail(), skillSelected.value.id, updatedProgression, currentContext)
                     }
 
+                },
+                {skillProgression ->
+                    StopSkillProgressionSS(
+                        sharedViewModel,
+                        skillProgression,
+                        skillModelsStarted,
+                        onlineFetchedSkills,
+                        skillProgressions,
+                        isSkillSelected,
+                        currentUserSkillSubs,
+                        currentContext
+                    )
                 }
             )
         }
