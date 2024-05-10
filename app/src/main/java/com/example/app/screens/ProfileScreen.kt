@@ -264,7 +264,8 @@ fun ProfileScreen(navController: NavHostController,
 
             Row (modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(20.dp)
+                .clickable { navController.navigate(Routes.History.route) },
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 

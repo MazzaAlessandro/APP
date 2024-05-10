@@ -10,5 +10,6 @@ sealed class Routes(val route: String) {
     object SkillDisplay : Routes("SkillDisplay")
     object MySkills : Routes("MySkills")
     object Badges : Routes("Badges")
+    object History : Routes("History")
     object Stats : Routes("Stats")
 }

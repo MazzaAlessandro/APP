@@ -65,6 +65,10 @@ fun ScreenMain(){
         composable(Routes.Stats.route){
             StatsScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
+
+        composable(Routes.History.route){
+            StatsScreen(navController = navController, sharedViewModel = sharedViewModel)
+        }
     }
 
 
