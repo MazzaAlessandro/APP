@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -46,7 +47,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.Routes
 import com.example.app.util.SharedViewModel
+import com.example.app.util.WindowInfo
 import com.example.app.util.relative
+import com.example.app.util.rememberWindowInfo
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +58,8 @@ fun LoginScreen(
     navController: NavHostController,
     sharedViewModel: SharedViewModel
 ) {
+
+    val windowInfo = rememberWindowInfo()
 
     val authenticating = remember { mutableStateOf(true) }
 
@@ -89,90 +94,183 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
-            TextField(
-                label = { Text(text = "Mail") },
-                value = email.value,
-                onValueChange = { email.value = it },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                singleLine = true,
-                maxLines = 1,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Mail,
-                        contentDescription = "email"
-                    )
-                },
-                enabled = !authenticating.value
-            )
-
-            Spacer(modifier = Modifier.height(relative(20.dp)))
-            TextField(
-                label = { Text(text = "Password") },
-                value = password.value,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
-                singleLine = true,
-                maxLines = 1,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = "password"
-                    )
-                },
-                onValueChange = { password.value = it },
-                enabled = !authenticating.value
-            )
-
-
-            Spacer(modifier = Modifier.height(relative(20.dp)))
-
-            Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                Button(
-                    onClick = {
-                        //checks if the credentials are right.
-                        //if yes, takes to profile page
-                        //if not an error should appear
-                        /*if (password.value.text == "PASSWORD" && email.value.text == "USERNAME") {
-                            navController.navigate(Routes.Profile.route)
-                        } else {
-                            notification.value = "Either Username or Password is incorrect"
-                        }*/
-                        authenticating.value = true
-
-                        FirebaseAuth
-                            .getInstance()
-                            .signInWithEmailAndPassword(email.value.text, password.value.text)
-                            .addOnCompleteListener {
-                                if(it.isSuccessful){
-                                    sharedViewModel.setCurrentUserMail(email.value.text)
-                                    authenticating.value = false
-                                    navController.navigate(Routes.Profile.route)
-                                }
-                            }
-                            .addOnFailureListener {
-                                authenticating.value = false
-                            }
-
-                    },
-                    enabled = !password.value.text.isBlank()
-                            && !email.value.text.isBlank()
-                            && !authenticating.value,
-                    shape = RoundedCornerShape(50.dp),
+            if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                TextField(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(text = "Login")
+                        .width(windowInfo.screenWidth.div(2))
+                        .height(windowInfo.screenHeight.div(18)),
+                    label = { Text(text = "Mail") },
+                    value = email.value,
+                    onValueChange = { email.value = it },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Mail,
+                            contentDescription = "email"
+                        )
+                    },
+                    enabled = !authenticating.value
+                )
+            }
+            else{
+                TextField(
+                    label = { Text(text = "Mail") },
+                    value = email.value,
+                    onValueChange = { email.value = it },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Mail,
+                            contentDescription = "email"
+                        )
+                    },
+                    enabled = !authenticating.value
+                )
+            }
+
+            Spacer(modifier = Modifier.height(relative(20.dp)))
+
+            if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                TextField(
+                    modifier = Modifier
+                        .width(windowInfo.screenWidth.div(2))
+                        .height(windowInfo.screenHeight.div(18)),
+                    label = { Text(text = "Password")},
+                    value = password.value,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "password"
+                        )
+                    },
+                    onValueChange = { password.value = it },
+                    enabled = !authenticating.value
+                )
+            }
+            else{
+                TextField(
+                    label = { Text(text = "Password") },
+                    value = password.value,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Lock,
+                            contentDescription = "password"
+                        )
+                    },
+                    onValueChange = { password.value = it },
+                    enabled = !authenticating.value
+                )
+            }
+
+            Spacer(modifier = Modifier.height(relative(20.dp)))
+
+            if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                Box(modifier = Modifier
+                    .width(windowInfo.screenWidth.div(2))
+                    .height(windowInfo.screenHeight.div(18))) {
+                    Button(
+                        onClick = {
+                            //checks if the credentials are right.
+                            //if yes, takes to profile page
+                            //if not an error should appear
+                            /*if (password.value.text == "PASSWORD" && email.value.text == "USERNAME") {
+                                navController.navigate(Routes.Profile.route)
+                            } else {
+                                notification.value = "Either Username or Password is incorrect"
+                            }*/
+                            authenticating.value = true
+
+                            FirebaseAuth
+                                .getInstance()
+                                .signInWithEmailAndPassword(email.value.text, password.value.text)
+                                .addOnCompleteListener {
+                                    if(it.isSuccessful){
+                                        sharedViewModel.setCurrentUserMail(email.value.text)
+                                        authenticating.value = false
+                                        navController.navigate(Routes.Profile.route)
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    authenticating.value = false
+                                }
+
+                        },
+                        enabled = !password.value.text.isBlank()
+                                && !email.value.text.isBlank()
+                                && !authenticating.value,
+                        shape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Login", fontSize = 20.sp)
+                    }
+                }
+            }
+            else{
+                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+                    Button(
+                        onClick = {
+                            //checks if the credentials are right.
+                            //if yes, takes to profile page
+                            //if not an error should appear
+                            /*if (password.value.text == "PASSWORD" && email.value.text == "USERNAME") {
+                                navController.navigate(Routes.Profile.route)
+                            } else {
+                                notification.value = "Either Username or Password is incorrect"
+                            }*/
+                            authenticating.value = true
+
+                            FirebaseAuth
+                                .getInstance()
+                                .signInWithEmailAndPassword(email.value.text, password.value.text)
+                                .addOnCompleteListener {
+                                    if(it.isSuccessful){
+                                        sharedViewModel.setCurrentUserMail(email.value.text)
+                                        authenticating.value = false
+                                        navController.navigate(Routes.Profile.route)
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    authenticating.value = false
+                                }
+
+                        },
+                        enabled = !password.value.text.isBlank()
+                                && !email.value.text.isBlank()
+                                && !authenticating.value,
+                        shape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Login")
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.width(windowInfo.screenWidth.div(2)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Divider(
@@ -210,7 +308,7 @@ fun LoginScreen(
                     navController.navigate(Routes.SignUp.route)
                 },
                 style = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontFamily = FontFamily.Default,
                     textDecoration = TextDecoration.Underline,
                     color = Color.Blue
