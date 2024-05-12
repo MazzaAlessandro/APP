@@ -415,7 +415,9 @@ fun BadgeCard(
 
                     }
 
-
+                    Button(onClick = onCloseClick) {
+                        Text(text = "Close")
+                    }
                     
                 }
             }
