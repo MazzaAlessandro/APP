@@ -453,6 +453,10 @@ fun HistoryScreen(
         mutableStateOf(listOf())
     }
 
+    val eventTitleEditText : MutableState<String> = remember {
+        mutableStateOf("")
+    }
+
     val isPopUpActive: MutableState<Boolean> = remember {
         mutableStateOf(false)
     }
@@ -473,22 +477,23 @@ fun HistoryScreen(
                 userSkillSub.value.createdSkillsId
             ){
                 listCreatedSkills.value = it
-                listEvents.value = ComputeList(currUserSkillSub, listCreatedSkills.value)
+                sharedViewModel.retrieveSkillsFromList(
+                    currentContext,
+                    userSkillSub.value.finishedSkills
+                ){
+                    listFinishedSkills.value = it
+                    sharedViewModel.retrieveAllBadges(
+                        userSkillSub.value.badgesObtained,
+                        currentContext,
+                    ){
+                        listObtainedBadges.value = it
+
+                        listEvents.value = ComputeList(currUserSkillSub, listCreatedSkills.value, eventTitleEditText.value)
+                    }
+                }
             }
 
-            sharedViewModel.retrieveSkillsFromList(
-                currentContext,
-                userSkillSub.value.finishedSkills
-            ){
-                listFinishedSkills.value = it
-            }
 
-            sharedViewModel.retrieveAllBadges(
-                userSkillSub.value.badgesObtained,
-                currentContext,
-            ){
-                listObtainedBadges.value = it
-            }
         }
     }
 
@@ -510,31 +515,69 @@ fun HistoryScreen(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                listEvents.value.forEachIndexed{index, event ->
 
-                    Row {
-                        if(event.type == EVEN_TYPE.BADGEGOTTEN){
-                            EventCard(EVEN_TYPE.BADGEGOTTEN, SkillModel(), listObtainedBadges.value.find { it.skillId + it.sectionId == event.stringId }!!, event.time)
-                            {
-                                selectedThreeGroup.value = event
-                                isPopUpActive.value = true
-                            }
-                        }
-                        else if(event.type == EVEN_TYPE.SKILLCREATED){
-                            EventCard(EVEN_TYPE.SKILLCREATED, listCreatedSkills.value.find { it.id == event.stringId }!!, BadgeDataModel(), event.time )
-                            {
-                                selectedThreeGroup.value = event
-                                isPopUpActive.value = true
-                            }
-                        }
-                        else{
-                            EventCard(EVEN_TYPE.SKILLFINISHEDFT, listFinishedSkills.value.find { it.id == event.stringId }!!, BadgeDataModel(), event.time )
+                TextField(
+                    value = eventTitleEditText.value,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    onValueChange = {
+                        eventTitleEditText.value = it
+
+                        listEvents.value = ComputeList(
+                            userSkillSub.value,
+                            listCreatedSkills.value,
+                            it
+                        )
+
+                                    },
+                    label = { Text(text = "Search a event by name") },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "search"
+                        )
+                    },
+                )
+
+                listEvents.value.forEach{ event ->
+
+                    if(event.type == EVEN_TYPE.BADGEGOTTEN){
+                        val badge = listObtainedBadges.value.find { it.skillId + it.sectionId == event.stringId }!!
+
+                        if(eventTitleEditText.value in badge.badgeName){
+                            EventCard(EVEN_TYPE.BADGEGOTTEN, SkillModel(), badge, event.time)
                             {
                                 selectedThreeGroup.value = event
                                 isPopUpActive.value = true
                             }
                         }
 
+
+                    }
+                    else if(event.type == EVEN_TYPE.SKILLCREATED){
+                        val skill = listCreatedSkills.value.find { it.id == event.stringId }!!
+
+                        if(eventTitleEditText.value in skill.titleSkill){
+                            EventCard(EVEN_TYPE.SKILLCREATED, skill, BadgeDataModel(), event.time )
+                            {
+                                selectedThreeGroup.value = event
+                                isPopUpActive.value = true
+                            }
+                        }
+
+                    }
+                    else if(event.type == EVEN_TYPE.SKILLFINISHEDFT){
+                        val skill = listFinishedSkills.value.find { it.id == event.stringId }!!
+
+                        if(eventTitleEditText.value in skill.titleSkill){
+                            EventCard(EVEN_TYPE.SKILLFINISHEDFT, skill, BadgeDataModel(), event.time )
+                            {
+                                selectedThreeGroup.value = event
+                                isPopUpActive.value = true
+                            }
+                        }
                     }
 
                 }
@@ -575,9 +618,9 @@ fun HistoryScreen(
 }
 
 
-fun ComputeList(userSkillSubsModel: UserSkillSubsModel, listCreatedSkills: List<SkillModel>): List<ThreeGroup>{
+fun ComputeList(userSkillSubsModel: UserSkillSubsModel, listCreatedSkills: List<SkillModel>, subString: String): List<ThreeGroup>{
 
-    var listCreatedEvents = userSkillSubsModel.createdSkillsId.map { skillId ->
+    var listCreatedEvents = userSkillSubsModel.createdSkillsId.filter {str -> subString in listCreatedSkills.find { it.id == str }!!.titleSkill }.map { skillId ->
         ThreeGroup(
             EVEN_TYPE.SKILLCREATED,
             ZonedDateTime.parse(listCreatedSkills.find { it.id == skillId }!!.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME),
