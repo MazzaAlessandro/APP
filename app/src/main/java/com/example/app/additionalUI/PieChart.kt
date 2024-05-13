@@ -11,7 +11,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.app.util.relative
 import kotlinx.coroutines.launch
 
 data class PieChartData(
@@ -29,9 +31,11 @@ data class ArcData(
 @Composable
 fun AnimatedPieChart(
     modifier: Modifier = Modifier,
-    pieDataPoints : List<PieChartData>
+    pieDataPoints : List<PieChartData>,
+    size : Dp = relative(100.dp),
+    width : Float = 25f
 ){
-    val localModifier = modifier.size(100.dp)
+    val localModifier = modifier.size(size)
     var total = pieDataPoints.fold(0f){ acc, pieData ->
         acc + pieData.value
     }.div(360)
@@ -64,7 +68,7 @@ fun AnimatedPieChart(
     }
 
     Canvas(modifier = localModifier){
-        val stroke = Stroke(width = 25f)
+        val stroke = Stroke(width)
 
         arcs.reversed().map{
             drawArc(

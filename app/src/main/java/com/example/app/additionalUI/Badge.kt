@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -40,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -125,9 +125,17 @@ fun BadgeBanner(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = skillName, fontSize = fontSize.sp, fontWeight = FontWeight.Bold)
+                Text(text = skillName,
+                    fontSize = fontSize.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
 
-                Text(text = description, fontSize = (fontSize + 1).sp, lineHeight = (fontSize + 1).sp)
+                Text(text = description,
+                    fontSize = (fontSize + 1).sp,
+                    lineHeight = (fontSize + 1).sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis)
 
                 Spacer(modifier = Modifier.fillMaxHeight())
 
