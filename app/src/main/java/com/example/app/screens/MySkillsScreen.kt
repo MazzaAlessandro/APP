@@ -120,8 +120,8 @@ fun SkillListElement(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10))
-            .background(color = Color(0XFFD9D9D9))
+            .background(color = Color(0XFFD9D9D9), RoundedCornerShape(10.dp))
+            .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
             .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -801,43 +801,89 @@ fun MySkillsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            //verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
 
-            Row {
-                
-                Column(modifier = Modifier.weight(1.0f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    RadioButton(selected = sortingType.value == SortingType.DateAsc, onClick = {
-                        sortingType.value = SortingType.DateAsc
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 10.dp, horizontal = 3.dp)
+                    .background(Color(0XFFD9D9D9), RoundedCornerShape(10.dp))
+                    .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                    .padding(vertical = 10.dp, horizontal = 3.dp)
+                    .height(75.dp)
 
-                        listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+            ) {
 
-                    })
-                    
-                    Text(text = "Date Asc.", textAlign = TextAlign.Center)
+                val color1 = Color(255, 130, 136)
+                val color2 = Color(163, 255, 130)
+
+                Box(
+                    modifier = Modifier.weight(1.0f)
+                        .padding(horizontal = 5.dp)
+
+                        .then(
+                            if(sortingType.value == SortingType.Custom)
+                                Modifier.background(color2, RoundedCornerShape(10.dp))
+                            else
+                                Modifier.background(color1, RoundedCornerShape(10.dp))
+
+                        )
+                        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                        .padding(10.dp)
+                        .fillMaxHeight()
+                        .clickable {
+                            sortingType.value = SortingType.Custom
+
+                            listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Custom", textAlign = TextAlign.Center, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
-                
-                
-                Column(modifier = Modifier.weight(1.0f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    RadioButton(selected = sortingType.value == SortingType.DateDesc, onClick = {
-                        sortingType.value = SortingType.DateDesc
 
-                        listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                Box(
+                    modifier = Modifier.weight(1.0f)
+                        .padding(horizontal = 5.dp)
+                        .then(
+                            if(sortingType.value == SortingType.DateAsc)
+                                Modifier.background(color2, RoundedCornerShape(10.dp))
+                            else
+                                Modifier.background(color1, RoundedCornerShape(10.dp))
+                        )
+                        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                        .padding(10.dp)
+                        .fillMaxHeight()
+                        .clickable {
+                            sortingType.value = SortingType.DateAsc
 
-                    })
-                    
-                    Text(text = "Date Desc.", textAlign = TextAlign.Center)
+                            listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Date Asc.", textAlign = TextAlign.Center, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
-                
-                Column(modifier = Modifier.weight(1.0f), horizontalAlignment = Alignment.CenterHorizontally) {
-                    RadioButton(selected = sortingType.value == SortingType.Custom, onClick = {
-                        sortingType.value = SortingType.Custom
 
-                        listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                Box(
+                    modifier = Modifier.weight(1.0f)
+                        .padding(horizontal = 5.dp)
 
-                    })
+                        .then(
+                            if(sortingType.value == SortingType.DateDesc)
+                                Modifier.background(color2, RoundedCornerShape(10.dp))
+                            else
+                                Modifier.background(color1, RoundedCornerShape(10.dp))
+                        )
+                        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+                        .padding(10.dp)
+                        .fillMaxHeight()
+                        .clickable {
+                            sortingType.value = SortingType.DateDesc
 
-                    Text(text = "Custom Order (working)", textAlign = TextAlign.Center)
+                            listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Date DateDesc.", textAlign = TextAlign.Center, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
 
             }
