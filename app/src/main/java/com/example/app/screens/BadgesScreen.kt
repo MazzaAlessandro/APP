@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +39,8 @@ import com.example.app.additionalUI.BadgeColor
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.models.BadgeDataModel
 import com.example.app.util.SharedViewModel
+import com.example.app.util.WindowInfo
+import com.example.app.util.rememberWindowInfo
 
 @Composable
 fun BadgesScreen(
@@ -44,6 +48,8 @@ fun BadgesScreen(
     sharedViewModel: SharedViewModel
 ){
     val currentContext: Context = LocalContext.current
+
+    val windowInfo = rememberWindowInfo()
 
     val selected = remember { mutableStateOf(false) }
 
@@ -117,23 +123,67 @@ fun BadgesScreen(
                 )
 
 
-                //BadgeCard(badge = BadgeColor.BRONZE, skillName = "Skill 1", description = "This is a description for the card. Let's make it longer to see how it fits", date = "24/10/12", done = false)
-                badgeList.value
-                    .filter { badgeTitleEditText.value in it.badgeName }
-                    .sortedBy { it.date }
-                    .map {
-                    BadgeBanner(
-                        it.badgeColor,
-                        it.badgeName,
-                        it.description,
-                        it.date,
-                        it.done,
-                        onClick = {
-                            selectedBadge.value = it
-                            selected.value = true
-                        })
-                }
+                if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                    var list = badgeList.value
+                        .filter { badgeTitleEditText.value in it.badgeName }
+                        .sortedBy { it.date }
+                    var listA : List<BadgeDataModel>
+                    var listB : List<BadgeDataModel>
 
+                    if(list.isNotEmpty()) {
+                        listA = list.subList(0, list.size / 2)
+                        listB = list.subList(list.size / 2, list.size)
+
+                        Row(){
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                listB.map{
+                                    BadgeBanner(
+                                        it.badgeColor,
+                                        it.badgeName,
+                                        it.description,
+                                        it.date,
+                                        it.done,
+                                        onClick = {
+                                            selectedBadge.value = it
+                                            selected.value = true
+                                        })
+                                }
+                            }
+
+                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                                listA.map{
+                                    BadgeBanner(
+                                        it.badgeColor,
+                                        it.badgeName,
+                                        it.description,
+                                        it.date,
+                                        it.done,
+                                        onClick = {
+                                            selectedBadge.value = it
+                                            selected.value = true
+                                        })
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    badgeList.value
+                        .filter { badgeTitleEditText.value in it.badgeName }
+                        .sortedBy { it.date }
+                        .map {
+                            BadgeBanner(
+                                it.badgeColor,
+                                it.badgeName,
+                                it.description,
+                                it.date,
+                                it.done,
+                                onClick = {
+                                    selectedBadge.value = it
+                                    selected.value = true
+                                })
+                        }
+                }
 
 
                 if(badgeList.value.isEmpty()){

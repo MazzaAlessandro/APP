@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -45,6 +46,9 @@ import com.example.app.Routes
 import com.example.app.models.UserDataModel
 import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
+import com.example.app.util.WindowInfo
+import com.example.app.util.relative
+import com.example.app.util.rememberWindowInfo
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -53,6 +57,8 @@ fun SignUpScreen(navController: NavHostController,
                  sharedViewModel: SharedViewModel
 ){
     val authenticating = remember { mutableStateOf(false) }
+
+    val windowInfo = rememberWindowInfo()
 
     val context = LocalContext.current
 
@@ -80,123 +86,257 @@ fun SignUpScreen(navController: NavHostController,
 
             Text(text = "Registration", style = TextStyle(fontSize = 40.sp))
 
-            ProfileImage(""){uri->
+            ProfileImage("", true, relative(120.dp)){uri->
                 pfpUri.value = uri
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(relative(20.dp)))
 
-            TextField(
-                label = { Text(text = "Username") },
-                value = username.value,
-                onValueChange = { username.value = it },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                singleLine = true,
-                maxLines = 1,
-                leadingIcon = {Icon(imageVector = Icons.Default.Person, contentDescription = "username")},
-                enabled = !authenticating.value
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            TextField(
-                label = { Text(text = "Email") },
-                value = mail.value,
-                onValueChange = { mail.value = it },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                singleLine = true,
-                maxLines = 1,
-                leadingIcon = {Icon(imageVector = Icons.Default.Mail, contentDescription = "email")},
-                enabled = !authenticating.value)
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            TextField(
-                label = { Text(text = "Password") },
-                value = password.value,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
-                singleLine = true,
-                maxLines = 1,
-                leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "password")},
-                onValueChange = { password.value = it },
-                enabled = !authenticating.value)
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            TextField(
-                label = { Text(text = "Confirm Password") },
-                value = passwordCheck.value,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                singleLine = true,
-                maxLines = 1,
-                leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "checkPassword")},
-                onValueChange = { passwordCheck.value = it },
-                enabled = !authenticating.value
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                Button(
-                    onClick = {
-                        //checks if password and password check match.
-                        //if yes, takes checks if username isn't already used
-                        // if it's unique, registers the user and takes him to his new profile page
-                        if(password.value.text != passwordCheck.value.text)
-                        {
-                            notification.value = "Please verify that the password match"
-                        }
-                        else
-                        {
-                            authenticating.value = true
-                            //createUserInFirebase(username.value.text, mail.value.text, password.value.text)
-                            FirebaseAuth
-                                .getInstance()
-                                .createUserWithEmailAndPassword(mail.value.text, password.value.text)
-                                .addOnCompleteListener {
-                                    Log.d(TAG, "Inside OnCompleteListener")
-                                    Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
-
-                                    if(it.isSuccessful){
-                                        sharedViewModel.saveUserData(
-                                            userData = UserDataModel(
-                                                FirebaseAuth.getInstance().currentUser!!.uid,
-                                                username.value.text,
-                                                mail.value.text,
-                                                pfpUri.value,
-                                            ),
-                                            context
-                                        )
-                                        sharedViewModel.setCurrentUserMail(mail.value.text)
-
-                                        sharedViewModel.saveUserSub(UserSkillSubsModel(userEmail = mail.value.text), context)
-
-                                        authenticating.value = false
-                                        navController.navigate(Routes.Profile.route)
-                                    }
-
-                                }
-                                .addOnFailureListener {
-                                    authenticating.value = false
-                                    Log.d(TAG, "Inside OnFailureListener")
-                                    Log.d(TAG, "Exception = ${it.message}")
-                                    Log.d(TAG, "Exception = ${it.localizedMessage}")
-                                }
-                        }
-                    },
-                    enabled = password.value.text.isNotBlank()
-                            && username.value.text.isNotBlank()
-                            && mail.value.text.isNotBlank()
-                            && passwordCheck.value.text.isNotBlank()
-                            && !authenticating.value,
-                    shape = RoundedCornerShape(50.dp),
+            if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
+                TextField(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(text = "Register")
+                        .width(windowInfo.screenWidth.div(2))
+                        .height(windowInfo.screenHeight.div(18)),
+                    label = { Text(text = "Username") },
+                    value = username.value,
+                    onValueChange = { username.value = it },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Person, contentDescription = "username")},
+                    enabled = !authenticating.value
+                )
+            }
+            else{
+                TextField(
+                    label = { Text(text = "Username") },
+                    value = username.value,
+                    onValueChange = { username.value = it },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Person, contentDescription = "username")},
+                    enabled = !authenticating.value
+                )
+            }
+
+            Spacer(modifier = Modifier.height(relative(20.dp)))
+
+            if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
+                TextField(
+                    modifier = Modifier
+                        .width(windowInfo.screenWidth.div(2))
+                        .height(windowInfo.screenHeight.div(18)),
+                    label = { Text(text = "Email") },
+                    value = mail.value,
+                    onValueChange = { mail.value = it },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Mail, contentDescription = "email")},
+                    enabled = !authenticating.value)
+            }
+            else{
+                TextField(
+                    label = { Text(text = "Email") },
+                    value = mail.value,
+                    onValueChange = { mail.value = it },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Mail, contentDescription = "email")},
+                    enabled = !authenticating.value)
+            }
+
+            Spacer(modifier = Modifier.height(relative(20.dp)))
+
+            if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
+                TextField(
+                    modifier = Modifier
+                        .width(windowInfo.screenWidth.div(2))
+                        .height(windowInfo.screenHeight.div(18)),
+                    label = { Text(text = "Password") },
+                    value = password.value,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "password")},
+                    onValueChange = { password.value = it },
+                    enabled = !authenticating.value)
+            }else{
+                TextField(
+                    label = { Text(text = "Password") },
+                    value = password.value,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "password")},
+                    onValueChange = { password.value = it },
+                    enabled = !authenticating.value)
+            }
+
+
+            Spacer(modifier = Modifier.height(relative(20.dp)))
+
+            if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
+                TextField(
+                    modifier = Modifier
+                        .width(windowInfo.screenWidth.div(2))
+                        .height(windowInfo.screenHeight.div(18)),
+                    label = { Text(text = "Confirm Password") },
+                    value = passwordCheck.value,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "checkPassword")},
+                    onValueChange = { passwordCheck.value = it },
+                    enabled = !authenticating.value
+                )
+            }else{
+                TextField(
+                    label = { Text(text = "Confirm Password") },
+                    value = passwordCheck.value,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    singleLine = true,
+                    maxLines = 1,
+                    leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "checkPassword")},
+                    onValueChange = { passwordCheck.value = it },
+                    enabled = !authenticating.value
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(relative(20.dp)))
+
+            if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
+                Box(modifier = Modifier
+                    .width(windowInfo.screenWidth.div(2))
+                    .height(windowInfo.screenHeight.div(18))) {
+                    Button(
+                        onClick = {
+                            //checks if password and password check match.
+                            //if yes, takes checks if username isn't already used
+                            // if it's unique, registers the user and takes him to his new profile page
+                            if(password.value.text != passwordCheck.value.text)
+                            {
+                                notification.value = "Please verify that the password match"
+                            }
+                            else
+                            {
+                                authenticating.value = true
+                                //createUserInFirebase(username.value.text, mail.value.text, password.value.text)
+                                FirebaseAuth
+                                    .getInstance()
+                                    .createUserWithEmailAndPassword(mail.value.text, password.value.text)
+                                    .addOnCompleteListener {
+                                        Log.d(TAG, "Inside OnCompleteListener")
+                                        Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
+
+                                        if(it.isSuccessful){
+                                            sharedViewModel.saveUserData(
+                                                userData = UserDataModel(
+                                                    FirebaseAuth.getInstance().currentUser!!.uid,
+                                                    username.value.text,
+                                                    mail.value.text,
+                                                    pfpUri.value,
+                                                ),
+                                                context
+                                            )
+                                            sharedViewModel.setCurrentUserMail(mail.value.text)
+
+                                            sharedViewModel.saveUserSub(UserSkillSubsModel(userEmail = mail.value.text), context)
+
+                                            authenticating.value = false
+                                            navController.navigate(Routes.Profile.route)
+                                        }
+
+                                    }
+                                    .addOnFailureListener {
+                                        authenticating.value = false
+                                        Log.d(TAG, "Inside OnFailureListener")
+                                        Log.d(TAG, "Exception = ${it.message}")
+                                        Log.d(TAG, "Exception = ${it.localizedMessage}")
+                                    }
+                            }
+                        },
+                        enabled = password.value.text.isNotBlank()
+                                && username.value.text.isNotBlank()
+                                && mail.value.text.isNotBlank()
+                                && passwordCheck.value.text.isNotBlank()
+                                && !authenticating.value,
+                        shape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Register")
+                    }
+                }
+            }else{
+                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+                    Button(
+                        onClick = {
+                            //checks if password and password check match.
+                            //if yes, takes checks if username isn't already used
+                            // if it's unique, registers the user and takes him to his new profile page
+                            if(password.value.text != passwordCheck.value.text)
+                            {
+                                notification.value = "Please verify that the password match"
+                            }
+                            else
+                            {
+                                authenticating.value = true
+                                //createUserInFirebase(username.value.text, mail.value.text, password.value.text)
+                                FirebaseAuth
+                                    .getInstance()
+                                    .createUserWithEmailAndPassword(mail.value.text, password.value.text)
+                                    .addOnCompleteListener {
+                                        Log.d(TAG, "Inside OnCompleteListener")
+                                        Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
+
+                                        if(it.isSuccessful){
+                                            sharedViewModel.saveUserData(
+                                                userData = UserDataModel(
+                                                    FirebaseAuth.getInstance().currentUser!!.uid,
+                                                    username.value.text,
+                                                    mail.value.text,
+                                                    pfpUri.value,
+                                                ),
+                                                context
+                                            )
+                                            sharedViewModel.setCurrentUserMail(mail.value.text)
+
+                                            sharedViewModel.saveUserSub(UserSkillSubsModel(userEmail = mail.value.text), context)
+
+                                            authenticating.value = false
+                                            navController.navigate(Routes.Profile.route)
+                                        }
+
+                                    }
+                                    .addOnFailureListener {
+                                        authenticating.value = false
+                                        Log.d(TAG, "Inside OnFailureListener")
+                                        Log.d(TAG, "Exception = ${it.message}")
+                                        Log.d(TAG, "Exception = ${it.localizedMessage}")
+                                    }
+                            }
+                        },
+                        enabled = password.value.text.isNotBlank()
+                                && username.value.text.isNotBlank()
+                                && mail.value.text.isNotBlank()
+                                && passwordCheck.value.text.isNotBlank()
+                                && !authenticating.value,
+                        shape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Register")
+                    }
                 }
             }
         }
