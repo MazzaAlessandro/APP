@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -30,7 +31,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,11 +48,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.app.additionalUI.BadgeColor
 import com.example.app.additionalUI.BadgeIcon
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.bottomNavigation.BottomNavigationBar
+import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillCompleteStructureModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
@@ -66,17 +70,14 @@ import java.time.format.DateTimeFormatter
 import kotlin.math.max
 
 
-//TODO MAKE THE USER CONNECTED TO THE SKILL
-//TODO MAKE IT POSSIBLE FOR A USER TO SEARCH FOR THE SKILL HE CREATED
-//TODO MAKE IT NON AUTOMATIC TO START A SKILL
-
 enum class SortingType{
     DateAsc, DateDesc, Custom
 }
 
 @Composable
-fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel) {
+fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel, badge : BadgeDataModel) {
     val colorCircle = MaterialTheme.colorScheme.primary
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,7 +89,7 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel) {
 
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BadgeIcon(badge = BadgeColor.BRONZE, size = relative(65.dp))
+        BadgeIcon(badge = badge.badgeColor, size = relative(65.dp), filled = badge.skillId != "")
         Spacer(Modifier.width(10.dp)) // Space between the circle and the text
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -102,7 +103,7 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel) {
             skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
         val requiredAmount: Int =
             skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
-        Text(text = completedAmount.toString() + "/" + requiredAmount, fontSize = 20.sp)
+        Text(text = "$completedAmount/$requiredAmount", fontSize = 20.sp)
     }
 }
 
@@ -111,11 +112,30 @@ fun SkillListElement(
     skillCompleteStructureModel: SkillCompleteStructureModel,
     index: Int,
     sortingType: SortingType,
+    sharedViewModel: SharedViewModel,
     onClickTask: (Int, SkillTaskModel) -> Unit,
     onValidateSkill: (Int) -> Unit,
     onOpenMenu: (Int) -> Unit,
-    onSwapRequest: (Int, Boolean) -> Unit
+    onSwapRequest: (Int, Boolean) -> Unit,
+    onBadgeAchieved: (BadgeDataModel) -> Unit
 ) {
+    val currentContext: Context = LocalContext.current
+
+    val badge : MutableState<BadgeDataModel> = remember {
+        mutableStateOf(BadgeDataModel())
+    }
+
+    val done : MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
+
+    sharedViewModel.retrieveBadge(
+        skillCompleteStructureModel.skill.id,
+        skillCompleteStructureModel.skillSection.id,
+        currentContext
+    ){
+        badge.value = it
+    }
 
     Column(
         modifier = Modifier
@@ -171,7 +191,7 @@ fun SkillListElement(
         }
 
 
-        SkillTitleBlock(skillCompleteStructureModel)
+        SkillTitleBlock(skillCompleteStructureModel, badge.value)
 
         Column(
             modifier = Modifier
@@ -207,12 +227,24 @@ fun SkillListElement(
                 )
             }
 
+            var completedTasks = 0
+
             skillCompleteStructureModel.skillTasks.forEach {
                 TaskListElement(
                     progression = it.value.first,
-                    task = it.key,
-                    { onClickTask(index, it.key) })
+                    task = it.key
+                ) { onClickTask(index, it.key) }
+
+                if(it.value.first == it.key.requiredAmount)
+                    completedTasks++
             }
+
+            if(completedTasks==skillCompleteStructureModel.skillTasks.size && !done.value){
+                onBadgeAchieved(badge.value)
+                done.value = true
+            }
+            else if (!skillCompleteStructureModel.skillProgression.isFinished)
+                done.value = false
 
             if (skillCompleteStructureModel.skillProgression.isFinished) {
 
@@ -251,10 +283,12 @@ fun TaskListElement(progression: Int, task: SkillTaskModel, onClickTask: () -> U
 fun SkillListBlock(
     listSkills: List<SkillCompleteStructureModel>,
     sortingType: SortingType,
+    sharedViewModel: SharedViewModel,
     onClickTask: (Int, SkillTaskModel) -> Unit,
     onValidateSkill: (Int) -> Unit,
     onOpenMenu: (Int) -> Unit,
-    onSwapRequest: (Int, Boolean) -> Unit
+    onSwapRequest: (Int, Boolean) -> Unit,
+    onBadgeAchieved: (BadgeDataModel) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -268,10 +302,12 @@ fun SkillListBlock(
                 skillCompleteStructureModel = skillStructure,
                 index,
                 sortingType,
+                sharedViewModel,
                 onClickTask,
                 onValidateSkill,
                 onOpenMenu,
-                onSwapRequest
+                onSwapRequest,
+                onBadgeAchieved
             )
         }
     }
@@ -622,6 +658,14 @@ fun MySkillsScreen(
         mutableStateOf(false)
     }
 
+    var isBadgePopUpOpen: MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
+
+    var badgeObtained : MutableState<BadgeDataModel> = remember {
+        mutableStateOf(BadgeDataModel())
+    }
+
     val sortingType: MutableState<SortingType> = remember {
         mutableStateOf(SortingType.Custom)
     }
@@ -818,11 +862,12 @@ fun MySkillsScreen(
                 val color2 = Color(163, 255, 130)
 
                 Box(
-                    modifier = Modifier.weight(1.0f)
+                    modifier = Modifier
+                        .weight(1.0f)
                         .padding(horizontal = 5.dp)
 
                         .then(
-                            if(sortingType.value == SortingType.Custom)
+                            if (sortingType.value == SortingType.Custom)
                                 Modifier.background(color2, RoundedCornerShape(10.dp))
                             else
                                 Modifier.background(color1, RoundedCornerShape(10.dp))
@@ -834,7 +879,11 @@ fun MySkillsScreen(
                         .clickable {
                             sortingType.value = SortingType.Custom
 
-                            listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                            listCompleteStructures.value = RecomputeList(
+                                listCompleteStructures.value,
+                                sortingType.value,
+                                userSkillSub.value.customOrdering
+                            )
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -842,10 +891,11 @@ fun MySkillsScreen(
                 }
 
                 Box(
-                    modifier = Modifier.weight(1.0f)
+                    modifier = Modifier
+                        .weight(1.0f)
                         .padding(horizontal = 5.dp)
                         .then(
-                            if(sortingType.value == SortingType.DateAsc)
+                            if (sortingType.value == SortingType.DateAsc)
                                 Modifier.background(color2, RoundedCornerShape(10.dp))
                             else
                                 Modifier.background(color1, RoundedCornerShape(10.dp))
@@ -856,7 +906,11 @@ fun MySkillsScreen(
                         .clickable {
                             sortingType.value = SortingType.DateAsc
 
-                            listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                            listCompleteStructures.value = RecomputeList(
+                                listCompleteStructures.value,
+                                sortingType.value,
+                                userSkillSub.value.customOrdering
+                            )
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -864,11 +918,12 @@ fun MySkillsScreen(
                 }
 
                 Box(
-                    modifier = Modifier.weight(1.0f)
+                    modifier = Modifier
+                        .weight(1.0f)
                         .padding(horizontal = 5.dp)
 
                         .then(
-                            if(sortingType.value == SortingType.DateDesc)
+                            if (sortingType.value == SortingType.DateDesc)
                                 Modifier.background(color2, RoundedCornerShape(10.dp))
                             else
                                 Modifier.background(color1, RoundedCornerShape(10.dp))
@@ -879,7 +934,11 @@ fun MySkillsScreen(
                         .clickable {
                             sortingType.value = SortingType.DateDesc
 
-                            listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                            listCompleteStructures.value = RecomputeList(
+                                listCompleteStructures.value,
+                                sortingType.value,
+                                userSkillSub.value.customOrdering
+                            )
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -888,7 +947,9 @@ fun MySkillsScreen(
 
             }
 
-            SkillListBlock(listSkills = listCompleteStructures.value, sortingType.value,
+            SkillListBlock(listSkills = listCompleteStructures.value,
+                sortingType.value,
+                sharedViewModel,
                 { index, task ->
 
                     val updatedList = ComputeListTaskAdd1(
@@ -948,6 +1009,10 @@ fun MySkillsScreen(
                     sharedViewModel.updateUserSub(userSkillSub.value, currentContext)
 
                     listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                },
+                { badge ->
+                    badgeObtained.value = badge
+                    isBadgePopUpOpen.value = true
                 }
             )
         }
@@ -1056,8 +1121,85 @@ fun MySkillsScreen(
                 }
             )
         }
+
+        if(isBadgePopUpOpen.value){
+            BadgeCompletedPopUp(badge = badgeObtained.value) {
+                isBadgePopUpOpen.value = false
+            }
+        }
     }
 
+}
+
+@Composable
+fun BadgeCompletedPopUp(
+    badge : BadgeDataModel,
+    onCloseClick: () -> Unit,
+){
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Gray.copy(alpha = 0.7f))
+            .zIndex(10F)
+            .clickable { },
+        contentAlignment = Alignment.Center
+    ){
+        Popup(
+            alignment = Alignment.Center,
+            properties = PopupProperties(
+                excludeFromSystemGesture = true,
+            ),
+            onDismissRequest = { onCloseClick() }
+        ){
+            Box(
+                Modifier
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.6f)
+                    .clip(shape = RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .background(MaterialTheme.colorScheme.surface),
+            ) {
+                IconButton(
+                    onClick = {
+                        onCloseClick()
+                    },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .zIndex(11F),
+                ) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "close")
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(0.dp, 0.dp, 0.dp, 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text("CONGRATULATIONS!", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+
+                    BadgeIcon(badge = badge.badgeColor, size = relative(150.dp))
+
+                    Text("You just obtained a", fontSize = 24.sp)
+
+                    var color : String = "BRONZE MEDAL"
+
+                    if(badge.badgeColor == BadgeColor.SILVER)
+                        color = "SILVER MEDAL"
+
+                    if(badge.badgeColor == BadgeColor.GOLD)
+                        color = "GOLD MEDAL"
+
+                    Text(text = color, fontSize = 27.sp)
+
+                    Text(badge.badgeName, fontSize = 20.sp)
+
+                    Text(badge.description, fontSize = 20.sp)
+                }
+            }
+        }
+    }
 }
 
 

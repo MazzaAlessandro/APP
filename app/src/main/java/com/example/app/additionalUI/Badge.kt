@@ -280,7 +280,7 @@ fun BadgeCard(
                             Text(
                                 text = "Creator: " + skillInfo.value.creatorUserName,
                                 color = Color.White,
-                                fontSize = 15.sp,
+                                fontSize = 16.sp,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .background(color = colorCircle, RoundedCornerShape(20))
@@ -333,7 +333,7 @@ fun BadgeCard(
                             Text(
                                 text = badge.description,
                                 modifier = Modifier.padding(15.dp),
-                                fontSize = 12.sp,
+                                fontSize = 16.sp,
                                 textAlign = TextAlign.Center,
                                 color = Color.Black
                             )
