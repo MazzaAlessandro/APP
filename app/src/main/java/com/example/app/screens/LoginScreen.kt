@@ -1,6 +1,14 @@
 package com.example.app.screens
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,16 +33,22 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -46,13 +60,20 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.app.R
 import com.example.app.Routes
-import com.example.app.ui.theme.GoogleButton
+import com.example.app.models.UserDataModel
+import com.example.app.models.UserSkillSubsModel
+import com.example.app.util.Constant
 import com.example.app.util.SharedViewModel
 import com.example.app.util.WindowInfo
 import com.example.app.util.relative
 import com.example.app.util.rememberWindowInfo
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,14 +81,66 @@ fun LoginScreen(
     navController: NavHostController,
     sharedViewModel: SharedViewModel
 ) {
-
     val windowInfo = rememberWindowInfo()
-
+    val context = LocalContext.current
     val authenticating = remember { mutableStateOf(true) }
+    val token = Constant.ServerClientId
 
     val notification = rememberSaveable { mutableStateOf("") }
     if(notification.value.isNotEmpty()){
         Toast.makeText(LocalContext.current, notification.value, Toast.LENGTH_LONG).show()
+    }
+
+    var clicked by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) {
+        val task =
+            try {
+                val account = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+                    .getResult(ApiException::class.java)
+                val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+                FirebaseAuth.getInstance().signInWithCredential(credential)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            var mail = task.result.user?.email
+                            var username = task.result.user?.displayName
+
+                            println(mail)
+                            println(username)
+                            println(FirebaseAuth.getInstance().currentUser!!.uid)
+
+                            if(username==null)
+                                username = "username"
+
+                            if(mail!=null){
+                                sharedViewModel.saveUserData(
+                                    userData = UserDataModel(
+                                        FirebaseAuth.getInstance().currentUser!!.uid,
+                                        username,
+                                        mail
+                                    ),
+                                    context
+                                )
+
+                                sharedViewModel.saveUserSub(UserSkillSubsModel(userEmail = mail), context)
+
+                                authenticating.value = false
+                                clicked = false
+                                navController.navigate(Routes.Profile.route)
+                                sharedViewModel.setCurrentUserMail(mail)
+                            }
+                        }
+                        else{
+                            authenticating.value = false
+                            clicked = false
+                        }
+                    }
+            }
+            catch (e: ApiException) {
+                Log.w("TAG", "GoogleSign in Failed", e)
+            }
     }
 
     if(FirebaseAuth.getInstance().currentUser != null){
@@ -190,14 +263,6 @@ fun LoginScreen(
                     .height(windowInfo.screenHeight.div(18))) {
                     Button(
                         onClick = {
-                            //checks if the credentials are right.
-                            //if yes, takes to profile page
-                            //if not an error should appear
-                            /*if (password.value.text == "PASSWORD" && email.value.text == "USERNAME") {
-                                navController.navigate(Routes.Profile.route)
-                            } else {
-                                notification.value = "Either Username or Password is incorrect"
-                            }*/
                             authenticating.value = true
 
                             FirebaseAuth
@@ -293,10 +358,63 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
-            GoogleButton(authenticating = authenticating.value,
-                onClick = {
+            Surface(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.medium)
+                    .clickable {
+                        if(!authenticating.value && !clicked){
+                            authenticating.value = true
+                            clicked = true
 
-                })
+                            val gso = GoogleSignInOptions
+                                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestIdToken(token)
+                                .requestEmail()
+                                .build()
+                            val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                            launcher.launch(googleSignInClient.signInIntent)
+                        }
+                    },
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(width = 1.dp, color = Color.LightGray),
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(
+                            start = 12.dp,
+                            end = 16.dp,
+                            top = 12.dp,
+                            bottom = 12.dp
+                        )
+                        .animateContentSize(
+                            animationSpec = tween(
+                                durationMillis = 300,
+                                easing = LinearOutSlowInEasing
+                            )
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_google_logo),
+                        contentDescription = "Google Button",
+                        tint = Color.Unspecified
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = if (clicked) "Logging in..." else "Log In with Google")
+                    if (clicked) {
+                        Spacer(modifier = Modifier.width(16.dp))
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .height(16.dp)
+                                .width(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
         }
 
         Box(modifier = Modifier
@@ -334,7 +452,5 @@ fun LoginScreen(
         if(authenticating.value)
             CircularProgressIndicator()
     }
-
-
 }
 
