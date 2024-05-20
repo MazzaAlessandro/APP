@@ -680,7 +680,10 @@ fun SkillInfoPopUp_STARTED(
                                         req = task.requiredAmount
                                     }
 
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Row(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(15.dp, 0.dp),
+                                        verticalAlignment = Alignment.CenterVertically) {
                                         IconButton(
                                             modifier = Modifier
                                                 .padding(horizontal = 2.dp)
@@ -1050,11 +1053,11 @@ fun SkillInfoPopUp_UNSTARTED(
                             // THE TASKS
 
                             Column(modifier = Modifier
-                                .fillMaxWidth(),) {
+                                .fillMaxWidth()
+                                .padding(15.dp, 0.dp),) {
                                 Row(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(15.dp, 0.dp),
+                                        .fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Divider(
