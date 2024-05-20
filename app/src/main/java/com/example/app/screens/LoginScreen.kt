@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.app.Routes
+import com.example.app.ui.theme.GoogleButton
 import com.example.app.util.SharedViewModel
 import com.example.app.util.WindowInfo
 import com.example.app.util.relative
@@ -229,14 +231,6 @@ fun LoginScreen(
                 Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                     Button(
                         onClick = {
-                            //checks if the credentials are right.
-                            //if yes, takes to profile page
-                            //if not an error should appear
-                            /*if (password.value.text == "PASSWORD" && email.value.text == "USERNAME") {
-                                navController.navigate(Routes.Profile.route)
-                            } else {
-                                notification.value = "Either Username or Password is incorrect"
-                            }*/
                             authenticating.value = true
 
                             FirebaseAuth
@@ -299,21 +293,42 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
-            ClickableText(
-                text = AnnotatedString("Create a new Account"),
-                modifier = Modifier
-                    .padding(10.dp),
+            GoogleButton(authenticating = authenticating.value,
                 onClick = {
-                    //here we should implement the navigation to the Sign Up Screen
-                    navController.navigate(Routes.SignUp.route)
-                },
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily.Default,
-                    textDecoration = TextDecoration.Underline,
-                    color = Color.Blue
+
+                })
+        }
+
+        Box(modifier = Modifier
+            .fillMaxHeight(0.9f)
+            .fillMaxWidth(), Alignment.BottomCenter){
+            Row {
+                Text(
+                    text = AnnotatedString("Don't have an account?"),
+                    modifier = Modifier
+                        .padding(5.dp, 0.dp),
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily.Default,
+                    )
                 )
-            )
+
+                ClickableText(
+                    text = AnnotatedString("Create now!"),
+                    modifier = Modifier
+                        .padding(5.dp, 0.dp),
+                    onClick = {
+                        //here we should implement the navigation to the Sign Up Screen
+                        navController.navigate(Routes.SignUp.route)
+                    },
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily.Default,
+                        textDecoration = TextDecoration.Underline,
+                        color = Color.Blue
+                    )
+                )
+            }
         }
 
         if(authenticating.value)
