@@ -22,11 +22,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,8 +39,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -670,6 +675,10 @@ fun MySkillsScreen(
         mutableStateOf(SortingType.Custom)
     }
 
+    val sortingMenuExp: MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
+
 
     LaunchedEffect(loadTrigger.value) {
 
@@ -848,104 +857,45 @@ fun MySkillsScreen(
             //verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
 
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 10.dp, horizontal = 3.dp)
-                    .background(Color(0XFFD9D9D9), RoundedCornerShape(10.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-                    .padding(vertical = 10.dp, horizontal = 3.dp)
-                    .height(75.dp)
 
-            ) {
+            Row(horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically) {
 
-                val color1 = Color(255, 130, 136)
-                val color2 = Color(163, 255, 130)
 
-                Box(
-                    modifier = Modifier
-                        .weight(1.0f)
-                        .padding(horizontal = 5.dp)
+                Box(modifier = Modifier.clickable { /*onAddBadgeProcess(id.toString())*/ sortingMenuExp.value =
+                    !sortingMenuExp.value
+                }) {
+                    Icon(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .zIndex(11F),
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "badge"
+                    )
 
-                        .then(
-                            if (sortingType.value == SortingType.Custom)
-                                Modifier.background(color2, RoundedCornerShape(10.dp))
-                            else
-                                Modifier.background(color1, RoundedCornerShape(10.dp))
-
-                        )
-                        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-                        .padding(10.dp)
-                        .fillMaxHeight()
-                        .clickable {
+                    DropdownMenu(
+                        expanded = sortingMenuExp.value,
+                        onDismissRequest = { sortingMenuExp.value = false }
+                    ) {
+                        DropdownMenuItem(text = { Text(text = "Custom") }, onClick = {
+                            sortingMenuExp.value = false
                             sortingType.value = SortingType.Custom
+                        })
 
-                            listCompleteStructures.value = RecomputeList(
-                                listCompleteStructures.value,
-                                sortingType.value,
-                                userSkillSub.value.customOrdering
-                            )
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Custom", textAlign = TextAlign.Center, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-
-                Box(
-                    modifier = Modifier
-                        .weight(1.0f)
-                        .padding(horizontal = 5.dp)
-                        .then(
-                            if (sortingType.value == SortingType.DateAsc)
-                                Modifier.background(color2, RoundedCornerShape(10.dp))
-                            else
-                                Modifier.background(color1, RoundedCornerShape(10.dp))
-                        )
-                        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-                        .padding(10.dp)
-                        .fillMaxHeight()
-                        .clickable {
+                        DropdownMenuItem(text = { Text(text = "Date Asc") }, onClick = {
+                            sortingMenuExp.value = false
                             sortingType.value = SortingType.DateAsc
-
-                            listCompleteStructures.value = RecomputeList(
-                                listCompleteStructures.value,
-                                sortingType.value,
-                                userSkillSub.value.customOrdering
-                            )
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Date Asc.", textAlign = TextAlign.Center, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-
-                Box(
-                    modifier = Modifier
-                        .weight(1.0f)
-                        .padding(horizontal = 5.dp)
-
-                        .then(
-                            if (sortingType.value == SortingType.DateDesc)
-                                Modifier.background(color2, RoundedCornerShape(10.dp))
-                            else
-                                Modifier.background(color1, RoundedCornerShape(10.dp))
-                        )
-                        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-                        .padding(10.dp)
-                        .fillMaxHeight()
-                        .clickable {
+                        })
+                        DropdownMenuItem(text = { Text(text = "Date Desc") }, onClick = {
+                            sortingMenuExp.value = false
                             sortingType.value = SortingType.DateDesc
+                        })
+                    }
 
-                            listCompleteStructures.value = RecomputeList(
-                                listCompleteStructures.value,
-                                sortingType.value,
-                                userSkillSub.value.customOrdering
-                            )
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Date DateDesc.", textAlign = TextAlign.Center, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
-
             }
+
+            
 
             SkillListBlock(listSkills = listCompleteStructures.value,
                 sortingType.value,
@@ -1201,5 +1151,3 @@ fun BadgeCompletedPopUp(
         }
     }
 }
-
-
