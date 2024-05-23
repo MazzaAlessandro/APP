@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -173,7 +174,8 @@ fun LoginScreen(
                 TextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
-                        .height(windowInfo.screenHeight.div(18)),
+                        .height(windowInfo.screenHeight.div(18))
+                        .testTag("mailTextField"),
                     label = { Text(text = "Mail") },
                     value = email.value,
                     onValueChange = { email.value = it },
@@ -191,6 +193,7 @@ fun LoginScreen(
             }
             else{
                 TextField(
+                    modifier = Modifier.testTag("mailTextField"),
                     label = { Text(text = "Mail") },
                     value = email.value,
                     onValueChange = { email.value = it },
@@ -213,7 +216,8 @@ fun LoginScreen(
                 TextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
-                        .height(windowInfo.screenHeight.div(18)),
+                        .height(windowInfo.screenHeight.div(18))
+                        .testTag("passwordTextField"),
                     label = { Text(text = "Password")},
                     value = password.value,
                     visualTransformation = PasswordVisualTransformation(),
@@ -235,6 +239,7 @@ fun LoginScreen(
             }
             else{
                 TextField(
+                    modifier = Modifier.testTag("passwordTextField"),
                     label = { Text(text = "Password") },
                     value = password.value,
                     visualTransformation = PasswordVisualTransformation(),
@@ -374,7 +379,8 @@ fun LoginScreen(
                             val googleSignInClient = GoogleSignIn.getClient(context, gso)
                             launcher.launch(googleSignInClient.signInIntent)
                         }
-                    },
+                    }
+                    .testTag("GoogleButton"),
                 shape = MaterialTheme.shapes.medium,
                 border = BorderStroke(width = 1.dp, color = Color.LightGray),
                 color = MaterialTheme.colorScheme.surface
