@@ -33,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -96,7 +97,8 @@ fun SignUpScreen(navController: NavHostController,
                 TextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
-                        .height(windowInfo.screenHeight.div(18)),
+                        .height(windowInfo.screenHeight.div(18))
+                        .testTag("username"),
                     label = { Text(text = "Username") },
                     value = username.value,
                     onValueChange = { username.value = it },
@@ -109,6 +111,7 @@ fun SignUpScreen(navController: NavHostController,
             }
             else{
                 TextField(
+                    modifier = Modifier.testTag("username"),
                     label = { Text(text = "Username") },
                     value = username.value,
                     onValueChange = { username.value = it },
@@ -126,7 +129,8 @@ fun SignUpScreen(navController: NavHostController,
                 TextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
-                        .height(windowInfo.screenHeight.div(18)),
+                        .height(windowInfo.screenHeight.div(18))
+                        .testTag("email"),
                     label = { Text(text = "Email") },
                     value = mail.value,
                     onValueChange = { mail.value = it },
@@ -138,6 +142,7 @@ fun SignUpScreen(navController: NavHostController,
             }
             else{
                 TextField(
+                    modifier = Modifier.testTag("email"),
                     label = { Text(text = "Email") },
                     value = mail.value,
                     onValueChange = { mail.value = it },
@@ -154,7 +159,8 @@ fun SignUpScreen(navController: NavHostController,
                 TextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
-                        .height(windowInfo.screenHeight.div(18)),
+                        .height(windowInfo.screenHeight.div(18))
+                        .testTag("password"),
                     label = { Text(text = "Password") },
                     value = password.value,
                     visualTransformation = PasswordVisualTransformation(),
@@ -166,6 +172,7 @@ fun SignUpScreen(navController: NavHostController,
                     enabled = !authenticating.value)
             }else{
                 TextField(
+                    modifier = Modifier.testTag("password"),
                     label = { Text(text = "Password") },
                     value = password.value,
                     visualTransformation = PasswordVisualTransformation(),
@@ -184,7 +191,8 @@ fun SignUpScreen(navController: NavHostController,
                 TextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
-                        .height(windowInfo.screenHeight.div(18)),
+                        .height(windowInfo.screenHeight.div(18))
+                        .testTag("confirmPassword"),
                     label = { Text(text = "Confirm Password") },
                     value = passwordCheck.value,
                     visualTransformation = PasswordVisualTransformation(),
@@ -197,6 +205,7 @@ fun SignUpScreen(navController: NavHostController,
                 )
             }else{
                 TextField(
+                    modifier = Modifier.testTag("confirmPassword"),
                     label = { Text(text = "Confirm Password") },
                     value = passwordCheck.value,
                     visualTransformation = PasswordVisualTransformation(),
