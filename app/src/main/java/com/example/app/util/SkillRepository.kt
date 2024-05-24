@@ -666,5 +666,41 @@ class SkillRepository {
         }
     }
 
+    fun unPublishSkillModel(
+        skill: SkillModel,
+        context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("skill")
+            .document(skill.id)
+
+        try{
+            fireStoreRef.set(skill.copy(isPublic = false))
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun publishSkillModel(
+        skill: SkillModel,
+        context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("skill")
+            .document(skill.id)
+
+        try{
+            fireStoreRef.set(skill.copy(isPublic = true))
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 }

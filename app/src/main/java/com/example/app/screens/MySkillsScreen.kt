@@ -1068,6 +1068,19 @@ fun MySkillsScreen(
                         currentStructureIndex,
                         currentContext
                     )
+                },
+                {skill ->
+                    sharedViewModel.unPublishSkill(skill, currentContext)
+
+                    listCompleteStructures.value = listCompleteStructures.value.map { if(it.skill.id == skill.id) it.copy(skill = it.skill.copy(isPublic = false)) else it}
+                },
+                {skill ->
+                    sharedViewModel.publishSkill(skill, currentContext)
+
+                    listCompleteStructures.value = listCompleteStructures.value.map { if(it.skill.id == skill.id) it.copy(skill = it.skill.copy(isPublic = true)) else it}
+                },
+                {
+
                 }
             )
         }
