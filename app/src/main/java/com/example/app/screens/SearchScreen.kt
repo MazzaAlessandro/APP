@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -1062,7 +1063,10 @@ fun SkillInfoPopUp_UNSTARTED(
     isRegistered: Boolean,
     onAddProgression: () -> Unit,
     onCloseClick: () -> Unit,
-    onRegisterSkill: () -> Unit
+    onRegisterSkill: () -> Unit,
+    onUnpublishSkill: (SkillModel) -> Unit,
+    onPublishSkill: (SkillModel) -> Unit,
+    onDeleteSkill: (SkillModel) -> Unit
 ) {
     val currentContext = LocalContext.current
 
@@ -1352,6 +1356,151 @@ fun SkillInfoPopUp_UNSTARTED(
                             colors = ButtonDefaults.buttonColors(containerColor = greenColor)
                         ) {
                             Text(text = "START SKILL")
+                        }
+                    }
+
+
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    if(skill.isPublic && sharedViewModel.isMySkill(skill)){
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            Box(
+                                Modifier
+                                    .weight(1.0f)
+                                    .padding(horizontal = 0.dp),
+                                contentAlignment = Alignment.Center
+                            ){
+                                Text(
+                                    "Public",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .background(color = greenColor, RoundedCornerShape(20))
+                                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                                )
+                            }
+
+
+                            Box(
+                                Modifier
+                                    .weight(1.0f)
+                                    .padding(horizontal = 0.dp),
+                                contentAlignment = Alignment.Center
+                            ){
+
+                                Button(onClick = {
+                                    onUnpublishSkill(skill)
+
+                                }) {
+
+                                    val initialColor: Color = Color(255, 180, 180)
+
+                                    Text(
+                                        "Un-publish",
+                                        color = Color.White,
+                                        fontSize = 12.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .padding(vertical = 4.dp, horizontal = 4.dp)
+                                    )
+                                }
+                            }
+
+                            Box(
+                                Modifier
+                                    .weight(1.0f)
+                                    .padding(horizontal = 0.dp),
+                                contentAlignment = Alignment.Center
+                            ){
+
+                                Button(
+                                    onClick = {
+                                        onDeleteSkill(skill)
+                                    }) {
+                                    Text(
+                                        "Delete Skill",
+                                        color =  Color.White,
+                                        fontSize = 12.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .padding(vertical = 4.dp, horizontal = 4.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    else if(!skill.isPublic && sharedViewModel.isMySkill(skill)){
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            Box(
+                                Modifier
+                                    .weight(1.0f)
+                                    .padding(horizontal = 0.dp),
+                                contentAlignment = Alignment.Center
+                            ){
+                                Text(
+                                    "Private",
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .background(color = redColor, RoundedCornerShape(20))
+                                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                                )
+                            }
+
+
+                            Box(
+                                Modifier
+                                    .weight(1.0f)
+                                    .padding(horizontal = 0.dp),
+                                contentAlignment = Alignment.Center
+                            ){
+
+                                Button(onClick = {
+                                    onPublishSkill(skill)
+                                }) {
+
+                                    val initialColor: Color = Color(255, 180, 180)
+
+                                    Text(
+                                        "Publish",
+                                        color = Color.White,
+                                        fontSize = 16.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .padding(vertical = 4.dp, horizontal = 4.dp)
+                                    )
+                                }
+                            }
+
+                            Box(
+                                Modifier
+                                    .weight(1.0f)
+                                    .padding(horizontal = 0.dp),
+                                contentAlignment = Alignment.Center
+                            ){
+
+                                Button(
+                                    onClick = {
+                                        onDeleteSkill(skill)
+                                    }) {
+                                    Text(
+                                        "Delete Skill",
+                                        color =  Color.White,
+                                        fontSize = 12.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier
+                                            .padding(vertical = 4.dp, horizontal = 4.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -2082,6 +2231,36 @@ fun SearchScreen(
                     skillModelsRegistered.value += skillSelected.value
 
                     isSkillSelected.value = SelectedSkillState.REGISTERED_SELECTED
+                },
+                {skill ->
+                    //TAKE CARE OF THE DB
+                    sharedViewModel.unPublishSkill(skill, currentContext)
+                    //TAKE CARE OF THE LOCAL
+                    skillModelsRegistered.value = skillModelsRegistered.value.toMutableList().map {
+                        if(it.id == skill.id) skill.copy(isPublic = false) else it
+                    }.toList()
+
+                    skillModelsCreated.value = skillModelsCreated.value.toMutableList().map {
+                        if(it.id == skill.id) skill.copy(isPublic = true) else it
+                    }.toList()
+
+                    skillSelected.value = skillSelected.value.copy(isPublic = false)
+                },
+                {skill ->
+                    sharedViewModel.publishSkill(skill, currentContext)
+
+                    skillModelsRegistered.value = skillModelsRegistered.value.toMutableList().map {
+                        if(it.id == skill.id) skill.copy(isPublic = true) else it
+                    }
+
+                    skillModelsCreated.value = skillModelsCreated.value.toMutableList().map {
+                        if(it.id == skill.id) skill.copy(isPublic = true) else it
+                    }.toList()
+
+                    skillSelected.value = skillSelected.value.copy(isPublic = true)
+                },
+                {
+
                 }
             )
         }
