@@ -38,7 +38,6 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
     }
 
 
-
     fun resetSession(){
         setCurrentUserMail("")
         currentUserData.value
@@ -271,6 +270,25 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.retrieveAllBadges(badgesList, context, data)
     }
 
+
+
+
+    fun unPublishSkill(
+        skill: SkillModel,
+        context: Context
+    ){
+        skillRepository.unPublishSkillModel(skill, context)
+    }
+
+    fun publishSkill(
+        skill: SkillModel,
+        context: Context
+    ){
+        skillRepository.publishSkillModel(skill, context)
+    }
+
+
+
     fun removeSkillProgression(
         skillProgression: SkillProgressionModel,
         context: Context
@@ -278,11 +296,23 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         skillRepository.removeSkillProgression(skillProgression, context)
     }
 
+    fun isSkillUnpublished(
+        skill: SkillModel,
+    ): Boolean{
+        return skill.isPublic && (getCurrentUserMail() == skill.creatorEmail)
+    }
+
     fun retrieveOnlineSkills(
         context: Context,
         data: (List<SkillModel>) -> Unit
     ){
         skillRepository.retrieveOnlineSkills(context, data)
+    }
+
+    fun isMySkill(
+        skill: SkillModel
+    ): Boolean{
+        return skill.creatorEmail == getCurrentUserMail()
     }
 
     fun popUpOn(){
