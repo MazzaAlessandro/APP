@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,7 +73,8 @@ fun BadgeIcon(
 
     Image(
         modifier = Modifier
-            .size(size),
+            .size(size)
+            .testTag("BadgeImage"),
         painter = painterResource(id = id),
         contentDescription = "gold"
     )
@@ -105,6 +107,7 @@ fun BadgeBanner(
 
     Box(modifier = Modifier
         .fillMaxWidth()
+        .testTag("Banner")
         .padding(5.dp, 2.dp)
         .clip(shape = RoundedCornerShape(10.dp))
         .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
@@ -147,9 +150,6 @@ fun BadgeBanner(
     }
 }
 
-//This is a card that basically shows the same things as the banner, but larger
-//The idea is that this should pop up whenever you click on a badge banner
-//If you did not completed the badge, the card has a button that takes you to that tutorial
 @Composable
 fun BadgeCard(
     badge: BadgeDataModel,
