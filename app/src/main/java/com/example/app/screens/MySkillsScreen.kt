@@ -39,10 +39,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -856,46 +854,45 @@ fun MySkillsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             //verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-
-
-            Row(horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-
-
-                Box(modifier = Modifier.clickable { /*onAddBadgeProcess(id.toString())*/ sortingMenuExp.value =
-                    !sortingMenuExp.value
-                }) {
+            Box(modifier = Modifier.clickable { /*onAddBadgeProcess(id.toString())*/ sortingMenuExp.value =
+                !sortingMenuExp.value
+            }) {
+                Row(horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    var order = "Custom"
+                    if(sortingType.value == SortingType.Custom)
+                        order = "Custom"
+                    if(sortingType.value == SortingType.DateAsc)
+                        order = "Date Asc"
+                    if(sortingType.value == SortingType.DateDesc)
+                        order = "Date Desc"
+                    Text("Order by: $order")
                     Icon(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .zIndex(11F),
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "badge"
                     )
-
-                    DropdownMenu(
-                        expanded = sortingMenuExp.value,
-                        onDismissRequest = { sortingMenuExp.value = false }
-                    ) {
-                        DropdownMenuItem(text = { Text(text = "Custom") }, onClick = {
-                            sortingMenuExp.value = false
-                            sortingType.value = SortingType.Custom
-                        })
-
-                        DropdownMenuItem(text = { Text(text = "Date Asc") }, onClick = {
-                            sortingMenuExp.value = false
-                            sortingType.value = SortingType.DateAsc
-                        })
-                        DropdownMenuItem(text = { Text(text = "Date Desc") }, onClick = {
-                            sortingMenuExp.value = false
-                            sortingType.value = SortingType.DateDesc
-                        })
-                    }
-
                 }
-            }
 
-            
+                DropdownMenu(
+                    expanded = sortingMenuExp.value,
+                    onDismissRequest = { sortingMenuExp.value = false }
+                ) {
+                    DropdownMenuItem(text = { Text(text = "Custom") }, onClick = {
+                        sortingMenuExp.value = false
+                        sortingType.value = SortingType.Custom
+                    })
+
+                    DropdownMenuItem(text = { Text(text = "Date Asc") }, onClick = {
+                        sortingMenuExp.value = false
+                        sortingType.value = SortingType.DateAsc
+                    })
+                    DropdownMenuItem(text = { Text(text = "Date Desc") }, onClick = {
+                        sortingMenuExp.value = false
+                        sortingType.value = SortingType.DateDesc
+                    })
+                }
+
+            }
 
             SkillListBlock(listSkills = listCompleteStructures.value,
                 sortingType.value,
