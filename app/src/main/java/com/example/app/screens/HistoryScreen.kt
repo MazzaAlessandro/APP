@@ -592,7 +592,7 @@ fun HistoryScreen(
 
                 val badge = listObtainedBadges.value.find{it.skillId + it.sectionId == selectedThreeGroup.value.stringId}!!
 
-                BadgeCard(badge = badge, sharedViewModel = sharedViewModel) {
+                BadgeCard(badge = badge, sharedViewModel = sharedViewModel, dateTime = selectedThreeGroup.value.time) {
                     isPopUpActive.value = false
                 }
             }

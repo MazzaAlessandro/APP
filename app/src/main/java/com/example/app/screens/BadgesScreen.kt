@@ -38,9 +38,12 @@ import com.example.app.additionalUI.BadgeCard
 import com.example.app.additionalUI.BadgeColor
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.models.BadgeDataModel
+import com.example.app.models.UserSkillSubsModel
 import com.example.app.util.SharedViewModel
 import com.example.app.util.WindowInfo
 import com.example.app.util.rememberWindowInfo
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun BadgesScreen(
@@ -71,6 +74,10 @@ fun BadgesScreen(
         mutableStateOf("")
     }
 
+    val currentUserSkillSub: MutableState<UserSkillSubsModel> = remember {
+        mutableStateOf(UserSkillSubsModel())
+    }
+
 
 
     LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
@@ -78,6 +85,8 @@ fun BadgesScreen(
             sharedViewModel.getCurrentUserMail(),
             currentContext,
         ){userSkillSub ->
+
+            currentUserSkillSub.value = userSkillSub
 
             sharedViewModel.retrieveAllBadges(
                 userSkillSub.badgesObtained,
@@ -135,7 +144,10 @@ fun BadgesScreen(
                         listB = list.subList(list.size / 2, list.size)
 
                         Row(){
-                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                            Column(
+                                Modifier
+                                    .width(windowInfo.screenWidth.div(2))
+                                    .weight(1f)){
                                 listB.map{
                                     BadgeBanner(
                                         it.badgeColor,
@@ -150,7 +162,10 @@ fun BadgesScreen(
                                 }
                             }
 
-                            Column(Modifier.width(windowInfo.screenWidth.div(2)).weight(1f)){
+                            Column(
+                                Modifier
+                                    .width(windowInfo.screenWidth.div(2))
+                                    .weight(1f)){
                                 listA.map{
                                     BadgeBanner(
                                         it.badgeColor,
@@ -209,9 +224,16 @@ fun BadgesScreen(
     }
 
     if (selected.value){
+        //TODO FIND THE GOOD INDEXING
+        val indexOfBadge = currentUserSkillSub.value.badgesObtained.indexOf(selectedBadge.value.skillId + selectedBadge.value.sectionId);
+
+        val time = if(indexOfBadge == -1) ZonedDateTime.parse(selectedBadge.value.date, DateTimeFormatter.ISO_OFFSET_DATE_TIME) else ZonedDateTime.now()
+
+
         BadgeCard(
             selectedBadge.value,
             sharedViewModel,
+            time,
             onCloseClick = {
                 selected.value = false
             })
