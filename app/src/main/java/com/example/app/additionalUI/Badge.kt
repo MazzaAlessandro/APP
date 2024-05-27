@@ -53,6 +53,8 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.util.SharedViewModel
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 //This is the round icon of a Badge that can be used on its own
 @Composable
@@ -154,6 +156,7 @@ fun BadgeBanner(
 fun BadgeCard(
     badge: BadgeDataModel,
     sharedViewModel: SharedViewModel,
+    dateTime: ZonedDateTime = ZonedDateTime.now(),
     onCloseClick: () -> Unit
 ){
     val context = LocalContext.current
@@ -388,13 +391,13 @@ fun BadgeCard(
                         ) {
                             Row {
                                 Text(
-                                    text = "Skill: ",
+                                    text = "Obtained on: ",
                                     textAlign = TextAlign.Start,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = skillInfo.value.titleSkill,
+                                    text = dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
                                     modifier = Modifier
                                         .weight(1.0f)
                                         .fillMaxWidth(),
@@ -406,12 +409,12 @@ fun BadgeCard(
                             Spacer(modifier = Modifier.height(10.dp))
                             Row {
                                 Text(
-                                    text = "Section " + skillInfo.value.skillSectionsList.indexOf(sectionInfo.value.id) + ": ",
+                                    text = "At time: ",
                                     textAlign = TextAlign.Start,
                                     fontSize = 18.sp,
                                 )
                                 Text(
-                                    text = sectionInfo.value.titleSection,
+                                    text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")).lowercase(),
                                     modifier = Modifier
                                         .weight(1.0f)
                                         .fillMaxWidth(),
