@@ -4,6 +4,7 @@ import android.content.ContentValues.TAG
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -32,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -69,7 +73,9 @@ fun SignUpScreen(navController: NavHostController,
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().testTag("SignUpScreen"),
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("SignUpScreen"),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -85,48 +91,52 @@ fun SignUpScreen(navController: NavHostController,
             val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
             val pfpUri = remember { MutableStateFlow("") }
 
-            Text(text = "Registration", style = TextStyle(fontSize = 40.sp))
+            Text(text = "Registration", style = TextStyle(fontSize = 50.sp))
 
-            ProfileImage("", true, relative(120.dp)){uri->
+            Spacer(modifier = Modifier.height(relative(20.dp)))
+
+            ProfileImage("", true, relative(100.dp)){uri->
                 pfpUri.value = uri
             }
 
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
                         .testTag("username"),
                     label = { Text(text = "Username") },
-                    value = username.value,
-                    onValueChange = { username.value = it },
+                    value = username.value.text,
+                    onValueChange = { username.value = TextFieldValue(it)},
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Person, contentDescription = "username")},
                     enabled = !authenticating.value
                 )
             }
             else{
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.testTag("username"),
                     label = { Text(text = "Username") },
                     value = username.value,
                     onValueChange = { username.value = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Person, contentDescription = "username")},
                     enabled = !authenticating.value
                 )
             }
 
-            Spacer(modifier = Modifier.height(relative(20.dp)))
+            Spacer(modifier = Modifier.height(relative(10.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -136,27 +146,29 @@ fun SignUpScreen(navController: NavHostController,
                     onValueChange = { mail.value = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Mail, contentDescription = "email")},
                     enabled = !authenticating.value)
             }
             else{
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.testTag("email"),
                     label = { Text(text = "Email") },
                     value = mail.value,
                     onValueChange = { mail.value = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Mail, contentDescription = "email")},
                     enabled = !authenticating.value)
             }
 
-            Spacer(modifier = Modifier.height(relative(20.dp)))
+            Spacer(modifier = Modifier.height(relative(10.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -166,18 +178,20 @@ fun SignUpScreen(navController: NavHostController,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "password")},
                     onValueChange = { password.value = it },
                     enabled = !authenticating.value)
             }else{
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.testTag("password"),
                     label = { Text(text = "Password") },
                     value = password.value,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "password")},
                     onValueChange = { password.value = it },
@@ -185,10 +199,10 @@ fun SignUpScreen(navController: NavHostController,
             }
 
 
-            Spacer(modifier = Modifier.height(relative(20.dp)))
+            Spacer(modifier = Modifier.height(relative(10.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -198,19 +212,21 @@ fun SignUpScreen(navController: NavHostController,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "checkPassword")},
                     onValueChange = { passwordCheck.value = it },
                     enabled = !authenticating.value
                 )
             }else{
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.testTag("confirmPassword"),
                     label = { Text(text = "Confirm Password") },
                     value = passwordCheck.value,
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {Icon(imageVector = Icons.Default.Lock, contentDescription = "checkPassword")},
                     onValueChange = { passwordCheck.value = it },
@@ -219,7 +235,7 @@ fun SignUpScreen(navController: NavHostController,
             }
 
 
-            Spacer(modifier = Modifier.height(relative(20.dp)))
+            Spacer(modifier = Modifier.height(relative(30.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
                 Box(modifier = Modifier
@@ -277,12 +293,12 @@ fun SignUpScreen(navController: NavHostController,
                                 && mail.value.text.isNotBlank()
                                 && passwordCheck.value.text.isNotBlank()
                                 && !authenticating.value,
-                        shape = RoundedCornerShape(50.dp),
+                        shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text = "Register")
+                        Text(text = "Register", fontSize = 20.sp)
                     }
                 }
             }else{
@@ -339,12 +355,12 @@ fun SignUpScreen(navController: NavHostController,
                                 && mail.value.text.isNotBlank()
                                 && passwordCheck.value.text.isNotBlank()
                                 && !authenticating.value,
-                        shape = RoundedCornerShape(50.dp),
+                        shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text = "Register")
+                        Text(text = "Register", fontSize = 20.sp)
                     }
                 }
             }

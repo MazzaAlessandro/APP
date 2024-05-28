@@ -269,7 +269,7 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(relative(20.dp)))
+            Spacer(modifier = Modifier.height(relative(30.dp)))
 
             if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
                 Box(modifier = Modifier
