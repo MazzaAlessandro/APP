@@ -166,7 +166,7 @@ fun ProfileScreen(navController: NavHostController,
     val stat = listOf(
         StatData("Total days using the app:", 356),
         //StatData("Consecutive days using the app:", 21),
-        StatData("Badges obtained:", userData.badgeCounter.sum()),
+        StatData("Badges obtained:", badges.value.count()),
         StatData("Total Skills:", skillProgressionList.value.filter { it.isFinished }.count() +
                 skillProgressionList.value.filter { !it.isFinished }.count() +
                 userSkillSubsModel.value.registeredSkillsIDs.count())
@@ -438,45 +438,53 @@ fun ProfileScreen(navController: NavHostController,
                     thickness = 1.dp
                 )
 
-                Text(text = "Current progression", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
+                Column(
+                    modifier = Modifier.clickable {
+                        navController.navigate(Routes.History.route)
+                    },
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Text(text = "Current progression", fontWeight = FontWeight.W600, style = TextStyle(fontSize = 20.sp))
 
-                Row (modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
-                    .clickable { navController.navigate(Routes.History.route) },
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+                    Row (modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                        //.clickable { navController.navigate(Routes.History.route) },
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
 
-                    var pieData = mutableListOf(
-                        PieChartData("Completed Skills: ", userSkillSubsModel.value.finishedSkills.count(), primaryColor),
-                        PieChartData("Skills In progress: ", skillProgressionList.value.filter { !it.isFinished }.count(), primaryColor.copy(alpha = 0.5f)),
-                        PieChartData("Unstarted Skills: ", userSkillSubsModel.value.registeredSkillsIDs.count(), color = Color.Gray.copy(alpha = 0.5f))
-                    )
-                    AnimatedPieChart(
-                        modifier = Modifier
-                            .padding(10.dp),
-                        pieDataPoints = pieData
-                    )
-
-                    Column (
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.SpaceEvenly
-                    ){
-                        pieData.map{
-                            Row(modifier = Modifier
-                                .fillMaxWidth()
+                        var pieData = mutableListOf(
+                            PieChartData("Completed Skills: ", userSkillSubsModel.value.finishedSkills.count(), primaryColor),
+                            PieChartData("Skills In progress: ", skillProgressionList.value.filter { !it.isFinished }.count(), primaryColor.copy(alpha = 0.5f)),
+                            PieChartData("Unstarted Skills: ", userSkillSubsModel.value.registeredSkillsIDs.count(), color = Color.Gray.copy(alpha = 0.5f))
+                        )
+                        AnimatedPieChart(
+                            modifier = Modifier
                                 .padding(10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(modifier = Modifier
-                                    .size(relative(15.dp))
-                                    .clip(RoundedCornerShape(5.dp))
-                                    .background(it.color))
-                                Text(text = it.label, fontWeight = FontWeight.W600)
-                                Text(text = it.value.toString())
+                            pieDataPoints = pieData
+                        )
+
+                        Column (
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.SpaceEvenly
+                        ){
+                            pieData.map{
+                                Row(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(modifier = Modifier
+                                        .size(relative(15.dp))
+                                        .clip(RoundedCornerShape(5.dp))
+                                        .background(it.color))
+                                    Text(text = it.label, fontWeight = FontWeight.W600)
+                                    Text(text = it.value.toString())
+                                }
+                                Spacer(modifier = Modifier.height(relative(2.dp)))
                             }
-                            Spacer(modifier = Modifier.height(relative(2.dp)))
                         }
                     }
                 }

@@ -1,6 +1,5 @@
 package com.example.app.screens
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,20 +51,15 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.app.Routes
-import com.example.app.additionalUI.BadgeBanner
 import com.example.app.additionalUI.BadgeCard
-import com.example.app.additionalUI.BadgeColor
 import com.example.app.additionalUI.BadgeIcon
 import com.example.app.additionalUI.BannerSize
 import com.example.app.bottomNavigation.AppToolBar
-import com.example.app.bottomNavigation.BottomNavigationBar
 import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserSkillSubsModel
-import com.example.app.ui.theme.greenColor
-import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -499,7 +491,7 @@ fun HistoryScreen(
 
 
     Scaffold(
-        topBar = { AppToolBar(title = "History", navController, sharedViewModel) },
+        topBar = { AppToolBar(title = "History", navController, sharedViewModel, true, Routes.Profile.route) },
 
     ) { innerPadding ->
 
