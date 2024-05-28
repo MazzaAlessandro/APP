@@ -127,11 +127,11 @@ fun SkillListElement(
     val badge : MutableState<BadgeDataModel> = remember {
         mutableStateOf(BadgeDataModel())
     }
-
+/*
     val done : MutableState<Boolean> = remember {
         mutableStateOf(false)
     }
-
+*/
     sharedViewModel.retrieveBadge(
         skillCompleteStructureModel.skill.id,
         skillCompleteStructureModel.skillSection.id,
@@ -241,13 +241,15 @@ fun SkillListElement(
                 if(it.value.first == it.key.requiredAmount)
                     completedTasks++
             }
-
+/*
             if(completedTasks==skillCompleteStructureModel.skillTasks.size && !done.value){
                 onBadgeAchieved(badge.value)
                 done.value = true
             }
             else if (!skillCompleteStructureModel.skillProgression.isFinished)
                 done.value = false
+
+ */
 
             if (skillCompleteStructureModel.skillProgression.isFinished) {
 
@@ -480,6 +482,8 @@ fun FinishSkill(
     listCompleteStructures: MutableState<List<SkillCompleteStructureModel>>,
     userSkillSub: MutableState<UserSkillSubsModel>,
     currentStructureIndex: MutableState<Int>,
+    badgeObtained: MutableState<BadgeDataModel>,
+    isBadgePopUpOpen: MutableState<Boolean>,
     currentContext: Context
 ) {
     var updatedList = listCompleteStructures.value.toMutableList()
@@ -508,6 +512,15 @@ fun FinishSkill(
     if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
         updatedBadges = updatedBadges + skillSection.badgeID
         updatedTimeBadge = updatedTimeBadge + ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+        sharedViewModel.retrieveBadge(
+            skillId = listCompleteStructures.value.get(currentStructureIndex.value).skill.id,
+            sectionId = skillSection.id,
+            currentContext,
+        ){
+            badgeObtained.value = it
+            isBadgePopUpOpen.value = true
+        }
     }
 
     if (updatedStructure.skill.id !in updatedFinishedSkills) {
@@ -546,7 +559,6 @@ fun FinishSkill(
 }
 
 
-//TODO SOLVE
 fun StopSkillProgressionMS(
     sharedViewModel: SharedViewModel,
     listCompleteStructures: MutableState<List<SkillCompleteStructureModel>>,
@@ -650,6 +662,10 @@ fun MySkillsScreen(
 
     var currentStructureIndex: MutableState<Int> = remember {
         mutableStateOf(0)
+    }
+
+    var canSkipSection: MutableState<Boolean> = remember {
+        mutableStateOf(true)
     }
 
     var triggerSectionSkip: MutableState<Boolean> = remember {
@@ -777,13 +793,14 @@ fun MySkillsScreen(
         val indexOfSection =
             updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
 
+        val skillSection =
+            listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+
+        val skill = listCompleteStructures.value.get(currentStructureIndex.value).skill.id
+
 
         //FIRST WE ADD THE BADGE
         sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext) {
-
-
-            val skillSection =
-                listCompleteStructures.value.get(currentStructureIndex.value).skillSection
 
             var updatedBadges = it.badgesObtained
             var updatedTimeBadge = it.timeBadgeObtained
@@ -791,6 +808,16 @@ fun MySkillsScreen(
             if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
                 updatedBadges = updatedBadges + skillSection.badgeID
                 updatedTimeBadge += ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+                sharedViewModel.retrieveBadge(
+                    skillId = skill,
+                    sectionId = skillSection.id,
+                    currentContext,
+                ){
+                    badgeObtained.value = it
+                    isBadgePopUpOpen.value = true
+                }
+
             }
             userSkillSub.value = it.copy(badgesObtained = updatedBadges, timeBadgeObtained = updatedTimeBadge)
 
@@ -833,6 +860,8 @@ fun MySkillsScreen(
                 updatedStructure = updatedStructure.copy(skillProgression = updatedProgression)
                 updatedList.set(currentStructureIndex.value, updatedStructure)
                 listCompleteStructures.value = updatedList
+
+                canSkipSection.value = true
             }
         }
 
@@ -906,12 +935,13 @@ fun MySkillsScreen(
                         listCompleteStructures.value.toMutableList()
                     )
 
-                    val mustSkipSection = ComputeSkipSection(index, updatedList)
+                    val mustSkipSection = ComputeSkipSection(index, updatedList) && canSkipSection.value
                     if (mustSkipSection) {
                         currentStructureIndex.value = index
 
                         isStartRun.value = false
                         triggerSectionSkip.value = !triggerSectionSkip.value
+                        canSkipSection.value = false
                     } else {
                         sharedViewModel.saveSkillProgression(
                             updatedList.get(index).skillProgression,
@@ -931,6 +961,8 @@ fun MySkillsScreen(
                         listCompleteStructures,
                         userSkillSub,
                         currentStructureIndex,
+                        badgeObtained,
+                        isBadgePopUpOpen,
                         currentContext
                     )
 
@@ -958,8 +990,11 @@ fun MySkillsScreen(
                     listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
                 },
                 { badge ->
+                    /*
                     badgeObtained.value = badge
                     isBadgePopUpOpen.value = true
+
+                     */
                 }
             )
         }
