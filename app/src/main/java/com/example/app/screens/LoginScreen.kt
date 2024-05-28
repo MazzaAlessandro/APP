@@ -29,11 +29,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -53,6 +55,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -166,12 +169,12 @@ fun LoginScreen(
             val email = remember { mutableStateOf(TextFieldValue()) }
             val password = remember { mutableStateOf(TextFieldValue()) }
 
-            Text(text = "Login", style = TextStyle(fontSize = 40.sp))
+            Text(text = "Login", style = TextStyle(fontSize = 50.sp))
 
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
             if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -181,6 +184,7 @@ fun LoginScreen(
                     onValueChange = { email.value = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {
                         Icon(
@@ -192,13 +196,14 @@ fun LoginScreen(
                 )
             }
             else{
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.testTag("mailTextField"),
                     label = { Text(text = "Mail") },
                     value = email.value,
                     onValueChange = { email.value = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {
                         Icon(
@@ -210,10 +215,10 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(relative(20.dp)))
+            Spacer(modifier = Modifier.height(relative(10.dp)))
 
             if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -226,6 +231,7 @@ fun LoginScreen(
                         imeAction = ImeAction.Done
                     ),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {
                         Icon(
@@ -238,7 +244,7 @@ fun LoginScreen(
                 )
             }
             else{
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier.testTag("passwordTextField"),
                     label = { Text(text = "Password") },
                     value = password.value,
@@ -248,6 +254,7 @@ fun LoginScreen(
                         imeAction = ImeAction.Done
                     ),
                     singleLine = true,
+                    shape = RoundedCornerShape(10.dp),
                     maxLines = 1,
                     leadingIcon = {
                         Icon(
@@ -288,7 +295,7 @@ fun LoginScreen(
                         enabled = !password.value.text.isBlank()
                                 && !email.value.text.isBlank()
                                 && !authenticating.value,
-                        shape = RoundedCornerShape(50.dp),
+                        shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
@@ -321,12 +328,12 @@ fun LoginScreen(
                         enabled = !password.value.text.isBlank()
                                 && !email.value.text.isBlank()
                                 && !authenticating.value,
-                        shape = RoundedCornerShape(50.dp),
+                        shape = RoundedCornerShape(10.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text = "Login")
+                        Text(text = "Login", fontSize = 18.sp)
                     }
                 }
             }
@@ -367,7 +374,7 @@ fun LoginScreen(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.medium)
                     .clickable {
-                        if(!authenticating.value && !clicked){
+                        if (!authenticating.value && !clicked) {
                             authenticating.value = true
                             clicked = true
 
@@ -426,17 +433,40 @@ fun LoginScreen(
         Box(modifier = Modifier
             .fillMaxHeight(0.9f)
             .fillMaxWidth(), Alignment.BottomCenter){
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = AnnotatedString("Don't have an account?"),
+                    text = AnnotatedString("Not registered yet?"),
                     modifier = Modifier
                         .padding(5.dp, 0.dp),
                     style = TextStyle(
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontFamily = FontFamily.Default,
-                    )
+                    ),
                 )
 
+
+                Button(onClick = {
+                    navController.navigate(Routes.SignUp.route)
+                    },
+
+                    modifier = Modifier.padding(start = 10.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+
+                    ),
+                    //border = BorderStroke(1.dp, Color.Black)
+                    ) {
+                    Text(
+                        text = AnnotatedString("Create now!"),
+                        modifier = Modifier,
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily.Default,
+                            color = Color.White
+                        )
+                    )
+                }
+/*
                 ClickableText(
                     text = AnnotatedString("Create now!"),
                     modifier = Modifier
@@ -452,6 +482,8 @@ fun LoginScreen(
                         color = Color.Blue
                     )
                 )
+
+ */
             }
         }
 
