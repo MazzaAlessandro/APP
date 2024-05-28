@@ -8,6 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
@@ -26,12 +28,13 @@ fun BottomNavigationBar(navController: NavController,
         BottomNavItem.Create
     )
 
-    NavigationBar {
+    NavigationBar(modifier = Modifier.testTag("BottomNavigationBar")) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
 
         items.forEach{item->
             NavigationBarItem(
+                modifier = Modifier.testTag(item.title),
                 selected = currentRoute == item.screen_route,
                 onClick = {
                     if (currentRoute != item.screen_route) {

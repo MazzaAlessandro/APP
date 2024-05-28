@@ -73,12 +73,20 @@ fun BadgeIcon(
         }
     }
 
+    var tag = ""
+    if(filled){
+        tag = when(badge){
+            BadgeColor.GOLD -> "GoldBadge"
+            BadgeColor.SILVER -> "SilverBadge"
+            BadgeColor.BRONZE -> "BronzeBadge"
+        }
+    }
+
     Image(
         modifier = Modifier
-            .size(size)
-            .testTag("BadgeImage"),
+            .size(size),
         painter = painterResource(id = id),
-        contentDescription = "gold"
+        contentDescription = tag
     )
 }
 

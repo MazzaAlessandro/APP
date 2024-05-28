@@ -14,6 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,7 @@ fun AppToolBar(
     backRoute : String = ""
 ){
     TopAppBar(
+        modifier = Modifier.testTag("AppToolBar"),
         title = {
             Text(
                 text = title,

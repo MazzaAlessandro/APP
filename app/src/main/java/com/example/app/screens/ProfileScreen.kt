@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -99,69 +100,39 @@ fun ProfileScreen(navController: NavHostController,
         mutableStateOf(listOf())
     }
 
-    LaunchedEffect(userData) {
-        sharedViewModel.retrieveUserData(
-            mail,
-            context
-        ){
-            userData = it
-
-            sharedViewModel.retrieveUserSkillSub(
+    if(sharedViewModel.getCurrentUserMail()!=""){
+        LaunchedEffect(userData) {
+            sharedViewModel.retrieveUserData(
                 mail,
                 context
             ){
-                userSkillSubsModel.value = it
+                userData = it
 
-                sharedViewModel.retrieveAllBadges(
-                    it.badgesObtained,
-                    context
-                ){
-                    badges.value = it
-                }
-
-                sharedViewModel.retrieveUserSkillProgressionList(
+                sharedViewModel.retrieveUserSkillSub(
                     mail,
                     context
                 ){
-                    skillProgressionList.value = it.toMutableList()
+                    userSkillSubsModel.value = it
+
+                    sharedViewModel.retrieveAllBadges(
+                        it.badgesObtained,
+                        context
+                    ){
+                        badges.value = it
+                    }
+
+                    sharedViewModel.retrieveUserSkillProgressionList(
+                        mail,
+                        context
+                    ){
+                        skillProgressionList.value = it.toMutableList()
+                    }
+
                 }
 
             }
-
         }
     }
-
-    /*
-    sharedViewModel.retrieveUserSkillProgressionList(
-            mail,
-            context = context
-    ){skillProgList ->
-        var tmp0 = 0
-        var tmp1 = 0
-        var tmp2 = 0
-
-        skillProgList.forEach { skillProg ->
-
-            if (skillProg.isFinished)
-                tmp0++
-
-            else{
-                if(skillProg.currentSectionId == "0")
-                    tmp2++
-                else
-                    tmp1++
-            }
-        }
-
-        println(tmp0)
-        println(tmp1)
-        println(tmp2)
-        userData.listSkillProgressions = mutableListOf(tmp0, tmp1, tmp2)
-
-        sharedViewModel.updateUserData(userData, context)
-    }
-
-     */
 
     val stat = listOf(
         StatData("Total days using the app:", 356),
@@ -187,7 +158,8 @@ fun ProfileScreen(navController: NavHostController,
             if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
                 Row (modifier = Modifier
                     .fillMaxWidth()
-                    .padding(10.dp),
+                    .padding(10.dp)
+                    .testTag("ProfileInfo"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -270,7 +242,7 @@ fun ProfileScreen(navController: NavHostController,
                         .weight(1f)
                         .clickable {
                             navController.navigate(Routes.Badges.route)
-                        },
+                        }.testTag("Badges"),
                         verticalArrangement = Arrangement.SpaceAround,
                         horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -315,7 +287,7 @@ fun ProfileScreen(navController: NavHostController,
                         .weight(2f)
                         .clickable {
                             navController.navigate(Routes.History.route)
-                        },
+                        }.testTag("pieChart"),
                         verticalArrangement = Arrangement.SpaceAround,
                         horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -364,7 +336,8 @@ fun ProfileScreen(navController: NavHostController,
             else{
                 Row (modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(20.dp)
+                    .testTag("ProfileInfo"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -393,7 +366,7 @@ fun ProfileScreen(navController: NavHostController,
                 Column(
                     modifier = Modifier.clickable {
                         navController.navigate(Routes.Badges.route)
-                    },
+                    }.testTag("Badges"),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
@@ -441,7 +414,7 @@ fun ProfileScreen(navController: NavHostController,
                 Column(
                     modifier = Modifier.clickable {
                         navController.navigate(Routes.History.route)
-                    },
+                    }.testTag("pieChart"),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
@@ -450,7 +423,6 @@ fun ProfileScreen(navController: NavHostController,
                     Row (modifier = Modifier
                         .fillMaxWidth()
                         .padding(20.dp),
-                        //.clickable { navController.navigate(Routes.History.route) },
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
 

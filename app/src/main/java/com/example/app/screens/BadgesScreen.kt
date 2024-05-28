@@ -78,26 +78,25 @@ fun BadgesScreen(
         mutableStateOf(UserSkillSubsModel())
     }
 
-
-
-    LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
-        sharedViewModel.retrieveUserSkillSub(
-            sharedViewModel.getCurrentUserMail(),
-            currentContext,
-        ){userSkillSub ->
-
-            currentUserSkillSub.value = userSkillSub
-
-            sharedViewModel.retrieveAllBadges(
-                userSkillSub.badgesObtained,
+    if(sharedViewModel.getCurrentUserMail()!=""){
+        LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
+            sharedViewModel.retrieveUserSkillSub(
+                sharedViewModel.getCurrentUserMail(),
                 currentContext,
-            ){badges ->
-                badgeList.value = badges
-            }
+            ){userSkillSub ->
 
+                currentUserSkillSub.value = userSkillSub
+
+                sharedViewModel.retrieveAllBadges(
+                    userSkillSub.badgesObtained,
+                    currentContext,
+                ){badges ->
+                    badgeList.value = badges
+                }
+
+            }
         }
     }
-
 
     Scaffold (
         topBar = { AppToolBar(title = "Total Badges", navController, sharedViewModel, true, Routes.Profile.route) }

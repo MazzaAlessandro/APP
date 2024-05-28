@@ -55,7 +55,7 @@ fun ProfileImage(
                 .size(size))
     {
             Image(painter = painter,
-                contentDescription = null,
+                contentDescription = "profilePic",
                 modifier = Modifier
                     .wrapContentSize()
                     .clickable { if(clickable)launcher.launch("image/*")},

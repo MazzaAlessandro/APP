@@ -43,7 +43,7 @@ class LoginUITest {
 
         test.onNodeWithTag("GoogleButton").assertExists()
 
-        test.onNodeWithText("Don't have an account?").assertExists()
+        test.onNodeWithText("Not registered yet?").assertExists()
         test.onNodeWithText("Create now!").assertExists()
     }
 }

@@ -69,7 +69,7 @@ fun SignUpScreen(navController: NavHostController,
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().testTag("SignUpScreen"),
         contentAlignment = Alignment.Center
     ) {
         Column(
