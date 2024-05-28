@@ -97,6 +97,8 @@ fun LoginScreen(
 
     var clicked by remember { mutableStateOf(false) }
 
+    val colorCircle = MaterialTheme.colorScheme.primary
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) {
@@ -444,7 +446,7 @@ fun LoginScreen(
                     ),
                 )
 
-
+/*
                 Button(onClick = {
                     navController.navigate(Routes.SignUp.route)
                     },
@@ -452,21 +454,23 @@ fun LoginScreen(
                     modifier = Modifier.padding(start = 10.dp),
                     shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
-
+                        containerColor = Color.White
                     ),
-                    //border = BorderStroke(1.dp, Color.Black)
+                    border = BorderStroke(1.dp, colorCircle)
                     ) {
                     Text(
-                        text = AnnotatedString("Create now!"),
+                        text = AnnotatedString("Join now!"),
                         modifier = Modifier,
                         style = TextStyle(
                             fontSize = 20.sp,
                             fontFamily = FontFamily.Default,
-                            color = Color.White
+                            color = colorCircle
                         )
                     )
                 }
-/*
+
+ */
+
                 ClickableText(
                     text = AnnotatedString("Create now!"),
                     modifier = Modifier
@@ -478,12 +482,13 @@ fun LoginScreen(
                     style = TextStyle(
                         fontSize = 20.sp,
                         fontFamily = FontFamily.Default,
+                        fontWeight = FontWeight.Bold,
                         textDecoration = TextDecoration.Underline,
-                        color = Color.Blue
+                        color = colorCircle
                     )
                 )
 
- */
+
             }
         }
 
