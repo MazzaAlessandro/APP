@@ -7,7 +7,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.rememberNavController
 import com.example.app.additionalUI.BadgeBanner
+import com.example.app.additionalUI.BadgeCard
 import com.example.app.additionalUI.BadgeColor
+import com.example.app.models.BadgeDataModel
 import com.example.app.screens.BadgesScreen
 import com.example.app.util.SharedViewModel
 import com.example.app.util.SkillRepository
@@ -42,7 +44,49 @@ class BadgeScreenUITest {
     }
 
     @Test
+    fun testCardUI(){
+        var badge = BadgeDataModel(
+            BadgeColor.GOLD,
+            "",
+            "Badge Name",
+            "",
+            "",
+            "Description",
+            "22/12/21"
+        )
+
+        test.setContent { BadgeCard(badge = badge, sharedViewModel = SharedViewModel(
+            UserRepository(), SkillRepository()
+        ) ) {} }
+
+        test.onNodeWithText("Creator: ").assertExists()
+        test.onNodeWithText("Badge Name").assertExists()
+        test.onNodeWithText("Description").assertExists()
+        test.onNodeWithText("Close").assertExists()
+        test.onNodeWithContentDescription("GoldBadge").assertExists()
+        test.onNodeWithContentDescription("close").assertExists()
+    }
+
+    @Test
     fun testEmptyBadgeScreenUI(){
+        test.setContent { BadgesScreen(navController = rememberNavController(), sharedViewModel = SharedViewModel(
+            UserRepository(), SkillRepository()
+        )
+        ) }
+
+        //check the existence of the AppToolBar
+        test.onNodeWithTag("AppToolBar").assertExists()
+        test.onNodeWithText("Total Badges").assertExists()
+        test.onNodeWithContentDescription("Back").assertExists()
+        test.onNodeWithContentDescription("Logout").assertExists()
+        test.onNodeWithContentDescription("search").assertExists()
+
+        test.onNodeWithText("You have not obtained a badge yet").assertExists()
+        test.onNodeWithTag("SkillsButton").assertExists()
+    }
+
+    @Test
+    fun testBadgeScreenUI(){
         test.setContent { BadgesScreen(navController = rememberNavController(), sharedViewModel = SharedViewModel(
             UserRepository(), SkillRepository()
         )

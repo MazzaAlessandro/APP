@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -879,7 +880,8 @@ fun MySkillsScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .testTag("MySkillsScreen"),
             horizontalAlignment = Alignment.CenterHorizontally,
             //verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {

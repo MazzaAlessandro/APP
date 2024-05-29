@@ -1,16 +1,21 @@
 package com.example.app
 
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
+import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.app.screens.LoginScreen
+import com.example.app.screens.ScreenMain
 import com.example.app.util.SharedViewModel
 import com.example.app.util.SkillRepository
 import com.example.app.util.UserRepository
@@ -45,5 +50,61 @@ class LoginUITest {
 
         test.onNodeWithText("Not registered yet?").assertExists()
         test.onNodeWithText("Create now!").assertExists()
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun testLoginFunction(){
+        test.setContent { ScreenMain() }
+
+        test.onNodeWithTag("LoginPage").assertExists()
+
+        test.onNodeWithText("Create now!").assertExists().performClick()
+        test.onNodeWithTag("SignUpScreen").assertExists()
+
+        Espresso.pressBack()
+        test.onNodeWithTag("LoginPage").assertExists()
+
+        test.onNodeWithTag("mailTextField").assertExists().performTextInput("abba@mail.com")
+        test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
+        test.onNode(loginButton).assertExists().assertIsEnabled().performClick()
+
+        test.waitUntilAtLeastOneExists(hasText("Profile"), 5000)
+
+        test.onNodeWithTag("ProfileScreen").assertExists()
+        test.onNodeWithContentDescription("Logout").assertExists().performClick()
+        test.onNodeWithTag("LoginPage").assertExists()
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun testBottomNavigationFunction(){
+        test.setContent { ScreenMain() }
+
+        test.onNodeWithTag("LoginPage").assertExists()
+
+        test.onNodeWithTag("mailTextField").assertExists().performTextInput("abba@mail.com")
+        test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
+        test.onNode(loginButton).assertExists().assertIsEnabled().performClick()
+
+        test.waitUntilAtLeastOneExists(hasText("Profile"), 5000)
+
+        test.onNodeWithTag("ProfileScreen").assertExists()
+
+        test.onNodeWithTag("Search Skills").assertExists().performClick()
+        test.onNodeWithTag("SearchScreen").assertExists()
+
+        test.onNodeWithTag("Profile").assertExists().performClick()
+        test.onNodeWithTag("ProfileScreen").assertExists()
+
+        test.onNodeWithTag("Create Skills").assertExists().performClick()
+        test.onNodeWithTag("CreateScreen").assertExists()
+
+        test.onNodeWithTag("My Skills").assertExists().performClick()
+        test.onNodeWithText("Yes").assertExists().performClick()
+        test.onNodeWithTag("MySkillsScreen").assertExists()
+
+        test.onNodeWithContentDescription("Logout").assertExists().performClick()
+        test.onNodeWithTag("LoginPage").assertExists()
     }
 }

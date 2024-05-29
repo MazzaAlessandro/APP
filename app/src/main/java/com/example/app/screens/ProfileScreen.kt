@@ -151,7 +151,7 @@ fun ProfileScreen(navController: NavHostController,
     ){innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding),
+                .padding(innerPadding).testTag("ProfileScreen"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
