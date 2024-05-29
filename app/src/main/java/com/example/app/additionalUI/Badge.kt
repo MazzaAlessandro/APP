@@ -181,33 +181,33 @@ fun BadgeCard(
         mutableStateOf(listOf())
     }
 
-    LaunchedEffect(badge) {
-        sharedViewModel.retrieveSkill(
-            badge.skillId,
-            context,
-        ){
-            skillInfo.value = it
-        }
+    if(badge.skillId!=""){
+        LaunchedEffect(badge) {
+            sharedViewModel.retrieveSkill(
+                badge.skillId,
+                context,
+            ){
+                skillInfo.value = it
+            }
 
-        sharedViewModel.retrieveSkillSection(
-            badge.skillId,
-            badge.sectionId,
-            context
-        ){
-            sectionInfo.value = it
-
-            sharedViewModel.retrieveAllSkillTasks(
+            sharedViewModel.retrieveSkillSection(
                 badge.skillId,
                 badge.sectionId,
-                it.skillTasksList,
                 context
             ){
-                taskList.value = it
+                sectionInfo.value = it
+
+                sharedViewModel.retrieveAllSkillTasks(
+                    badge.skillId,
+                    badge.sectionId,
+                    it.skillTasksList,
+                    context
+                ){
+                    taskList.value = it
+                }
             }
         }
     }
-
-
 
     Box(
         modifier = Modifier
@@ -280,11 +280,6 @@ fun BadgeCard(
                             .padding(horizontal = 10.dp),
                             horizontalAlignment = Alignment.Start) {
                             Text(badge.badgeName, fontWeight = FontWeight.Bold, fontSize = 30.sp, textAlign = TextAlign.Start)
-                            Text(
-                                text = "Obtained on: 20/12/2024" + badge.date,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
                             
                             Spacer(modifier = Modifier.height(5.dp))
 
