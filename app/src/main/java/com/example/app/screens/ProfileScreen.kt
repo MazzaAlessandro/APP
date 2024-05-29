@@ -103,7 +103,7 @@ fun ProfileScreen(navController: NavHostController,
     if(sharedViewModel.getCurrentUserMail()!=""){
         LaunchedEffect(userData) {
             sharedViewModel.retrieveUserData(
-                mail,
+                sharedViewModel.getCurrentUserMail(),
                 context
             ){
                 userData = it

@@ -39,6 +39,7 @@ fun BottomNavigationBar(navController: NavController,
                 onClick = {
                     if (currentRoute != item.screen_route) {
                         if (currentRoute == "Create") { // Only show dialog if current screen is "CREATE"
+
                             pendingRoute.value = item.screen_route
                             openDialog.value = true
                         } else {

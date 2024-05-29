@@ -2,6 +2,9 @@ package com.example.app.util
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import com.example.app.models.UserDataModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -14,11 +17,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class UserRepository{
-    private var currentUserMail: MutableStateFlow<String> = MutableStateFlow("")
-    var userMail: StateFlow<String> = currentUserMail.asStateFlow()
+    private var currentUserMail: MutableState<String> = mutableStateOf("")
+    var userMail: State<String> = currentUserMail
 
-    private var currentUserData: MutableStateFlow<UserDataModel> = MutableStateFlow(UserDataModel())
-    var userData: StateFlow<UserDataModel> = currentUserData.asStateFlow()
+    private var currentUserData: MutableState<UserDataModel> = mutableStateOf(UserDataModel())
+    var userData: State<UserDataModel> = currentUserData
 
 
     fun saveData(

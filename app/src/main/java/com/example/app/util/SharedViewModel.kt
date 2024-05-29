@@ -1,6 +1,8 @@
 package com.example.app.util
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -23,11 +25,11 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
     var dialogShown by mutableStateOf(false)
         private set
 
-    private val currentUserMail: StateFlow<String> = userRepository.userMail
-    private val currentUserData : StateFlow<UserDataModel> = userRepository.userData
+    private val currentUserMail: State<String> = userRepository.userMail
+    private val currentUserData : State<UserDataModel> = userRepository.userData
 
-    private var userData : MutableStateFlow<UserDataModel> = MutableStateFlow(UserDataModel())
-    private var userMail : MutableStateFlow<String> = MutableStateFlow("")
+    private var userData : MutableState<UserDataModel> = mutableStateOf(UserDataModel())
+    private var userMail : MutableState<String> = mutableStateOf("")
 
     private val currentUserSkillProgressions: StateFlow<List<SkillProgressionModel>> = skillRepository.skillListProgression
 
@@ -114,7 +116,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         mail : String,
         context : Context,
         data: (UserDataModel) -> Unit
-    ) = CoroutineScope(Dispatchers.IO).launch{
+    ){
 
         userRepository.retrieveData(mail, context, data)
     }

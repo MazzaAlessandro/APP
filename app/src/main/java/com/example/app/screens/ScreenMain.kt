@@ -1,6 +1,8 @@
 package com.example.app.screens
 
 import android.content.pm.ActivityInfo
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -21,70 +23,78 @@ import com.example.app.util.UserRepository
 @Composable
 fun ScreenMain(){
     val navController = rememberNavController()
-    val sharedViewModel = SharedViewModel(UserRepository(), SkillRepository())
+    val sharedViewModel = remember{SharedViewModel(UserRepository(), SkillRepository())}
 
-    val openDialog = remember { mutableStateOf(false) }
-    val pendingRoute = remember { mutableStateOf<String?>(null) }
+    var openDialog = remember { mutableStateOf(false) }
+    var pendingRoute = remember { mutableStateOf<String?>("Profile") }
 
     LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     NavHost(navController = navController, startDestination = "Login") {
 
-        composable(Routes.Login.route) {
+        composable(Routes.Login.route,
+            enterTransition = {fadeIn(tween(350), )},
+            ) {
             LoginScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
 
-        composable(Routes.SignUp.route) {
+        composable(Routes.SignUp.route,
+            enterTransition = {fadeIn(tween(350), )},
+            ) {
             SignUpScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
 
-        composable(Routes.Profile.route) {
+        composable(Routes.Profile.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ) {
             ProfileScreen(navController = navController, sharedViewModel = sharedViewModel, openDialog, pendingRoute)
         }
 
-        composable(Routes.Search.route) {
+        composable(Routes.Search.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ) {
             SearchScreen(navController = navController, sharedViewModel = sharedViewModel, openDialog, pendingRoute)
         }
 
-        composable(Routes.Create.route) {
+        composable(Routes.Create.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ) {
             CreateScreen(navController = navController, sharedViewModel = sharedViewModel, openDialog = openDialog, pendingRoute = pendingRoute)
         }
 
-        composable(Routes.Update.route){
+        composable(Routes.Update.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ){
             ModifyAccountScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
         
-        composable(Routes.MySkills.route){
+        composable(Routes.MySkills.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ){
             MySkillsScreen(navController = navController, sharedViewModel = sharedViewModel, openDialog, pendingRoute)
         }
 
-        composable(Routes.Badges.route){
+        composable(Routes.Badges.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ){
             BadgesScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
 
-        composable(Routes.Stats.route){
+        composable(Routes.Stats.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ){
             StatsScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
 
-        composable(Routes.History.route){
+        composable(Routes.History.route,
+            enterTransition = {fadeIn(tween(350), )},
+        ){
             HistoryScreen(navController = navController, sharedViewModel = sharedViewModel)
         }
     }
 
 
 
-    if (openDialog.value) {
-        ConfirmDialog(openDialog, pendingRoute, navController)
-    }
-
-}
-
-@Composable
-fun ConfirmDialog(
-    openDialog: MutableState<Boolean>,
-    pendingRoute: MutableState<String?>,
-    navController: NavController
-) {
     if (openDialog.value) {
         AlertDialog(
             onDismissRequest = { openDialog.value = false },
@@ -110,5 +120,18 @@ fun ConfirmDialog(
                 }
             }
         )
+     }
+
+
+}
+
+@Composable
+fun ConfirmDialog(
+    openDialog: MutableState<Boolean>,
+    pendingRoute: MutableState<String?>,
+    navController: NavController
+) {
+    if (openDialog.value) {
+
     }
 }
