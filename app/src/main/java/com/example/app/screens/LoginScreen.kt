@@ -333,7 +333,7 @@ fun LoginScreen(
                             .fillMaxWidth()
                             .height(50.dp)
                     ) {
-                        Text(text = "Login", fontSize = 18.sp)
+                        Text(text = "Login", fontSize = 20.sp)
                     }
                 }
             }

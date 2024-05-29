@@ -27,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,6 +36,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -131,7 +133,7 @@ fun SectionElementBlock(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp, 2.dp)
+            .padding(bottom = 0.dp, start = 2.dp, end = 2.dp)
             .height(80.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -263,10 +265,10 @@ fun SkillSearchBlock(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp, 2.dp)
+            .padding(15.dp, 4.dp)
             .clip(shape = RoundedCornerShape(10.dp))
             .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-            .background(Color.Gray.copy(alpha = 0.2f))
+            .background(Color.LightGray.copy(alpha = 0.2f))
     ) {
         Row(
             modifier = Modifier
@@ -280,11 +282,9 @@ fun SkillSearchBlock(
             Box(
                 modifier = Modifier
                     .size(50.dp) // Set the size of the circle
-                    .background(
-                        colorCircle,
-                        shape = CircleShape
-                    ) // Use the color of the circle in your image
-            )
+            ){
+                Icon(imageVector = Icons.Filled.RadioButtonChecked, "SkillLogo",  modifier = Modifier.fillMaxSize(), tint = colorCircle)
+            }
             Spacer(Modifier.width(25.dp))
             // Space between the circle and the text
             Row(
@@ -325,37 +325,73 @@ fun SkillSearchBlock(
                 }
 
                 if (selectedSkillState == SelectedSkillState.STARTED_SELECTED) {
-                    Text(
+                    /*Text(
                         text = "In Progress",
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         color = Color.White,
                         modifier = Modifier
-                            .background(greenColor, shape = RoundedCornerShape(40.dp))
+                            .background(greenColor, shape = RoundedCornerShape(10.dp))
                             .padding(2.dp)
+                            .weight(1f)
+                    )*/
+
+                    Text(
+                        text = "In Progress",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        color = greenColor,
+                        modifier = Modifier
+                            .background(Color.White, shape = RoundedCornerShape(10.dp))
+                            .border(1.dp, greenColor, RoundedCornerShape(10.dp))
+                            .padding(5.dp)
                             .weight(1f)
                     )
                 } else if (selectedSkillState == SelectedSkillState.NEW_SELECTED) {
-                    Text(
+                    /*Text(
                         text = "Not Started",
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         color = Color.White,
                         modifier = Modifier
-                            .background(redColor, shape = RoundedCornerShape(40.dp))
+                            .background(redColor, shape = RoundedCornerShape(10.dp))
                             .padding(2.dp)
+                            .weight(1f)
+                    )*/
+
+                    Text(
+                        text = "Not Started",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        color = redColor,
+                        modifier = Modifier
+                            .background(Color.White, shape = RoundedCornerShape(10.dp))
+                            .border(1.dp, redColor, RoundedCornerShape(10.dp))
+                            .padding(5.dp)
                             .weight(1f)
                     )
                 } else {
-                    Text(
+                    /*Text(
                         text = "Registered",
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         color = Color.White,
                         modifier = Modifier
-                            .background(yellowColor, shape = RoundedCornerShape(40.dp))
+                            .background(yellowColor, shape = RoundedCornerShape(10.dp))
                             .padding(2.dp)
                             .weight(1f),
+                    )*/
+
+                    Text(
+                        text = "Registered",
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        color = yellowColor,
+                        modifier = Modifier
+                            .background(Color.White, shape = RoundedCornerShape(10.dp))
+                            .border(1.dp, yellowColor, RoundedCornerShape(10.dp))
+                            .padding(5.dp)
+                            .weight(1f)
                     )
                 }
             }
@@ -1675,7 +1711,12 @@ fun SearchScreen(
 
 
             item {
-                TextField(
+
+                Text(text = "Search a Skill", fontSize = 50.sp, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 20.dp), textAlign = TextAlign.Center)
+
+                OutlinedTextField(
                     value = skillTitleEditText,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1683,6 +1724,7 @@ fun SearchScreen(
                     onValueChange = { skillTitleEditText = it },
                     label = { Text(text = "Search a skill by name") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    shape = RoundedCornerShape(10.dp),
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -1691,6 +1733,7 @@ fun SearchScreen(
                     },
                 )
 
+                Spacer(Modifier.height(20.dp))
 
                 Row(
                     modifier = Modifier
@@ -1699,7 +1742,8 @@ fun SearchScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Started Skills", fontSize = 25.sp)
+
+                    Text(text = "Started Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
 
                     Text(
                         text = skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
@@ -1720,6 +1764,8 @@ fun SearchScreen(
                         .padding(10.dp, 2.dp),
                     color = Color.Black
                 )
+
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
@@ -1784,7 +1830,7 @@ fun SearchScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Registered Skills", fontSize = 25.sp)
+                    Text(text = "Registered Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
 
                     Text(
                         text = skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase()
@@ -1805,6 +1851,8 @@ fun SearchScreen(
                         .padding(10.dp, 2.dp),
                     color = Color.Black
                 )
+
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
@@ -1934,7 +1982,7 @@ fun SearchScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Created Skills", fontSize = 25.sp)
+                    Text(text = "Created Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
 
                     Text(
                         text = skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
@@ -1955,6 +2003,8 @@ fun SearchScreen(
                         .padding(10.dp, 2.dp),
                     color = Color.Black
                 )
+
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
@@ -1984,6 +2034,7 @@ fun SearchScreen(
                                             else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
                                             else SelectedSkillState.NEW_SELECTED
                                     }
+
                                 }
                             }
 
@@ -2023,6 +2074,7 @@ fun SearchScreen(
                             else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
                             else SelectedSkillState.NEW_SELECTED
                     }
+
                 }
             }
 
@@ -2039,7 +2091,7 @@ fun SearchScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Public Skills", fontSize = 25.sp)
+                        Text(text = "Public Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
 
                         Text(
                             text = filteredOnlineFetchedSkills.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
@@ -2060,6 +2112,8 @@ fun SearchScreen(
                             .padding(10.dp, 2.dp),
                         color = Color.Black
                     )
+
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
 
                 if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
@@ -2129,6 +2183,7 @@ fun SearchScreen(
                                 else if (it in skillModelsRegistered.value) SelectedSkillState.REGISTERED_SELECTED
                                 else SelectedSkillState.NEW_SELECTED
                         }
+
                     }
                 }
             }
@@ -2140,9 +2195,11 @@ fun SearchScreen(
                         .padding(top = 50.dp, start = 10.dp, end = 10.dp),
                         contentAlignment = Alignment.Center){
                         Button(
-                            onClick = {loadPublic.value = true}
+                            onClick = {loadPublic.value = true},
+                            shape = RoundedCornerShape(10.dp),
                         ) {
-                            Text(text = "Search Online")
+                            Text(text = "Search Online", fontSize = 20.sp, modifier = Modifier.fillMaxWidth(0.6f).padding(vertical = 3.dp), textAlign = TextAlign.Center)
+
                         }
                     }
 
