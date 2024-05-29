@@ -265,7 +265,7 @@ fun SkillSearchBlock(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp, 4.dp)
+            .padding(10.dp, 4.dp)
             .clip(shape = RoundedCornerShape(10.dp))
             .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
             .background(Color.LightGray.copy(alpha = 0.2f))
@@ -1710,11 +1710,13 @@ fun SearchScreen(
 
 
             item {
-
+/*
                 Text(text = "Search a Skill", fontSize = 50.sp, modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 20.dp), textAlign = TextAlign.Center)
+                    .padding(vertical = 20.dp), textAlign = TextAlign.Center)*/
 
+                Spacer(modifier = Modifier.height(10.dp))
+                
                 OutlinedTextField(
                     value = skillTitleEditText,
                     modifier = Modifier
@@ -1732,7 +1734,7 @@ fun SearchScreen(
                     },
                 )
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(30.dp))
 
                 Row(
                     modifier = Modifier
@@ -2197,7 +2199,9 @@ fun SearchScreen(
                             onClick = {loadPublic.value = true},
                             shape = RoundedCornerShape(10.dp),
                         ) {
-                            Text(text = "Search Online", fontSize = 20.sp, modifier = Modifier.fillMaxWidth(0.6f).padding(vertical = 3.dp), textAlign = TextAlign.Center)
+                            Text(text = "Search Online", fontSize = 20.sp, modifier = Modifier
+                                .fillMaxWidth(0.6f)
+                                .padding(vertical = 3.dp), textAlign = TextAlign.Center)
 
                         }
                     }
