@@ -105,7 +105,8 @@ fun BadgesScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .testTag("BadgesScreen"),
         ){
 
             Column(
