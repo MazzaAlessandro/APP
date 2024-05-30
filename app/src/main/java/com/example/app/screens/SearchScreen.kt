@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -39,7 +38,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -1651,49 +1649,65 @@ fun SearchScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(currentUserSkillSubs.value) {
-        sharedViewModel.retrieveUserSkillProgressionList(
-            sharedViewModel.getCurrentUserMail(),
-            currentContext,
-        ) {
-            skillProgressions.value = it.sortedByDescending {
-                ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
-
-            sharedViewModel.retrieveSkillsFromList(
+    if(sharedViewModel.getCurrentUserMail()!="") {
+        LaunchedEffect(currentUserSkillSubs.value) {
+            sharedViewModel.retrieveUserSkillProgressionList(
+                sharedViewModel.getCurrentUserMail(),
                 currentContext,
-                it.map { it.skillId }
             ) {
-                skillModelsStarted.value = it.sortedBy { skillProgressions.value.map { it.skillId }.indexOf(it.id) }
+                skillProgressions.value = it.sortedByDescending {
+                    ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                }
+
+                sharedViewModel.retrieveSkillsFromList(
+                    currentContext,
+                    it.map { it.skillId }
+                ) {
+                    skillModelsStarted.value =
+                        it.sortedBy { skillProgressions.value.map { it.skillId }.indexOf(it.id) }
+                }
+
             }
 
+            sharedViewModel.retrieveUserSkillSub(
+                sharedViewModel.getCurrentUserMail(),
+                currentContext,
+            ) {
+                currentUserSkillSubs.value = it
+
+
+
+                sharedViewModel.retrieveSkillsFromList(
+                    currentContext,
+                    currentUserSkillSubs.value.registeredSkillsIDs
+                ) {
+                    skillModelsRegistered.value = it.sortedByDescending {
+                        ZonedDateTime.parse(
+                            it.dateTime,
+                            DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                        )
+                    }
+                }
+
+                sharedViewModel.retrieveSkillsFromList(
+                    currentContext,
+                    currentUserSkillSubs.value.createdSkillsId
+                ) {
+                    skillModelsCreated.value = it.sortedByDescending {
+                        ZonedDateTime.parse(
+                            it.dateTime,
+                            DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                        )
+                    }
+                }
+            }
         }
 
-        sharedViewModel.retrieveUserSkillSub(
-            sharedViewModel.getCurrentUserMail(),
-            currentContext,
-        ) {
-            currentUserSkillSubs.value = it
-
-
-
-            sharedViewModel.retrieveSkillsFromList(
-                currentContext,
-                currentUserSkillSubs.value.registeredSkillsIDs
-            ) {
-                skillModelsRegistered.value = it.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
+        LaunchedEffect(loadPublic.value) {
+            sharedViewModel.retrieveOnlineSkills(currentContext) {
+                onlineFetchedSkills.value =
+                    it.filter { it.creatorEmail != sharedViewModel.getCurrentUserMail() }
             }
-
-            sharedViewModel.retrieveSkillsFromList(
-                currentContext,
-                currentUserSkillSubs.value.createdSkillsId) {
-                skillModelsCreated.value = it.sortedByDescending { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
-            }
-        }
-    }
-
-    LaunchedEffect(loadPublic.value) {
-        sharedViewModel.retrieveOnlineSkills(currentContext){
-            onlineFetchedSkills.value = it.filter { it.creatorEmail != sharedViewModel.getCurrentUserMail() }
         }
     }
 
@@ -1722,7 +1736,8 @@ fun SearchScreen(
                     value = skillTitleEditText,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
+                        .padding(10.dp)
+                        .testTag("SearchBar"),
                     onValueChange = { skillTitleEditText = it },
                     label = { Text(text = "Search a skill by name") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -1740,7 +1755,8 @@ fun SearchScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp, 0.dp),
+                        .padding(10.dp, 0.dp)
+                        .testTag("StartedSkillsDivider"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1828,7 +1844,8 @@ fun SearchScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
+                        .padding(top = 50.dp, start = 10.dp, end = 10.dp)
+                        .testTag("RegisteredSkillsDivider"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1980,7 +1997,8 @@ fun SearchScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 50.dp, start = 10.dp, end = 10.dp),
+                        .padding(top = 50.dp, start = 10.dp, end = 10.dp)
+                        .testTag("CreatedSkillsDivider"),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
