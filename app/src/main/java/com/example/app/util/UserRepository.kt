@@ -6,6 +6,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.example.app.models.UserDataModel
+import com.example.app.models.UserSkillSubsModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
@@ -22,6 +23,9 @@ class UserRepository{
 
     private var currentUserData: MutableState<UserDataModel> = mutableStateOf(UserDataModel())
     var userData: State<UserDataModel> = currentUserData
+
+    private var currentUserSub: MutableStateFlow<UserSkillSubsModel> = MutableStateFlow(UserSkillSubsModel())
+
 
 
     fun saveData(
@@ -89,5 +93,72 @@ class UserRepository{
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
         }
     }
+
+
+    fun retrieveUserSkillSub(
+        userEmail : String,
+        context : Context,
+        data: (UserSkillSubsModel) -> Unit
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("usersub")
+            .document(userEmail)
+
+        try{
+            fireStoreRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()){
+                        val userSkillSub = it.toObject<UserSkillSubsModel>()!!
+                        data(userSkillSub)
+                        currentUserSub.value = userSkillSub
+                    } else {
+                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun saveUserSkillSub(
+        userSub: UserSkillSubsModel,
+        context: Context,
+    ) = CoroutineScope(Dispatchers.IO).launch{
+
+        val fireStoreRef = Firebase.firestore
+            .collection("usersub")
+            .document(userSub.userEmail)
+
+        try {
+
+            fireStoreRef.set(userSub)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    fun updateUserSub(         userSub: UserSkillSubsModel,
+                               context: Context
+    ) = CoroutineScope(Dispatchers.IO).launch{
+        val fireStoreRef = Firebase.firestore
+            .collection("usersub")
+            .document(userSub.userEmail)
+
+        try{
+            fireStoreRef.set(userSub)
+                .addOnSuccessListener {
+                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception){
+            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 }

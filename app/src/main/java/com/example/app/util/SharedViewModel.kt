@@ -153,14 +153,14 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         userSub: UserSkillSubsModel,
         context: Context
     ){
-        skillRepository.updateUserSub(userSub, context)
+        userRepository.updateUserSub(userSub, context)
     }
 
     fun saveUserSub(
         userSub: UserSkillSubsModel,
         context: Context,
     ){
-        skillRepository.saveUserSkillSub(userSub, context)
+        userRepository.saveUserSkillSub(userSub, context)
     }
 
     fun saveBadgeData(
@@ -252,7 +252,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
         context : Context,
         data: (UserSkillSubsModel) -> Unit
     ){
-        skillRepository.retrieveUserSkillSub(userEmail, context, data)
+        userRepository.retrieveUserSkillSub(userEmail, context, data)
     }
 
     fun retrieveBadge(

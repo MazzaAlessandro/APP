@@ -22,7 +22,6 @@ class SkillRepository {
 
     private var currentSkillProgression: MutableStateFlow<SkillProgressionModel> = MutableStateFlow(SkillProgressionModel())
 
-    private var currentUserSub: MutableStateFlow<UserSkillSubsModel> = MutableStateFlow(UserSkillSubsModel())
 
     private var currentSkillListProgression: MutableStateFlow<List<SkillProgressionModel>> = MutableStateFlow(emptyList())
     var skillListProgression: StateFlow<List<SkillProgressionModel>> = currentSkillListProgression.asStateFlow()
@@ -273,31 +272,7 @@ class SkillRepository {
         }
     }
 
-    fun retrieveUserSkillSub(
-        userEmail : String,
-        context : Context,
-        data: (UserSkillSubsModel) -> Unit
-    ) = CoroutineScope(Dispatchers.IO).launch{
 
-        val fireStoreRef = Firebase.firestore
-            .collection("usersub")
-            .document(userEmail)
-
-        try{
-            fireStoreRef.get()
-                .addOnSuccessListener {
-                    if (it.exists()){
-                        val userSkillSub = it.toObject<UserSkillSubsModel>()!!
-                        data(userSkillSub)
-                        currentUserSub.value = userSkillSub
-                    } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
-                    }
-                }
-        } catch (e: Exception){
-            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     fun retrieveBadge(
         skillId: String,
@@ -463,27 +438,6 @@ class SkillRepository {
         }
     }
 
-    fun saveUserSkillSub(
-        userSub: UserSkillSubsModel,
-        context: Context,
-    ) = CoroutineScope(Dispatchers.IO).launch{
-
-        val fireStoreRef = Firebase.firestore
-            .collection("usersub")
-            .document(userSub.userEmail)
-
-        try {
-
-            fireStoreRef.set(userSub)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
-                }
-
-        } catch (e: Exception){
-            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     fun saveBadgeData(
         badge: BadgeDataModel,
         context: Context
@@ -568,26 +522,6 @@ class SkillRepository {
         }
     }
 
-    /*
-    fun updateSkillProgression(
-        mail : String,
-        context: Context,
-        userData: UserDataModel
-    ) = CoroutineScope(Dispatchers.IO).launch{
-        val fireStoreRef = Firebase.firestore
-            .collection("user")
-            .document(mail)
-
-        try{
-            fireStoreRef.set(userData)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
-                }
-        } catch (e: Exception){
-            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-        }
-    }*/
-
 
 
     fun updateSkillProgression(userEmail: String,
@@ -609,22 +543,6 @@ class SkillRepository {
         }
     }
 
-    fun updateUserSub(         userSub: UserSkillSubsModel,
-                               context: Context
-    ) = CoroutineScope(Dispatchers.IO).launch{
-        val fireStoreRef = Firebase.firestore
-            .collection("usersub")
-            .document(userSub.userEmail)
-
-        try{
-            fireStoreRef.set(userSub)
-                .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
-                }
-        } catch (e: Exception){
-            Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-        }
-    }
 
     fun removeSkillProgression(
         skillProgression: SkillProgressionModel,
