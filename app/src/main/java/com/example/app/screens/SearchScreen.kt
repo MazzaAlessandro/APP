@@ -38,7 +38,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -271,6 +270,7 @@ fun SkillSearchBlock(
             .clip(shape = RoundedCornerShape(10.dp))
             .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
             .background(Color.LightGray.copy(alpha = 0.2f))
+            .testTag("SkillSearchBlock " + skill.titleSkill)
     ) {
         Row(
             modifier = Modifier
@@ -493,34 +493,36 @@ fun SkillInfoPopUp_STARTED(
         )
     }
 
-    LaunchedEffect(skill) {
-        sharedViewModel.retrieveAllSkillSection(skill.id, currentContext) { sectionModels ->
-            sectionsList.value = sectionModels.sortedWith { a, b ->
-                if (skill.skillSectionsList.indexOf(a.id) < skill.skillSectionsList.indexOf(b.id)) -1 else 1
-            }
-            sectionModels.forEach { section ->
-                sharedViewModel.retrieveAllSkillTasks(
-                    skill.id,
-                    section.id,
-                    section.skillTasksList,
-                    currentContext
-                ) { taskModels ->
-                    tasksMap.value += Pair(section.id, taskModels)
+    if(skill.id!=""){
+        LaunchedEffect(skill) {
+            sharedViewModel.retrieveAllSkillSection(skill.id, currentContext) { sectionModels ->
+                sectionsList.value = sectionModels.sortedWith { a, b ->
+                    if (skill.skillSectionsList.indexOf(a.id) < skill.skillSectionsList.indexOf(b.id)) -1 else 1
+                }
+                sectionModels.forEach { section ->
+                    sharedViewModel.retrieveAllSkillTasks(
+                        skill.id,
+                        section.id,
+                        section.skillTasksList,
+                        currentContext
+                    ) { taskModels ->
+                        tasksMap.value += Pair(section.id, taskModels)
 
-                    completeStructure.value = SkillCompleteStructureModel(skillProgression,
-                        skill,
-                        sectionsList.value.find { it.id == skillProgression.currentSectionId }
-                            ?: sectionsList.value.get(0),
-                        tasksMap.value.get(skillProgression.currentSectionId)?.associate {
+                        completeStructure.value = SkillCompleteStructureModel(skillProgression,
+                            skill,
+                            sectionsList.value.find { it.id == skillProgression.currentSectionId }
+                                ?: sectionsList.value.get(0),
+                            tasksMap.value.get(skillProgression.currentSectionId)?.associate {
 
 
-                            var progressionNumer: Int =
-                                if (it.id in skillProgression.mapNonCompletedTasks.keys) skillProgression.mapNonCompletedTasks.get(
-                                    it.id
-                                ) ?: 0 else it.requiredAmount
+                                var progressionNumer: Int =
+                                    if (it.id in skillProgression.mapNonCompletedTasks.keys) skillProgression.mapNonCompletedTasks.get(
+                                        it.id
+                                    ) ?: 0 else it.requiredAmount
 
-                            Pair(it, Pair(progressionNumer, it.requiredAmount))
-                        } ?: emptyMap())
+                                Pair(it, Pair(progressionNumer, it.requiredAmount))
+                            } ?: emptyMap())
+                    }
                 }
             }
         }
@@ -1119,24 +1121,25 @@ fun SkillInfoPopUp_UNSTARTED(
     }
 
 
-    LaunchedEffect(skill) {
-        sharedViewModel.retrieveAllSkillSection(skill.id, currentContext) { sectionModels ->
-            sectionsList.value = sectionModels.sortedWith { a, b ->
-                if (skill.skillSectionsList.indexOf(a.id) < skill.skillSectionsList.indexOf(b.id)) -1 else 1
-            }
-            sectionModels.forEach { section ->
-                sharedViewModel.retrieveAllSkillTasks(
-                    skill.id,
-                    section.id,
-                    section.skillTasksList,
-                    currentContext
-                ) { taskModels ->
-                    tasksMap.value += Pair(section.id, taskModels)
+    if(skill.id!=""){
+        LaunchedEffect(skill) {
+            sharedViewModel.retrieveAllSkillSection(skill.id, currentContext) { sectionModels ->
+                sectionsList.value = sectionModels.sortedWith { a, b ->
+                    if (skill.skillSectionsList.indexOf(a.id) < skill.skillSectionsList.indexOf(b.id)) -1 else 1
+                }
+                sectionModels.forEach { section ->
+                    sharedViewModel.retrieveAllSkillTasks(
+                        skill.id,
+                        section.id,
+                        section.skillTasksList,
+                        currentContext
+                    ) { taskModels ->
+                        tasksMap.value += Pair(section.id, taskModels)
+                    }
                 }
             }
         }
     }
-
 
     Box(
         modifier = Modifier

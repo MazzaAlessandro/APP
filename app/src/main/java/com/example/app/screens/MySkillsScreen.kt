@@ -133,12 +133,14 @@ fun SkillListElement(
         mutableStateOf(false)
     }
 */
-    sharedViewModel.retrieveBadge(
-        skillCompleteStructureModel.skill.id,
-        skillCompleteStructureModel.skillSection.id,
-        currentContext
-    ){
-        badge.value = it
+    if(skillCompleteStructureModel.skill.id!=""){
+        sharedViewModel.retrieveBadge(
+            skillCompleteStructureModel.skill.id,
+            skillCompleteStructureModel.skillSection.id,
+            currentContext
+        ){
+            badge.value = it
+        }
     }
 
     Column(
@@ -146,7 +148,8 @@ fun SkillListElement(
             .fillMaxWidth()
             .background(color = Color(0XFFD9D9D9), RoundedCornerShape(10.dp))
             .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-            .padding(10.dp),
+            .padding(10.dp)
+            .testTag("SkillListBlock"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -158,7 +161,7 @@ fun SkillListElement(
                     onClick = { onSwapRequest(index, true) }
                 )
                 {
-                    Icon(imageVector = Icons.Default.ArrowUpward, contentDescription = "")
+                    Icon(imageVector = Icons.Default.ArrowUpward, contentDescription = "ArrowUp")
                 }
 
                 IconButton(
@@ -166,7 +169,7 @@ fun SkillListElement(
                     onClick = { onSwapRequest(index, false) }
                 )
                 {
-                    Icon(imageVector = Icons.Default.ArrowDownward, contentDescription = "")
+                    Icon(imageVector = Icons.Default.ArrowDownward, contentDescription = "ArrowDown")
                 }
             }
         }
@@ -187,7 +190,7 @@ fun SkillListElement(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Menu,
-                    contentDescription = null
+                    contentDescription = "MenuButton"
                 )
             }
 
@@ -694,179 +697,180 @@ fun MySkillsScreen(
         mutableStateOf(false)
     }
 
+    if(sharedViewModel.getCurrentUserMail()!=""){
+        LaunchedEffect(loadTrigger.value) {
 
-    LaunchedEffect(loadTrigger.value) {
-
-        sharedViewModel.retrieveUserSkillSub(
-            sharedViewModel.getCurrentUserMail(),
-            currentContext
-        ){
-            userSkillSub.value = it
-            sharedViewModel.retrieveUserSkillProgressionList(
+            sharedViewModel.retrieveUserSkillSub(
                 sharedViewModel.getCurrentUserMail(),
-                context = currentContext
-            ) { skillProgList ->
+                currentContext
+            ){
+                userSkillSub.value = it
+                sharedViewModel.retrieveUserSkillProgressionList(
+                    sharedViewModel.getCurrentUserMail(),
+                    context = currentContext
+                ) { skillProgList ->
 
-                skillProgList.forEach { skillProg ->
-                    var skill: SkillModel
-                    var skillSection: SkillSectionModel
-                    var structure: SkillCompleteStructureModel
+                    skillProgList.forEach { skillProg ->
+                        var skill: SkillModel
+                        var skillSection: SkillSectionModel
+                        var structure: SkillCompleteStructureModel
 
-                    sharedViewModel.retrieveSkill(skillProg.skillId, currentContext) { data ->
-                        skill = data
-                        sharedViewModel.retrieveSkillSection(
-                            skillProg.skillId,
-                            skillProg.currentSectionId,
-                            currentContext,
-                        ) { data ->
-                            skillSection = data
+                        sharedViewModel.retrieveSkill(skillProg.skillId, currentContext) { data ->
+                            skill = data
+                            sharedViewModel.retrieveSkillSection(
+                                skillProg.skillId,
+                                skillProg.currentSectionId,
+                                currentContext,
+                            ) { data ->
+                                skillSection = data
 
-                            structure =
-                                SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
+                                structure =
+                                    SkillCompleteStructureModel(skillProg, skill, skillSection, mapOf())
 
-                            sharedViewModel.retrieveAllSkillTasks(
-                                skill.id,
-                                skillSection.id,
-                                skillSection.skillTasksList,
-                                currentContext
-                            ) { listTasks ->
-                                structure = SkillCompleteStructureModel(
-                                    skillProg, skill, skillSection, listTasks.associate { task ->
-                                        if (skillProg.mapNonCompletedTasks.containsKey(task.id)) {
-                                            Pair(
-                                                task,
+                                sharedViewModel.retrieveAllSkillTasks(
+                                    skill.id,
+                                    skillSection.id,
+                                    skillSection.skillTasksList,
+                                    currentContext
+                                ) { listTasks ->
+                                    structure = SkillCompleteStructureModel(
+                                        skillProg, skill, skillSection, listTasks.associate { task ->
+                                            if (skillProg.mapNonCompletedTasks.containsKey(task.id)) {
                                                 Pair(
-                                                    skillProg.mapNonCompletedTasks.getOrDefault(
-                                                        task.id,
-                                                        0
-                                                    ), task.requiredAmount
+                                                    task,
+                                                    Pair(
+                                                        skillProg.mapNonCompletedTasks.getOrDefault(
+                                                            task.id,
+                                                            0
+                                                        ), task.requiredAmount
+                                                    )
                                                 )
-                                            )
-                                        } else {
-                                            Pair(task, Pair(task.requiredAmount, task.requiredAmount))
+                                            } else {
+                                                Pair(task, Pair(task.requiredAmount, task.requiredAmount))
+                                            }
                                         }
+                                    )
+
+                                    if (listCompleteStructures.value.map { it.skill }
+                                            .contains(structure.skill)) {
+                                        val updatedList = listCompleteStructures.value.toMutableList()
+
+                                        val index =
+                                            listCompleteStructures.value.indexOf(listCompleteStructures.value.find { it.skill == structure.skill })
+
+                                        updatedList.set(index, structure)
+
+                                        listCompleteStructures.value = updatedList.toList()
+
+                                    } else {
+                                        listCompleteStructures.value += structure
                                     }
-                                )
 
-                                if (listCompleteStructures.value.map { it.skill }
-                                        .contains(structure.skill)) {
-                                    val updatedList = listCompleteStructures.value.toMutableList()
+                                    listCompleteStructures.value = RecomputeList(
+                                        listCompleteStructures.value,
+                                        sortingType.value,
+                                        userSkillSub.value.customOrdering
+                                    )
 
-                                    val index =
-                                        listCompleteStructures.value.indexOf(listCompleteStructures.value.find { it.skill == structure.skill })
-
-                                    updatedList.set(index, structure)
-
-                                    listCompleteStructures.value = updatedList.toList()
-
-                                } else {
-                                    listCompleteStructures.value += structure
                                 }
-
-                                listCompleteStructures.value = RecomputeList(
-                                    listCompleteStructures.value,
-                                    sortingType.value,
-                                    userSkillSub.value.customOrdering
-                                )
-
                             }
                         }
                     }
                 }
             }
+
         }
 
-    }
+        LaunchedEffect(triggerSectionSkip.value) {
 
-    LaunchedEffect(triggerSectionSkip.value) {
-
-        if (isStartRun.value) {
-            return@LaunchedEffect
-        }
+            if (isStartRun.value) {
+                return@LaunchedEffect
+            }
 
 
-        var updatedList = listCompleteStructures.value.toMutableList()
-        var updatedStructure = updatedList.get(currentStructureIndex.value)
+            var updatedList = listCompleteStructures.value.toMutableList()
+            var updatedStructure = updatedList.get(currentStructureIndex.value)
 
 
-        var updatedProgression = updatedStructure.skillProgression
+            var updatedProgression = updatedStructure.skillProgression
 
-        val indexOfSection =
-            updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
+            val indexOfSection =
+                updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
 
-        val skillSection =
-            listCompleteStructures.value.get(currentStructureIndex.value).skillSection
+            val skillSection =
+                listCompleteStructures.value.get(currentStructureIndex.value).skillSection
 
-        val skill = listCompleteStructures.value.get(currentStructureIndex.value).skill.id
+            val skill = listCompleteStructures.value.get(currentStructureIndex.value).skill.id
 
 
-        //FIRST WE ADD THE BADGE
-        sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext) {
+            //FIRST WE ADD THE BADGE
+            sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext) {
 
-            var updatedBadges = it.badgesObtained
-            var updatedTimeBadge = it.timeBadgeObtained
+                var updatedBadges = it.badgesObtained
+                var updatedTimeBadge = it.timeBadgeObtained
 
-            if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
-                updatedBadges = updatedBadges + skillSection.badgeID
-                updatedTimeBadge += ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
+                    updatedBadges = updatedBadges + skillSection.badgeID
+                    updatedTimeBadge += ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
 
-                sharedViewModel.retrieveBadge(
-                    skillId = skill,
-                    sectionId = skillSection.id,
-                    currentContext,
-                ){
-                    badgeObtained.value = it
-                    isBadgePopUpOpen.value = true
+                    sharedViewModel.retrieveBadge(
+                        skillId = skill,
+                        sectionId = skillSection.id,
+                        currentContext,
+                    ){
+                        badgeObtained.value = it
+                        isBadgePopUpOpen.value = true
+                    }
+
                 }
+                userSkillSub.value = it.copy(badgesObtained = updatedBadges, timeBadgeObtained = updatedTimeBadge)
+
+                sharedViewModel.saveUserSub(
+                    userSkillSub.value,
+                    context = currentContext
+                )
 
             }
-            userSkillSub.value = it.copy(badgesObtained = updatedBadges, timeBadgeObtained = updatedTimeBadge)
 
-            sharedViewModel.saveUserSub(
-                userSkillSub.value,
-                context = currentContext
-            )
+            //SECOND WE UPDATE THE STRUCT
+            updatedProgression.currentSectionId =
+                updatedStructure.skill.skillSectionsList.get(indexOfSection + 1)
 
-        }
+            sharedViewModel.retrieveSkillSection(
+                updatedProgression.skillId,
+                updatedProgression.currentSectionId,
+                currentContext,
+            ) { data ->
+                updatedStructure.skillSection = data
 
-        //SECOND WE UPDATE THE STRUCT
-        updatedProgression.currentSectionId =
-            updatedStructure.skill.skillSectionsList.get(indexOfSection + 1)
+                sharedViewModel.retrieveAllSkillTasks(
+                    updatedStructure.skill.id,
+                    updatedStructure.skillSection.id,
+                    updatedStructure.skillSection.skillTasksList,
+                    currentContext
+                ) { listTasks ->
 
-        sharedViewModel.retrieveSkillSection(
-            updatedProgression.skillId,
-            updatedProgression.currentSectionId,
-            currentContext,
-        ) { data ->
-            updatedStructure.skillSection = data
-
-            sharedViewModel.retrieveAllSkillTasks(
-                updatedStructure.skill.id,
-                updatedStructure.skillSection.id,
-                updatedStructure.skillSection.skillTasksList,
-                currentContext
-            ) { listTasks ->
-
-                updatedStructure = updatedStructure.copy(skillTasks = listTasks.associate {
-                    Pair(it, Pair(0, it.requiredAmount))
-                })
-
-                updatedProgression =
-                    updatedProgression.copy(mapNonCompletedTasks = listTasks.associate {
-                        Pair(it.id, 0)
+                    updatedStructure = updatedStructure.copy(skillTasks = listTasks.associate {
+                        Pair(it, Pair(0, it.requiredAmount))
                     })
 
-                sharedViewModel.saveSkillProgression(updatedProgression, currentContext)
+                    updatedProgression =
+                        updatedProgression.copy(mapNonCompletedTasks = listTasks.associate {
+                            Pair(it.id, 0)
+                        })
 
-                updatedStructure = updatedStructure.copy(skillProgression = updatedProgression)
-                updatedList.set(currentStructureIndex.value, updatedStructure)
-                listCompleteStructures.value = updatedList
+                    sharedViewModel.saveSkillProgression(updatedProgression, currentContext)
 
-                canSkipSection.value = true
+                    updatedStructure = updatedStructure.copy(skillProgression = updatedProgression)
+                    updatedList.set(currentStructureIndex.value, updatedStructure)
+                    listCompleteStructures.value = updatedList
+
+                    canSkipSection.value = true
+                }
             }
+
+
         }
-
-
     }
 
     Scaffold(
@@ -900,7 +904,7 @@ fun MySkillsScreen(
                     Text("Order by: $order")
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "badge"
+                        contentDescription = "OrderingArrow"
                     )
                 }
 

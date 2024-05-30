@@ -11,5 +11,5 @@ data class SkillTaskModel (
 
     var taskDescription: String = "",
 
-    var requiredAmount:Int = 0,
+    var requiredAmount:Int = 1,
 ): Parcelable
