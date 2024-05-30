@@ -38,6 +38,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -70,6 +72,7 @@ import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserSkillSubsModel
+import com.example.app.ui.theme.PrimaryColor
 import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
 import com.example.app.ui.theme.yellowColor
@@ -143,7 +146,7 @@ fun SectionElementBlock(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color, RoundedCornerShape(10))
-                    .border(1.dp, Color.Black, RoundedCornerShape(10))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
                     .then(
                         if (isResetable) {
                             Modifier.clickable {
@@ -164,12 +167,14 @@ fun SectionElementBlock(
                 text = "Section " + index.toString() + ": " + section.titleSection,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
+                color = Color.DarkGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1.0f)
             )
 
             Text(
                 text = isDoneText,
+                color = Color.DarkGray,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
         }
@@ -182,13 +187,12 @@ fun SkillSearchBlockUnavailable(
     skill: SkillModel,
     onClick: () -> Unit
 ){
-    val colorCircle = MaterialTheme.colorScheme.primary
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp, 2.dp)
             .clip(shape = RoundedCornerShape(10.dp))
-            .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+            .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
             .background(Color(133, 133, 133, 255))
     ) {
         Row(
@@ -229,6 +233,7 @@ fun SkillSearchBlockUnavailable(
                     Text(
                         text = "Creator: " + skill.creatorUserName,
                         fontSize = 12.sp,
+                        color = Color.DarkGray,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1.0f),
                         textAlign = TextAlign.End
@@ -258,14 +263,13 @@ fun SkillSearchBlock(
     selectedSkillState: SelectedSkillState,
     onClick: () -> Unit
 ) {
-    val colorCircle = MaterialTheme.colorScheme.primary
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp, 4.dp)
             .clip(shape = RoundedCornerShape(10.dp))
-            .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
             .background(Color.LightGray.copy(alpha = 0.2f))
             .testTag("SkillSearchBlock")
     ) {
@@ -280,9 +284,9 @@ fun SkillSearchBlock(
         ) {
             Box(
                 modifier = Modifier
-                    .size(50.dp) // Set the size of the circle
+                    .size(40.dp) // Set the size of the circle
             ){
-                Icon(imageVector = Icons.Filled.RadioButtonChecked, "SkillLogo",  modifier = Modifier.fillMaxSize(), tint = colorCircle)
+                Icon(imageVector = Icons.Filled.RadioButtonChecked, "SkillLogo",  modifier = Modifier.fillMaxSize(), tint = PrimaryColor)
             }
             Spacer(Modifier.width(25.dp))
             // Space between the circle and the text
@@ -300,6 +304,7 @@ fun SkillSearchBlock(
 
                     Text(skill.titleSkill,
                         fontWeight = FontWeight.Bold,
+                        color = Color.DarkGray,
                         fontSize = 25.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
@@ -310,12 +315,14 @@ fun SkillSearchBlock(
                         Text(
                             text = sectionAmount.toString() + " section" + if (sectionAmount > 1) "s" else "",
                             fontSize = 12.sp,
+                            color = Color.DarkGray,
                             textAlign = TextAlign.Center
                         )
                         Text(
                             text = "Creator: " + skill.creatorUserName,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray,
                             modifier = Modifier.weight(1.0f),
                             textAlign = TextAlign.End
                         )
@@ -545,7 +552,7 @@ fun SkillInfoPopUp_STARTED(
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.75f)
                     .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface)
                 //.verticalScroll(rememberScrollState()),
             ) {
@@ -570,7 +577,6 @@ fun SkillInfoPopUp_STARTED(
                 ) {
 
 
-                    val colorCircle = MaterialTheme.colorScheme.primary
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -578,7 +584,7 @@ fun SkillInfoPopUp_STARTED(
                                 Color(0XFFF0F0F0),
                                 RoundedCornerShape(10)
                             ) // Use the color of the background in your image
-                            .border(1.dp, Color.Black, RoundedCornerShape(10))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -587,7 +593,7 @@ fun SkillInfoPopUp_STARTED(
                         /*Box(
                             modifier = Modifier
                                 .size(50.dp) // Set the size of the circle
-                                .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
+                                .background(PrimaryColor, shape = CircleShape) // Use the color of the circle in your image
                         )
                         Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier.weight(2f)) {
@@ -600,7 +606,7 @@ fun SkillInfoPopUp_STARTED(
                             fontSize = 15.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .background(color = colorCircle, RoundedCornerShape(20))
+                                .background(color = PrimaryColor, RoundedCornerShape(20))
                                 .padding(vertical = 4.dp, horizontal = 4.dp)
                                 .weight(1f)
                         )
@@ -619,7 +625,7 @@ fun SkillInfoPopUp_STARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
@@ -633,7 +639,7 @@ fun SkillInfoPopUp_STARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -647,7 +653,7 @@ fun SkillInfoPopUp_STARTED(
                                 text = skill.skillDescription,
                                 modifier = Modifier.padding(15.dp),
                                 fontSize = 12.sp,
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
                         }
                     }
@@ -664,7 +670,7 @@ fun SkillInfoPopUp_STARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
@@ -678,7 +684,7 @@ fun SkillInfoPopUp_STARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -763,7 +769,7 @@ fun SkillInfoPopUp_STARTED(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .weight(1f),
-                                        color = Color.Black,
+                                        color = Color.DarkGray,
                                         thickness = 1.dp
                                     )
 
@@ -777,7 +783,7 @@ fun SkillInfoPopUp_STARTED(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .weight(1f),
-                                        color = Color.Black,
+                                        color = Color.DarkGray,
                                         thickness = 1.dp
                                     )
                                 }
@@ -808,7 +814,7 @@ fun SkillInfoPopUp_STARTED(
                                                 )
                                                 .border(
                                                     1.dp,
-                                                    Color.Black,
+                                                    Color.DarkGray,
                                                     RoundedCornerShape(15.dp)
                                                 )
                                                 .size(40.dp)
@@ -860,7 +866,7 @@ fun SkillInfoPopUp_STARTED(
                                 text = completeStructure.value.skillSection.descriptionSection,
                                 modifier = Modifier.padding(15.dp),
                                 fontSize = 12.sp,
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
                         }*/
 
@@ -1159,7 +1165,7 @@ fun SkillInfoPopUp_UNSTARTED(
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.75f)
                     .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     //.verticalScroll(rememberScrollState()),
             ) {
@@ -1183,7 +1189,6 @@ fun SkillInfoPopUp_UNSTARTED(
                 ) {
 
 
-                    val colorCircle = MaterialTheme.colorScheme.primary
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -1191,7 +1196,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                 Color(0XFFF0F0F0),
                                 RoundedCornerShape(10)
                             ) // Use the color of the background in your image
-                            .border(1.dp, Color.Black, RoundedCornerShape(10))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -1200,12 +1205,16 @@ fun SkillInfoPopUp_UNSTARTED(
                         /*Box(
                             modifier = Modifier
                                 .size(50.dp) // Set the size of the circle
-                                .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
+                                .background(PrimaryColor, shape = CircleShape) // Use the color of the circle in your image
                         )
                         Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier.weight(2f)) {
-                            Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 30.sp)
-                            Text(text = "Creator: " + skill.creatorUserName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 30.sp,
+                                color = Color.DarkGray,
+                            )
+                            Text(text = "Creator: " + skill.creatorUserName, fontWeight = FontWeight.Bold, fontSize = 15.sp,
+                                color = Color.DarkGray,
+                            )
                         }
                         Text(
                             skill.skillSectionsList.count().toString() + " section" + if (skill.skillSectionsList.count() > 1) "s" else "",
@@ -1213,7 +1222,7 @@ fun SkillInfoPopUp_UNSTARTED(
                             fontSize = 15.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .background(color = colorCircle, RoundedCornerShape(20))
+                                .background(color = PrimaryColor, RoundedCornerShape(20))
                                 .padding(vertical = 4.dp, horizontal = 4.dp)
                                 .weight(1f)
                         )
@@ -1221,7 +1230,7 @@ fun SkillInfoPopUp_UNSTARTED(
                     /*Box(
                         modifier = Modifier
                             .size(windowWidth / 5) // Set the size of the circle
-                            .background(colorCircle, shape = CircleShape)
+                            .background(PrimaryColor, shape = CircleShape)
                     )*/
 
                     Column(modifier = Modifier
@@ -1236,13 +1245,14 @@ fun SkillInfoPopUp_UNSTARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
                             Text(
                                 modifier = Modifier.padding(8.dp),
                                 text = "Skill Description",
+                                color = Color.DarkGray,
                                 fontSize = 18.sp
                             )
 
@@ -1250,7 +1260,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -1264,7 +1274,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                 text = skill.skillDescription,
                                 modifier = Modifier.padding(15.dp),
                                 fontSize = 12.sp,
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
                         }
                     }
@@ -1281,12 +1291,13 @@ fun SkillInfoPopUp_UNSTARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
                             Text(
                                 modifier = Modifier.padding(8.dp),
+                                color = Color.DarkGray,
                                 text = "Sections",
                                 fontSize = 18.sp
                             )
@@ -1295,7 +1306,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -1327,13 +1338,14 @@ fun SkillInfoPopUp_UNSTARTED(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .weight(1f),
-                                        color = Color.Black,
+                                        color = Color.DarkGray,
                                         thickness = 1.dp
                                     )
 
                                     Text(
                                         modifier = Modifier.padding(8.dp),
                                         text = "Tasks",
+                                        color = Color.DarkGray,
                                         fontSize = 18.sp
                                     )
 
@@ -1341,7 +1353,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .weight(1f),
-                                        color = Color.Black,
+                                        color = Color.DarkGray,
                                         thickness = 1.dp
                                     )
                                 }
@@ -1371,7 +1383,7 @@ fun SkillInfoPopUp_UNSTARTED(
                                 text = completeStructure.value.skillSection.descriptionSection,
                                 modifier = Modifier.padding(15.dp),
                                 fontSize = 12.sp,
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
                         }*/
 
@@ -1716,6 +1728,7 @@ fun SearchScreen(
     }
 
     Scaffold(
+        modifier = Modifier.background(PrimaryColor),
         topBar = { AppToolBar(title = "Search a Skill", navController, sharedViewModel) },
         bottomBar = {
             BottomNavigationBar(navController = navController, openDialog, pendingRoute)
@@ -1735,8 +1748,13 @@ fun SearchScreen(
                     .padding(vertical = 20.dp), textAlign = TextAlign.Center)*/
 
                 Spacer(modifier = Modifier.height(10.dp))
-                
+
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor
+                    ),
                     value = skillTitleEditText,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1765,7 +1783,9 @@ fun SearchScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Text(text = "Started Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+                    Text(text = "Started Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        color = Color.DarkGray,
+                    )
 
                     Text(
                         text = skillModelsStarted.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
@@ -1784,7 +1804,7 @@ fun SearchScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp, 2.dp),
-                    color = Color.Black
+                    color = Color.DarkGray
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -1853,7 +1873,9 @@ fun SearchScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Registered Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+                    Text(text = "Registered Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        color = Color.DarkGray,
+                    )
 
                     Text(
                         text = skillModelsRegistered.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase()
@@ -1872,7 +1894,7 @@ fun SearchScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp, 2.dp),
-                    color = Color.Black
+                    color = Color.DarkGray
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -2006,7 +2028,9 @@ fun SearchScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Created Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+                    Text(text = "Created Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        color = Color.DarkGray,
+                    )
 
                     Text(
                         text = skillModelsCreated.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
@@ -2025,7 +2049,7 @@ fun SearchScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp, 2.dp),
-                    color = Color.Black
+                    color = Color.DarkGray
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -2115,7 +2139,9 @@ fun SearchScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Public Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+                        Text(text = "Public Skills", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            color = Color.DarkGray,
+                        )
 
                         Text(
                             text = filteredOnlineFetchedSkills.value.filter { skillTitleEditText.lowercase() in it.titleSkill.lowercase() }
@@ -2134,7 +2160,7 @@ fun SearchScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(10.dp, 2.dp),
-                        color = Color.Black
+                        color = Color.DarkGray
                     )
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -2219,6 +2245,7 @@ fun SearchScreen(
                         .padding(top = 50.dp, start = 10.dp, end = 10.dp),
                         contentAlignment = Alignment.Center){
                         Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
                             onClick = {loadPublic.value = true},
                             shape = RoundedCornerShape(10.dp),
                         ) {
@@ -2473,5 +2500,3 @@ fun SearchScreen(
         navController.navigate(Routes.Profile.route)
     }
 }
-
-
