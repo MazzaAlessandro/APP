@@ -1,5 +1,6 @@
 package com.example.app.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -20,3 +21,5 @@ val Silver = Color(0xFFC0C0C0)
 val Gold = Color(0xFFFFD700)
 
 val TransparentGrey = Color(0x80000000)
+
+val PrimaryColor = Color(0xFF6D74FF)
