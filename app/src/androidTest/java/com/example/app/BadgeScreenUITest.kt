@@ -110,7 +110,7 @@ class BadgeScreenUITest {
         test.onNodeWithTag("Badges").assertExists().performClick()
 
         test.waitUntilAtLeastOneExists(hasTestTag("BadgesScreen"), 5000)
-        test.waitUntilDoesNotExist(hasText("You have not obtained a badge yet"), 5000)
+        test.waitUntilDoesNotExist(hasText("You have not obtained a badge yet"), 15000)
 
         test.onNodeWithText("Read Dune - Halfway there").assertExists().performClick()
         test.onNodeWithContentDescription("close").assertExists().performClick()

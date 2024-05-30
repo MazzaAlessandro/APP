@@ -148,7 +148,8 @@ fun SkillListElement(
             .fillMaxWidth()
             .background(color = Color(0XFFD9D9D9), RoundedCornerShape(10.dp))
             .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-            .padding(10.dp),
+            .padding(10.dp)
+            .testTag("SkillListBlock"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {

@@ -1,11 +1,17 @@
 package com.example.app
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
 import com.example.app.additionalUI.BadgeColor
 import com.example.app.models.BadgeDataModel
@@ -15,9 +21,11 @@ import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.screens.MySkillsScreen
+import com.example.app.screens.ScreenMain
 import com.example.app.screens.SkillListElement
 import com.example.app.screens.SkillTitleBlock
 import com.example.app.screens.SortingType
+import com.example.app.screens.TaskListElement
 import com.example.app.util.SharedViewModel
 import com.example.app.util.SkillRepository
 import com.example.app.util.UserRepository
@@ -87,6 +95,26 @@ class MySkillsTest {
         test.onNodeWithText("3/6").assertExists()
 
         test.onNodeWithText("Tasks").assertExists()
+
+        test.onNodeWithText("desc a").assertExists()
+        test.onNodeWithText("2/8").assertExists()
+
+        test.onNodeWithText("desc b").assertExists()
+        test.onNodeWithText("1/8").assertExists()
+
+        test.onNodeWithText("Finish").assertExists()
+    }
+
+    @Test
+    fun taskListElementTest(){
+        test.setContent { TaskListElement(
+            3,
+            SkillTaskModel("a", "", "", "desc a", 8)
+        ) {}
+        }
+
+        test.onNodeWithText("desc a").assertExists()
+        test.onNodeWithText("3/8").assertExists()
     }
 
     @Test
@@ -116,5 +144,26 @@ class MySkillsTest {
         test.onNodeWithTag("Profile").assertExists()
         test.onNodeWithTag("Create Skills").assertExists()
         test.onNodeWithTag("My Skills").assertExists()
+    }
+
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun integratedMySkillsTest(){
+        test.setContent { ScreenMain() }
+
+        test.onNodeWithTag("LoginPage").assertExists()
+
+        test.onNodeWithTag("mailTextField").assertExists().performTextInput("abba@mail.com")
+        test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
+        test.onNode(hasClickAction() and hasText("Login")).assertExists().assertIsEnabled().performClick()
+
+        test.waitUntilAtLeastOneExists(hasText("Profile"), 5000)
+        test.onNodeWithTag("ProfileScreen").assertExists()
+
+        test.onNodeWithTag("My Skills").assertExists().performClick()
+        test.onNodeWithTag("MySkillsScreen").assertExists()
+        test.waitUntilAtLeastOneExists(hasTestTag("SkillListBlock"), 5000)
+
+        test.onNodeWithContentDescription("Logout").assertExists().performClick()
     }
 }
