@@ -82,6 +82,7 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
+import com.example.app.ui.theme.Bronze
 import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
 import com.example.app.ui.theme.yellowColor
@@ -272,6 +273,7 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
 @Composable
 fun SectionBox(id:Int,
                section:SkillSectionModel,
+               badge:BadgeDataModel,
                listTasks: List<SkillTaskModel>,
                onTitleChange: (String) -> Unit,
                onDescriptionChange: (String) -> Unit,
@@ -282,9 +284,9 @@ fun SectionBox(id:Int,
                onDeleteTask: (String, Int) -> Unit,
                onBadgeUpdate: (BadgeColor) -> Unit) {
 
-    var done = remember { mutableStateOf(false) }
-    var filled = remember { mutableStateOf(false) }
-    var color = remember { mutableStateOf(BadgeColor.BRONZE) }
+    var done: MutableState<Boolean> = remember{mutableStateOf(if(section.hasBadge) badge.done else false)}
+    var filled: MutableState<Boolean> = remember { mutableStateOf(section.hasBadge) }
+    var color: MutableState<BadgeColor> = remember { mutableStateOf(if(section.hasBadge) badge.badgeColor else BadgeColor.BRONZE) }
 
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -981,6 +983,7 @@ fun CreateScreen(
 
                         SectionBox(id = index,
                             section = section,
+                            badges.value.get(section.id) ?: BadgeDataModel(),
                             skillTasks.value.get(section.id)?.toList() ?: mutableListOf(),
                             {skillSections.value = skillSections.value.toMutableList().apply {
                                 set(index, section.copy(titleSection = it))
@@ -1038,7 +1041,13 @@ fun CreateScreen(
                                 skillTasks.value = updatedMapTasks
                             },
                             {currentBadge ->
-                                //badges.value.get(index.toString()) =
+                                //badges.value.get(index.toString())
+
+                                var updatable = skillSections.value.toMutableList()
+                                val skillSect = skillSections.value.get(index).copy(hasBadge = true)
+                                updatable.set(index, skillSect)
+
+                                skillSections.value = updatable
 
                                 badges.value.put(section.id,
                                     BadgeDataModel(currentBadge,
