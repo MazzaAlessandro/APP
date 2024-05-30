@@ -1,14 +1,24 @@
 package com.example.app
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.navigation.compose.rememberNavController
+import androidx.test.espresso.Espresso
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
+import com.example.app.screens.ScreenMain
 import com.example.app.screens.SearchScreen
 import com.example.app.screens.SectionElementBlock
 import com.example.app.screens.SelectedSkillState
@@ -90,7 +100,7 @@ class SearchScreenUITest {
                 selectedSkillState = SelectedSkillState.STARTED_SELECTED) {
             }
         }
-        test.onNodeWithTag("SkillSearchBlock").assertExists()
+        test.onNodeWithTag("SkillSearchBlock Skill Title").assertExists()
 
         test.onNodeWithContentDescription("SkillLogo").assertExists()
         test.onNodeWithText("Skill Title").assertExists()
@@ -112,7 +122,7 @@ class SearchScreenUITest {
                 selectedSkillState = SelectedSkillState.NEW_SELECTED) {
             }
         }
-        test.onNodeWithTag("SkillSearchBlock").assertExists()
+        test.onNodeWithTag("SkillSearchBlock Skill Title").assertExists()
 
         test.onNodeWithContentDescription("SkillLogo").assertExists()
         test.onNodeWithText("Skill Title").assertExists()
@@ -134,7 +144,7 @@ class SearchScreenUITest {
                 selectedSkillState = SelectedSkillState.REGISTERED_SELECTED) {
             }
         }
-        test.onNodeWithTag("SkillSearchBlock").assertExists()
+        test.onNodeWithTag("SkillSearchBlock Skill Title").assertExists()
 
         test.onNodeWithContentDescription("SkillLogo").assertExists()
         test.onNodeWithText("Skill Title").assertExists()
@@ -276,6 +286,35 @@ class SearchScreenUITest {
         test.onNodeWithTag("Profile").assertExists()
         test.onNodeWithTag("Create Skills").assertExists()
         test.onNodeWithTag("My Skills").assertExists()
+    }
 
+    @OptIn(ExperimentalTestApi::class)
+    @Test
+    fun integratedSearchScreenTest(){
+        test.setContent { ScreenMain() }
+
+        test.onNodeWithTag("LoginPage").assertExists()
+
+        test.onNodeWithTag("mailTextField").assertExists().performTextInput("abba@mail.com")
+        test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
+        test.onNode(hasClickAction() and hasText("Login")).assertExists().assertIsEnabled().performClick()
+
+        test.waitUntilAtLeastOneExists(hasText("Profile"), 5000)
+        test.onNodeWithTag("ProfileScreen").assertExists()
+
+        test.onNodeWithTag("Search Skills").assertExists().performClick()
+        test.onNodeWithTag("SearchScreen").assertExists()
+        test.waitUntilAtLeastOneExists(hasContentDescription("SkillLogo"), 15000)
+
+        test.onNodeWithTag("SearchBar").performTextInput("Basic cooking")
+        test.waitUntilAtLeastOneExists(hasTestTag("SkillSearchBlock Basic cooking"), 5000)
+        Espresso.closeSoftKeyboard()
+
+        test.onNode(hasTestTag("SkillSearchBlock Basic cooking")).performClick()
+
+        test.onNodeWithText("REGISTER SKILL").assertExists()
+        test.onNodeWithContentDescription("close").assertExists().performClick()
+
+        test.onNodeWithContentDescription("Logout").assertExists().performClick()
     }
 }

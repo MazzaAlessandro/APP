@@ -38,7 +38,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -271,7 +270,7 @@ fun SkillSearchBlock(
             .clip(shape = RoundedCornerShape(10.dp))
             .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
             .background(Color.LightGray.copy(alpha = 0.2f))
-            .testTag("SkillSearchBlock")
+            .testTag("SkillSearchBlock " + skill.titleSkill)
     ) {
         Row(
             modifier = Modifier
