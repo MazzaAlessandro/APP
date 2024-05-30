@@ -73,7 +73,7 @@ fun BadgeIcon(
         }
     }
 
-    var tag = ""
+    var tag = "EmptyBadge"
     if(filled){
         tag = when(badge){
             BadgeColor.GOLD -> "GoldBadge"
