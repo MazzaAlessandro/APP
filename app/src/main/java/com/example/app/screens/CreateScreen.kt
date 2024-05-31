@@ -86,7 +86,6 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
-import com.example.app.ui.theme.Bronze
 import com.example.app.ui.theme.PrimaryColor
 import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
@@ -183,6 +182,7 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
 
     Box(modifier = Modifier
         .padding(15.dp, 10.dp)
+        .testTag("GeneralInfoBox")
     ){
         Column {
             Row(
@@ -232,7 +232,8 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(2.dp),
+                        .padding(2.dp)
+                        .testTag("TitleTextField"),
                     label = { Text(text = "Enter a Title") },
                     value = skill.titleSkill,
                     onValueChange = onTitleChange,
@@ -269,7 +270,8 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(2.dp),
+                    .padding(2.dp)
+                    .testTag("DescriptionTextField"),
                 label = { Text(text = "Enter a Description") },
                 value = skill.skillDescription,
                 onValueChange = onDescriptionChange,
@@ -289,7 +291,8 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                     onCheckedChange = onCheckChange,
                     colors = CheckboxDefaults.colors(
                         checkedColor = PrimaryColor
-                    )
+                    ),
+                    modifier = Modifier.testTag("PublicCheckBox")
                     )
                 Text(text = "Public Skill", color = Color.DarkGray, fontSize = 16.sp)
             }
@@ -321,6 +324,7 @@ fun SectionBox(id:Int,
         .padding(5.dp)
         .background(color = Color.LightGray.copy(alpha = 0.2f), shape = RoundedCornerShape(10.dp))
         .border(1.dp, color = Color.Gray, RoundedCornerShape(10.dp))
+        .testTag("SectionBox$id")
     ){
         /*IconButton(
             onClick = {
@@ -382,11 +386,12 @@ fun SectionBox(id:Int,
                         .align(Alignment.TopEnd)
                         .zIndex(11F),
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "badge")
+                        contentDescription = "BadgeSelection")
 
                     DropdownMenu(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.testTag("DropdownBadge")
                     ){
                         BadgeColor.values().forEachIndexed { index, badgeColor ->
 
@@ -415,7 +420,8 @@ fun SectionBox(id:Int,
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(2.dp, 0.dp, 2.dp, 2.dp),
+                            .padding(2.dp, 0.dp, 2.dp, 2.dp)
+                            .testTag("SectionNameTextField"),
                         label = { Text(text = "Enter a Name") },
                         value = section.titleSection,
                         onValueChange = onTitleChange,
@@ -440,7 +446,8 @@ fun SectionBox(id:Int,
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(2.dp, 0.dp, 2.dp, 2.dp),
+                            .padding(2.dp, 0.dp, 2.dp, 2.dp)
+                            .testTag("SectionDescriptionTextField"),
                         label = { Text(text = "Enter a Description") },
                         value = section.descriptionSection,
                         onValueChange = onDescriptionChange,
@@ -563,14 +570,16 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
 
         Row(modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp),
+            .padding(5.dp)
+            .testTag("TaskCreate$id"),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
 
             OutlinedTextField(
                 modifier = Modifier
                     .padding(2.dp)
-                    .weight(4f, true),
+                    .weight(4f, true)
+                    .testTag("TaskDescriptionTextField$id"),
                 label = { Text(text = "Task Description") },
                 value = task.taskDescription,
                 onValueChange = onDescriptionChange,
@@ -591,7 +600,8 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
 
                 modifier = Modifier
                     .padding(2.dp)
-                    .weight(1.5f),
+                    .weight(1.5f)
+                    .testTag("AmountTextField$id"),
                 label = { Text(text = "Times") },
                 placeholder = { Text(text = "0") },
                 value = if (task.requiredAmount != 0) task.requiredAmount.toString() else "",
@@ -894,16 +904,17 @@ fun CreateScreen(
 
     val context = LocalContext.current
 
-    //LOAD USER DATA IN MEMORY
-    LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
-        sharedViewModel.retrieveUserData(
-            sharedViewModel.getCurrentUserMail(),
-            context,
-        ){
-            currentUser.value = it
+    if(sharedViewModel.getCurrentUserMail()!=""){
+        //LOAD USER DATA IN MEMORY
+        LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
+            sharedViewModel.retrieveUserData(
+                sharedViewModel.getCurrentUserMail(),
+                context,
+            ){
+                currentUser.value = it
+            }
         }
     }
-
 
     Scaffold(
         topBar = { AppToolBar(title = "Create a new Skill", navController, sharedViewModel) },
@@ -1131,7 +1142,9 @@ fun CreateScreen(
                     }*/
 
                     Button(
-                        modifier = Modifier.padding(top = 10.dp),
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .testTag("SkillDoneButton"),
                         onClick = {
 
                         if(skillSections.value.isEmpty()){
@@ -1155,8 +1168,11 @@ fun CreateScreen(
                                 skill.value.skillDescription.isBlank() ||
                                 skill.value.titleSkill.isBlank()
                                 )) {
-                        Text(text = "DONE", fontSize = 20.sp, modifier = Modifier.fillMaxWidth(0.4f)
-                            .padding(vertical = 5.dp), textAlign = TextAlign.Center)
+                        Text(text = "DONE",
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                                .fillMaxWidth(0.4f)
+                                .padding(vertical = 5.dp), textAlign = TextAlign.Center)
                     }
                 }
 
