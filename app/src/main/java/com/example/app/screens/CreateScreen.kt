@@ -182,41 +182,31 @@ fun TextFieldInt(value: Int, onValueChange: (String) -> Unit){
 fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit, onCheckChange: (Boolean) -> Unit){
 
     Box(modifier = Modifier
-        .padding(15.dp, 10.dp)
+        .padding(0.dp, 30.dp)
     ){
         Column {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, bottom = 20.dp),
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    color = Color.DarkGray,
-                    thickness = 1.dp
-                )
 
-                Text(
-                    modifier = Modifier.padding(8.dp),
+                Text(text = "General Information", fontSize = 30.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
                     color = Color.DarkGray,
-                    text = "General Information",
-                    fontSize = 30.sp
-                )
-
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    color = Color.DarkGray,
-                    thickness = 1.dp
                 )
             }
-            Row (verticalAlignment = Alignment.CenterVertically)
-            {
 
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 2.dp),
+                color = Color.DarkGray
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Column(modifier = Modifier.padding(horizontal = 15.dp)) {
                 Text(text = "Title:",
                     fontSize = 20.sp,
                     color = Color.DarkGray,
@@ -241,58 +231,50 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                     maxLines = 1
                 )
 
+                Spacer(modifier = Modifier.size(relative(size = 10.dp)))
+
+                Text(text = "Description:",
+                    fontSize = 20.sp,
+                    color = Color.DarkGray,
+                    modifier = Modifier.padding(2.dp))
+
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    label = { Text(text = "Enter a Description") },
+                    value = skill.skillDescription,
+                    onValueChange = onDescriptionChange,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    singleLine = false
+                )
                 /*Box(
                     modifier = Modifier
-                        .background(color = Color(0xFFF0F0F0), shape = RoundedCornerShape(10))
+                        .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
                 ){
-                    TextFieldString(
-                        value = skill.titleSkill,
-                        onValueChange = onTitleChange,
-                        isSingleLine = true
-                    )
+                    TextFieldString(value = skill.skillDescription, onValueChange = onDescriptionChange, false)
                 }*/
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = skill.isPublic,
+                        onCheckedChange = onCheckChange,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = PrimaryColor
+                        )
+                    )
+                    Text(text = "Public Skill", color = Color.DarkGray, fontSize = 16.sp)
+                }
             }
 
-            Spacer(modifier = Modifier.size(relative(size = 10.dp)))
-            
-            Text(text = "Description:",
-                fontSize = 20.sp,
-                modifier = Modifier.padding(2.dp))
 
-            OutlinedTextField(
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = PrimaryColor,
-                    focusedLabelColor = PrimaryColor,
-                    focusedLeadingIconColor = PrimaryColor,
-                    focusedTextColor = Color.DarkGray,
-                    unfocusedTextColor = Color.DarkGray
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp),
-                label = { Text(text = "Enter a Description") },
-                value = skill.skillDescription,
-                onValueChange = onDescriptionChange,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                singleLine = false
-            )
-            /*Box(
-                modifier = Modifier
-                    .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
-            ){
-                TextFieldString(value = skill.skillDescription, onValueChange = onDescriptionChange, false)
-            }*/
-            
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = skill.isPublic,
-                    onCheckedChange = onCheckChange,
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = PrimaryColor
-                    )
-                    )
-                Text(text = "Public Skill", color = Color.DarkGray, fontSize = 16.sp)
-            }
         }
     }
 }
@@ -381,6 +363,7 @@ fun SectionBox(id:Int,
                     Icon(modifier = Modifier
                         .align(Alignment.TopEnd)
                         .zIndex(11F),
+                        tint = Color.DarkGray,
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "badge")
 
@@ -1155,7 +1138,8 @@ fun CreateScreen(
                                 skill.value.skillDescription.isBlank() ||
                                 skill.value.titleSkill.isBlank()
                                 )) {
-                        Text(text = "DONE", fontSize = 20.sp, modifier = Modifier.fillMaxWidth(0.4f)
+                        Text(text = "DONE", fontSize = 20.sp, modifier = Modifier
+                            .fillMaxWidth(0.4f)
                             .padding(vertical = 5.dp), textAlign = TextAlign.Center)
                     }
                 }
