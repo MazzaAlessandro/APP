@@ -86,6 +86,7 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
+import com.example.app.ui.theme.Bronze
 import com.example.app.ui.theme.PrimaryColor
 import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
@@ -181,42 +182,31 @@ fun TextFieldInt(value: Int, onValueChange: (String) -> Unit){
 fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescriptionChange: (String) -> Unit, onCheckChange: (Boolean) -> Unit){
 
     Box(modifier = Modifier
-        .padding(15.dp, 10.dp)
-        .testTag("GeneralInfoBox")
+        .padding(0.dp, 30.dp)
     ){
         Column {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp, bottom = 20.dp),
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    color = Color.DarkGray,
-                    thickness = 1.dp
-                )
 
-                Text(
-                    modifier = Modifier.padding(8.dp),
+                Text(text = "General Information", fontSize = 30.sp, modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
                     color = Color.DarkGray,
-                    text = "General Information",
-                    fontSize = 30.sp
-                )
-
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    color = Color.DarkGray,
-                    thickness = 1.dp
                 )
             }
-            Row (verticalAlignment = Alignment.CenterVertically)
-            {
 
+            Divider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp, 2.dp),
+                color = Color.DarkGray
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Column(modifier = Modifier.padding(horizontal = 15.dp)) {
                 Text(text = "Title:",
                     fontSize = 20.sp,
                     color = Color.DarkGray,
@@ -232,8 +222,7 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(2.dp)
-                        .testTag("TitleTextField"),
+                        .padding(2.dp),
                     label = { Text(text = "Enter a Title") },
                     value = skill.titleSkill,
                     onValueChange = onTitleChange,
@@ -242,60 +231,50 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
                     maxLines = 1
                 )
 
+                Spacer(modifier = Modifier.size(relative(size = 10.dp)))
+
+                Text(text = "Description:",
+                    fontSize = 20.sp,
+                    color = Color.DarkGray,
+                    modifier = Modifier.padding(2.dp))
+
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    label = { Text(text = "Enter a Description") },
+                    value = skill.skillDescription,
+                    onValueChange = onDescriptionChange,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    singleLine = false
+                )
                 /*Box(
                     modifier = Modifier
-                        .background(color = Color(0xFFF0F0F0), shape = RoundedCornerShape(10))
+                        .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
                 ){
-                    TextFieldString(
-                        value = skill.titleSkill,
-                        onValueChange = onTitleChange,
-                        isSingleLine = true
-                    )
+                    TextFieldString(value = skill.skillDescription, onValueChange = onDescriptionChange, false)
                 }*/
-            }
 
-            Spacer(modifier = Modifier.size(relative(size = 10.dp)))
-            
-            Text(text = "Description:",
-                fontSize = 20.sp,
-                modifier = Modifier.padding(2.dp))
-
-            OutlinedTextField(
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = PrimaryColor,
-                    focusedLabelColor = PrimaryColor,
-                    focusedLeadingIconColor = PrimaryColor,
-                    focusedTextColor = Color.DarkGray,
-                    unfocusedTextColor = Color.DarkGray
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp)
-                    .testTag("DescriptionTextField"),
-                label = { Text(text = "Enter a Description") },
-                value = skill.skillDescription,
-                onValueChange = onDescriptionChange,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                singleLine = false
-            )
-            /*Box(
-                modifier = Modifier
-                    .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
-            ){
-                TextFieldString(value = skill.skillDescription, onValueChange = onDescriptionChange, false)
-            }*/
-            
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = skill.isPublic,
-                    onCheckedChange = onCheckChange,
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = PrimaryColor
-                    ),
-                    modifier = Modifier.testTag("PublicCheckBox")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = skill.isPublic,
+                        onCheckedChange = onCheckChange,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = PrimaryColor
+                        )
                     )
-                Text(text = "Public Skill", color = Color.DarkGray, fontSize = 16.sp)
+                    Text(text = "Public Skill", color = Color.DarkGray, fontSize = 16.sp)
+                }
             }
+
+
         }
     }
 }
@@ -324,7 +303,6 @@ fun SectionBox(id:Int,
         .padding(5.dp)
         .background(color = Color.LightGray.copy(alpha = 0.2f), shape = RoundedCornerShape(10.dp))
         .border(1.dp, color = Color.Gray, RoundedCornerShape(10.dp))
-        .testTag("SectionBox$id")
     ){
         /*IconButton(
             onClick = {
@@ -385,13 +363,13 @@ fun SectionBox(id:Int,
                     Icon(modifier = Modifier
                         .align(Alignment.TopEnd)
                         .zIndex(11F),
+                        tint = Color.DarkGray,
                         imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "BadgeSelection")
+                        contentDescription = "badge")
 
                     DropdownMenu(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.testTag("DropdownBadge")
+                        onDismissRequest = { expanded = false }
                     ){
                         BadgeColor.values().forEachIndexed { index, badgeColor ->
 
@@ -420,8 +398,7 @@ fun SectionBox(id:Int,
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(2.dp, 0.dp, 2.dp, 2.dp)
-                            .testTag("SectionNameTextField"),
+                            .padding(2.dp, 0.dp, 2.dp, 2.dp),
                         label = { Text(text = "Enter a Name") },
                         value = section.titleSection,
                         onValueChange = onTitleChange,
@@ -446,8 +423,7 @@ fun SectionBox(id:Int,
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(2.dp, 0.dp, 2.dp, 2.dp)
-                            .testTag("SectionDescriptionTextField"),
+                            .padding(2.dp, 0.dp, 2.dp, 2.dp),
                         label = { Text(text = "Enter a Description") },
                         value = section.descriptionSection,
                         onValueChange = onDescriptionChange,
@@ -570,16 +546,14 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
 
         Row(modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
-            .testTag("TaskCreate$id"),
+            .padding(5.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween) {
 
             OutlinedTextField(
                 modifier = Modifier
                     .padding(2.dp)
-                    .weight(4f, true)
-                    .testTag("TaskDescriptionTextField$id"),
+                    .weight(4f, true),
                 label = { Text(text = "Task Description") },
                 value = task.taskDescription,
                 onValueChange = onDescriptionChange,
@@ -600,8 +574,7 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
 
                 modifier = Modifier
                     .padding(2.dp)
-                    .weight(1.5f)
-                    .testTag("AmountTextField$id"),
+                    .weight(1.5f),
                 label = { Text(text = "Times") },
                 placeholder = { Text(text = "0") },
                 value = if (task.requiredAmount != 0) task.requiredAmount.toString() else "",
@@ -904,17 +877,16 @@ fun CreateScreen(
 
     val context = LocalContext.current
 
-    if(sharedViewModel.getCurrentUserMail()!=""){
-        //LOAD USER DATA IN MEMORY
-        LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
-            sharedViewModel.retrieveUserData(
-                sharedViewModel.getCurrentUserMail(),
-                context,
-            ){
-                currentUser.value = it
-            }
+    //LOAD USER DATA IN MEMORY
+    LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
+        sharedViewModel.retrieveUserData(
+            sharedViewModel.getCurrentUserMail(),
+            context,
+        ){
+            currentUser.value = it
         }
     }
+
 
     Scaffold(
         topBar = { AppToolBar(title = "Create a new Skill", navController, sharedViewModel) },
@@ -1142,9 +1114,7 @@ fun CreateScreen(
                     }*/
 
                     Button(
-                        modifier = Modifier
-                            .padding(top = 10.dp)
-                            .testTag("SkillDoneButton"),
+                        modifier = Modifier.padding(top = 10.dp),
                         onClick = {
 
                         if(skillSections.value.isEmpty()){
@@ -1168,11 +1138,9 @@ fun CreateScreen(
                                 skill.value.skillDescription.isBlank() ||
                                 skill.value.titleSkill.isBlank()
                                 )) {
-                        Text(text = "DONE",
-                            fontSize = 20.sp,
-                            modifier = Modifier
-                                .fillMaxWidth(0.4f)
-                                .padding(vertical = 5.dp), textAlign = TextAlign.Center)
+                        Text(text = "DONE", fontSize = 20.sp, modifier = Modifier
+                            .fillMaxWidth(0.4f)
+                            .padding(vertical = 5.dp), textAlign = TextAlign.Center)
                     }
                 }
 

@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -67,6 +69,8 @@ import com.example.app.models.SkillProgressionModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserSkillSubsModel
+import com.example.app.ui.theme.PrimaryColor
+import com.example.app.ui.theme.greenColor
 import com.example.app.util.SharedViewModel
 import com.example.app.util.relative
 import java.time.ZonedDateTime
@@ -85,11 +89,9 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel, ba
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Color(0XFFF0F0F0),
-                RoundedCornerShape(10)
-            ) // Use the color of the background in your image
-            .padding(horizontal = 10.dp, vertical = 10.dp),
+            .background(Color.White, shape = RoundedCornerShape(10.dp))
+            .border(1.dp, Color.LightGray, RoundedCornerShape(10.dp))
+            .padding(10.dp),
 
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -97,17 +99,23 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel, ba
         Spacer(Modifier.width(10.dp)) // Space between the circle and the text
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                skillCompleteStructureModel.skillSection.titleSection,
-                fontSize = 20.sp,
+                color = Color.DarkGray,
+                text = skillCompleteStructureModel.skillSection.titleSection,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(skillCompleteStructureModel.skillSection.descriptionSection, fontSize = 16.sp)
+            Text(skillCompleteStructureModel.skillSection.descriptionSection, fontSize = 16.sp,
+                color = Color.DarkGray,
+            )
         }
         val completedAmount: Int =
             skillCompleteStructureModel.skillTasks.values.map { pair -> pair.first }.sum()
         val requiredAmount: Int =
             skillCompleteStructureModel.skillTasks.values.map { pair -> pair.second }.sum()
-        Text(text = "$completedAmount/$requiredAmount", fontSize = 20.sp)
+        Text(text = "$completedAmount/$requiredAmount", fontSize = 20.sp,
+            color = Color.DarkGray,
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
     }
 }
 
@@ -146,8 +154,8 @@ fun SkillListElement(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color(0XFFD9D9D9), RoundedCornerShape(10.dp))
-            .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
+            .background(color = Color.LightGray.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
             .padding(10.dp)
             .testTag("SkillListBlock"),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -161,7 +169,7 @@ fun SkillListElement(
                     onClick = { onSwapRequest(index, true) }
                 )
                 {
-                    Icon(imageVector = Icons.Default.ArrowUpward, contentDescription = "ArrowUp")
+                    Icon(imageVector = Icons.Default.ArrowUpward, tint = Color.DarkGray, contentDescription = "ArrowUp")
                 }
 
                 IconButton(
@@ -169,21 +177,32 @@ fun SkillListElement(
                     onClick = { onSwapRequest(index, false) }
                 )
                 {
-                    Icon(imageVector = Icons.Default.ArrowDownward, contentDescription = "ArrowDown")
+                    Icon(imageVector = Icons.Default.ArrowDownward, tint = Color.DarkGray, contentDescription = "ArrowDown")
                 }
             }
         }
 
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 skillCompleteStructureModel.skill.titleSkill,
-                modifier = Modifier.weight(1.0f),
-                fontSize = 25.sp,
+                modifier = Modifier.weight(1.0f).padding(start = 20.dp),
+                color = Color.DarkGray,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Start
             )
 
             Button(
+                modifier = Modifier.padding(end = 10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = PrimaryColor
+                ),
+                shape = RoundedCornerShape(10.dp),
+                contentPadding = PaddingValues(
+                    8.dp
+                ),
                 onClick = {
                     onOpenMenu(index)
                 }
@@ -211,27 +230,30 @@ fun SkillListElement(
                     .padding(15.dp, 0.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Divider(
+                    color = Color.DarkGray,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
-                    color = Color.Black,
-                    thickness = 1.dp
+                        .weight(1f)
+                        .padding(horizontal = 10.dp),
                 )
 
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = "Tasks",
+                    color = Color.DarkGray,
                     fontSize = 18.sp
                 )
 
                 Divider(
+                    color = Color.DarkGray,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
-                    color = Color.Black,
-                    thickness = 1.dp
+                        .weight(1f)
+                        .padding(horizontal = 10.dp),
                 )
+
             }
 
             var completedTasks = 0
@@ -369,13 +391,13 @@ fun CustomProgressIndicator(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White, RoundedCornerShape(15))
-                    .border(1.dp, Color.Black, RoundedCornerShape(15))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(15))
             )
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .background(color, RoundedCornerShape(15))
-                    .border(1.dp, Color.Black, RoundedCornerShape(15))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(15))
                     .fillMaxWidth(amount.toFloat() / required.toFloat())
             )
         }
@@ -386,12 +408,14 @@ fun CustomProgressIndicator(
         ) {
             Text(
                 text = description,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1.0f)
+                color = Color.DarkGray,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.weight(1.0f).padding(start = 40.dp)
             )
 
             Text(
                 text = isDoneText,
+                color = Color.DarkGray,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
 
@@ -411,7 +435,7 @@ fun ComputeListTaskAdd1(
 
     val basedNumber = updatedStructure.skillTasks[task]!!.first
     var updatedMap = updatedStructure.skillTasks.toMutableMap()
-    //Toast.makeText(context, minOf(basedNumber + 1, task.requiredAmount).toString(), Toast.LENGTH_SHORT).show()
+
     updatedMap.set(task, Pair(minOf(basedNumber + 1, task.requiredAmount), task.requiredAmount))
 
     var updatedProgression = updatedStructure.skillProgression
@@ -448,7 +472,6 @@ fun ComputeListTaskSub1(
     var newAmount = 0
 
     if (task.id in result.mapNonCompletedTasks.keys) {
-        Toast.makeText(context, result.mapNonCompletedTasks.get(task.id).toString(), Toast.LENGTH_SHORT).show()
         newAmount = max((result.mapNonCompletedTasks.get(task.id) ?: 0) - 1, 0)
     } else {
         newAmount = task.requiredAmount - 1
@@ -889,9 +912,15 @@ fun MySkillsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             //verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Box(modifier = Modifier.clickable { /*onAddBadgeProcess(id.toString())*/ sortingMenuExp.value =
-                !sortingMenuExp.value
-            }) {
+            Box(modifier = Modifier
+                .padding(vertical = 20.dp, horizontal = 5.dp)
+                .background(Color.LightGray.copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+                .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+                .fillMaxWidth()
+                .padding(vertical = 15.dp),
+                contentAlignment = Alignment.Center
+            )
+            {
                 Row(horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
                     var order = "Custom"
@@ -901,31 +930,52 @@ fun MySkillsScreen(
                         order = "Date Asc"
                     if(sortingType.value == SortingType.DateDesc)
                         order = "Date Desc"
-                    Text("Order by: $order")
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "OrderingArrow"
-                    )
+
+
+                    Row(modifier = Modifier.clickable { /*onAddBadgeProcess(id.toString())*/ sortingMenuExp.value =
+                        !sortingMenuExp.value
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+
+                    ) {
+                        Text("Order by: $order",
+                            modifier = Modifier.padding(start = 10.dp),
+                            fontSize = 20.sp,
+                            color = Color.DarkGray,
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            tint = Color.DarkGray,
+                            contentDescription = "OrderingArrow",
+                        )
+
+                        DropdownMenu(
+                            modifier = Modifier.padding(top = 10.dp),
+                            expanded = sortingMenuExp.value,
+                            onDismissRequest = { sortingMenuExp.value = false }
+                        ) {
+                            DropdownMenuItem(text = { Text(text = "Custom") }, onClick = {
+                                sortingMenuExp.value = false
+                                sortingType.value = SortingType.Custom
+                                listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                            })
+
+                            DropdownMenuItem(text = { Text(text = "Starting Date Asc") }, onClick = {
+                                sortingMenuExp.value = false
+                                sortingType.value = SortingType.DateAsc
+                                listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                            })
+                            DropdownMenuItem(text = { Text(text = "Starting Date Desc") }, onClick = {
+                                sortingMenuExp.value = false
+                                sortingType.value = SortingType.DateDesc
+                                listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                            })
+                        }
+                    }
+
                 }
 
-                DropdownMenu(
-                    expanded = sortingMenuExp.value,
-                    onDismissRequest = { sortingMenuExp.value = false }
-                ) {
-                    DropdownMenuItem(text = { Text(text = "Custom") }, onClick = {
-                        sortingMenuExp.value = false
-                        sortingType.value = SortingType.Custom
-                    })
 
-                    DropdownMenuItem(text = { Text(text = "Date Asc") }, onClick = {
-                        sortingMenuExp.value = false
-                        sortingType.value = SortingType.DateAsc
-                    })
-                    DropdownMenuItem(text = { Text(text = "Date Desc") }, onClick = {
-                        sortingMenuExp.value = false
-                        sortingType.value = SortingType.DateDesc
-                    })
-                }
 
             }
 
@@ -1156,8 +1206,8 @@ fun BadgeCompletedPopUp(
                 Modifier
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.6f)
-                    .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .clip(shape = RoundedCornerShape(10.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surface),
             ) {
                 IconButton(
@@ -1168,7 +1218,7 @@ fun BadgeCompletedPopUp(
                         .align(Alignment.TopEnd)
                         .zIndex(11F),
                 ) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "close")
+                    Icon(imageVector = Icons.Default.Close, tint = Color.DarkGray, contentDescription = "close")
                 }
 
                 Column(
@@ -1178,11 +1228,15 @@ fun BadgeCompletedPopUp(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text("CONGRATULATIONS!", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+                    Text("CONGRATULATIONS!", fontSize = 30.sp, fontWeight = FontWeight.Bold,
+                        color = Color.DarkGray,
+                    )
 
                     BadgeIcon(badge = badge.badgeColor, size = relative(150.dp))
 
-                    Text("You just obtained a", fontSize = 24.sp)
+                    Text("You just obtained a", fontSize = 24.sp,
+                        color = Color.DarkGray,
+                    )
 
                     var color : String = "BRONZE MEDAL"
 
@@ -1192,11 +1246,17 @@ fun BadgeCompletedPopUp(
                     if(badge.badgeColor == BadgeColor.GOLD)
                         color = "GOLD MEDAL"
 
-                    Text(text = color, fontSize = 27.sp)
+                    Text(text = color, fontSize = 27.sp,
+                        color = Color.DarkGray,
+                    )
 
-                    Text(badge.badgeName, fontSize = 20.sp)
+                    Text(badge.badgeName, fontSize = 20.sp,
+                        color = Color.DarkGray,
+                    )
 
-                    Text(badge.description, fontSize = 20.sp)
+                    Text(badge.description, fontSize = 20.sp,
+                        color = Color.DarkGray,
+                    )
                 }
             }
         }
