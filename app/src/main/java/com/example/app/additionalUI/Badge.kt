@@ -63,7 +63,7 @@ fun BadgeIcon(
     size : Dp,
     filled : Boolean = true
 ){
-    var id = R.drawable.empty
+    var id = R.drawable.emptyv2
 
     if(filled){
         id = when (badge) {

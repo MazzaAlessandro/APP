@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.app.screens
 
 import android.content.Context
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -35,6 +38,7 @@ import androidx.compose.material.icons.filled.KeyboardHide
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -83,6 +87,7 @@ import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserDataModel
 import com.example.app.ui.theme.Bronze
+import com.example.app.ui.theme.PrimaryColor
 import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.redColor
 import com.example.app.ui.theme.yellowColor
@@ -182,28 +187,30 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
         Column {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, bottom = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    color = Color.Black,
+                    color = Color.DarkGray,
                     thickness = 1.dp
                 )
 
                 Text(
                     modifier = Modifier.padding(8.dp),
+                    color = Color.DarkGray,
                     text = "General Information",
-                    fontSize = 20.sp
+                    fontSize = 30.sp
                 )
 
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    color = Color.Black,
+                    color = Color.DarkGray,
                     thickness = 1.dp
                 )
             }
@@ -211,10 +218,18 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
             {
 
                 Text(text = "Title:",
-                    fontSize = 25.sp,
+                    fontSize = 20.sp,
+                    color = Color.DarkGray,
                     modifier = Modifier.padding(2.dp))
 
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
@@ -241,10 +256,17 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
             Spacer(modifier = Modifier.size(relative(size = 10.dp)))
             
             Text(text = "Description:",
-                fontSize = 15.sp,
+                fontSize = 20.sp,
                 modifier = Modifier.padding(2.dp))
 
             OutlinedTextField(
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = PrimaryColor,
+                    focusedLabelColor = PrimaryColor,
+                    focusedLeadingIconColor = PrimaryColor,
+                    focusedTextColor = Color.DarkGray,
+                    unfocusedTextColor = Color.DarkGray
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(2.dp),
@@ -262,8 +284,14 @@ fun GeneralInfoBox(skill:SkillModel, onTitleChange: (String) -> Unit, onDescript
             }*/
             
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = skill.isPublic, onCheckedChange = onCheckChange)
-                Text(text = "Public Skill")
+                Checkbox(
+                    checked = skill.isPublic,
+                    onCheckedChange = onCheckChange,
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = PrimaryColor
+                    )
+                    )
+                Text(text = "Public Skill", color = Color.DarkGray, fontSize = 16.sp)
             }
         }
     }
@@ -291,7 +319,8 @@ fun SectionBox(id:Int,
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(5.dp)
-        .background(color = Color.Gray.copy(0.25f), shape = RoundedCornerShape(10.dp))
+        .background(color = Color.LightGray.copy(alpha = 0.2f), shape = RoundedCornerShape(10.dp))
+        .border(1.dp, color = Color.Gray, RoundedCornerShape(10.dp))
     ){
         /*IconButton(
             onClick = {
@@ -337,7 +366,8 @@ fun SectionBox(id:Int,
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = "Section $i",
-                    fontSize = 20.sp,
+                    color = Color.DarkGray,
+                    fontSize = 25.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -378,8 +408,9 @@ fun SectionBox(id:Int,
 
                 Column {
                     Text(text = "Name:",
-                        fontSize = 15.sp,
-                        modifier = Modifier.padding(2.dp, 2.dp, 2.dp, 0.dp))
+                        fontSize = 18.sp,
+                        color = Color.DarkGray,
+                        modifier = Modifier.padding(2.dp, 7.dp, 2.dp, 0.dp))
 
                     OutlinedTextField(
                         modifier = Modifier
@@ -392,15 +423,19 @@ fun SectionBox(id:Int,
                         enabled = !done.value,
                         singleLine = true,
                         maxLines = 1,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.White)
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = PrimaryColor,
+                            focusedLabelColor = PrimaryColor,
+                            focusedLeadingIconColor = PrimaryColor,
+                            focusedTextColor = Color.DarkGray,
+                            unfocusedTextColor = Color.DarkGray
+                        ),
                     )
 
                     Text(text = "Description:",
-                        fontSize = 15.sp,
-                        modifier = Modifier.padding(2.dp, 2.dp, 2.dp, 0.dp))
+                        fontSize = 18.sp,
+                        color = Color.DarkGray,
+                        modifier = Modifier.padding(2.dp, 7.dp, 2.dp, 0.dp))
 
                     OutlinedTextField(
                         modifier = Modifier
@@ -412,11 +447,13 @@ fun SectionBox(id:Int,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         enabled = !done.value,
                         singleLine = false,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.White,
-                        )
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = PrimaryColor,
+                            focusedLabelColor = PrimaryColor,
+                            focusedLeadingIconColor = PrimaryColor,
+                            focusedTextColor = Color.DarkGray,
+                            unfocusedTextColor = Color.DarkGray
+                        ),
                     )
                 }
             }
@@ -428,7 +465,11 @@ fun SectionBox(id:Int,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Tasks", fontSize = 20.sp)
+                Text(
+                    text = "Tasks",
+                    color = Color.DarkGray,
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    fontSize = 25.sp)
 
                 var num = listTasks.size
 
@@ -446,7 +487,7 @@ fun SectionBox(id:Int,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp, 2.dp),
-                color = Color.Black
+                color = Color.DarkGray
             )
 
             if(listTasks.isEmpty()){
@@ -477,6 +518,7 @@ fun SectionBox(id:Int,
                 horizontalArrangement = Arrangement.SpaceAround){
 
                 Button(onClick = {onDeleteSection(id)},
+                    shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = redColor)) {
                     Row{
                         Text(text = "DELETE", modifier = Modifier.padding(2.dp))
@@ -486,6 +528,7 @@ fun SectionBox(id:Int,
 
                 if(done.value){
                     Button(onClick = {done.value = false},
+                        shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = yellowColor)) {
                         Row{
                             Text(text = "EDIT", modifier = Modifier.padding(2.dp))
@@ -496,6 +539,7 @@ fun SectionBox(id:Int,
                 else{
                     Button(onClick = {done.value = true},
                         colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                        shape = RoundedCornerShape(10.dp),
                         enabled = !(section.titleSection.isBlank() ||
                                 section.descriptionSection.isBlank() ||
                                 listTasks.isEmpty() ||
@@ -534,14 +578,17 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                 maxLines = 1,
                 singleLine = true,
                 enabled = enabled,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    disabledContainerColor = Color.White,
-                )
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = PrimaryColor,
+                    focusedLabelColor = PrimaryColor,
+                    focusedLeadingIconColor = PrimaryColor,
+                    focusedTextColor = Color.DarkGray,
+                    unfocusedTextColor = Color.DarkGray
+                ),
             )
 
             OutlinedTextField(
+
                 modifier = Modifier
                     .padding(2.dp)
                     .weight(1.5f),
@@ -563,11 +610,13 @@ fun TaskBox(id:Int, task:SkillTaskModel, onDescriptionChange: (String) -> Unit, 
                 maxLines = 1,
                 singleLine = true,
                 enabled = enabled,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    disabledContainerColor = Color.White,
-                )
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = PrimaryColor,
+                    focusedLabelColor = PrimaryColor,
+                    focusedLeadingIconColor = PrimaryColor,
+                    focusedTextColor = Color.DarkGray,
+                    unfocusedTextColor = Color.DarkGray
+                ),
             )
 
             IconButton(modifier = Modifier.weight(0.5f),
@@ -654,7 +703,7 @@ fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeN
                     .fillMaxWidth()
                     .fillMaxHeight(0.75f)
                     .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface)
                 //.verticalScroll(rememberScrollState()),
             ) {
@@ -895,7 +944,10 @@ fun CreateScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Sections", fontSize = 20.sp)
+
+                        Text(text = "Sections", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            color = Color.DarkGray,
+                        )
 
                         var num = skillSections.value.size
 
@@ -904,42 +956,22 @@ fun CreateScreen(
                             fontSize = 15.sp,
                             color = Color.Gray
                         )
+
+                        /*Icon(imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = null,
+                            Modifier.clickable {  })*/
+
                     }
 
                     Divider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(10.dp, 2.dp),
-                        color = Color.Black
+                        color = Color.DarkGray
                     )
-                    /*Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(15.dp, 0.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            color = Color.Black,
-                            thickness = 1.dp
-                        )
 
-                        Text(
-                            modifier = Modifier.padding(8.dp),
-                            text = "Skill Sections",
-                            fontSize = 20.sp
-                        )
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f),
-                            color = Color.Black,
-                            thickness = 1.dp
-                        )
-                    }*/
                 }
 
                 if(skillSections.value.isEmpty()){
@@ -953,15 +985,20 @@ fun CreateScreen(
                                 color = Color.Gray,
                                 textAlign = TextAlign.Center)
 
-                            Button(onClick = {
+                            Button(
+                                modifier = Modifier.padding(vertical = 10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                                onClick = {var updatedSkillSections = skillSections.value.toMutableList()
+                                    updatedSkillSections.add(0, SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf()))
 
-                                var updatedSkillSections = skillSections.value.toMutableList()
-                                updatedSkillSections.add(0, SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf()))
+                                    skillSections.value = updatedSkillSections
+                                    sectionIdCounter.value += 1},
+                                shape = RoundedCornerShape(10.dp),
+                            ) {
+                                Text(text = "ADD A SECTION", fontSize = 20.sp, modifier = Modifier
+                                    .fillMaxWidth(0.6f)
+                                    .padding(vertical = 3.dp), textAlign = TextAlign.Center)
 
-                                skillSections.value = updatedSkillSections
-                                sectionIdCounter.value += 1
-                            }) {
-                                Text(text = "ADD A SECTION")
                             }
                         }
                     }
@@ -1063,11 +1100,20 @@ fun CreateScreen(
                     }
 
                     item{
-                        Button(onClick = {
-                            skillSections.value = skillSections.value + SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf())
-                            sectionIdCounter.value += 1
-                        }) {
-                            Text(text = "ADD A SECTION")
+
+                        Button(
+                            modifier = Modifier.padding(vertical = 10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                            onClick = {
+                                skillSections.value = skillSections.value + SkillSectionModel(id = sectionIdCounter.value.toString(), idSkill = skillID, titleSection = "", skillTasksList = mutableListOf())
+                                sectionIdCounter.value += 1
+                            },
+                            shape = RoundedCornerShape(10.dp),
+                        ) {
+                            Text(text = "ADD A SECTION", fontSize = 20.sp, modifier = Modifier
+                                .fillMaxWidth(0.6f)
+                                .padding(vertical = 3.dp), textAlign = TextAlign.Center)
+
                         }
                     }
                 }
@@ -1084,7 +1130,9 @@ fun CreateScreen(
                         Text(text = "ADD SECTION +")
                     }*/
 
-                    Button(onClick = {
+                    Button(
+                        modifier = Modifier.padding(top = 10.dp),
+                        onClick = {
 
                         if(skillSections.value.isEmpty()){
                             Toast.makeText(context, "THERE ARE NO SECTIONS", Toast.LENGTH_SHORT).show()
@@ -1099,6 +1147,7 @@ fun CreateScreen(
                         navController.navigate("Search")
                     },
                         colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                        shape = RoundedCornerShape(10.dp),
                         enabled = !(skillSections.value.isEmpty() ||
                                 skillTasks.value.any { it.value.isEmpty() ||
                                         it.value.any { it.taskDescription.isBlank() || it.requiredAmount == 0 } } ||
@@ -1106,7 +1155,8 @@ fun CreateScreen(
                                 skill.value.skillDescription.isBlank() ||
                                 skill.value.titleSkill.isBlank()
                                 )) {
-                        Text(text = "DONE")
+                        Text(text = "DONE", fontSize = 20.sp, modifier = Modifier.fillMaxWidth(0.4f)
+                            .padding(vertical = 5.dp), textAlign = TextAlign.Center)
                     }
                 }
 
