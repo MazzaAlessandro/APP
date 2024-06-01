@@ -135,10 +135,11 @@ fun BadgesScreen(
                         focusedTextColor = Color.DarkGray,
                         unfocusedTextColor = Color.DarkGray
                     ),
+                    shape = RoundedCornerShape(10.dp),
                     value = badgeTitleEditText.value,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp),
+                        .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                     onValueChange = { badgeTitleEditText.value = it },
                     label = { Text(text = "Search a skill by name") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
