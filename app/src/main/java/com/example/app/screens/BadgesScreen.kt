@@ -5,20 +5,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -40,12 +49,14 @@ import com.example.app.additionalUI.BadgeColor
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.models.BadgeDataModel
 import com.example.app.models.UserSkillSubsModel
+import com.example.app.ui.theme.PrimaryColor
 import com.example.app.util.SharedViewModel
 import com.example.app.util.WindowInfo
 import com.example.app.util.rememberWindowInfo
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgesScreen(
     navController: NavHostController,
@@ -116,11 +127,18 @@ fun BadgesScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     value = badgeTitleEditText.value,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
+                        .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp),
                     onValueChange = { badgeTitleEditText.value = it },
                     label = { Text(text = "Search a skill by name") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -132,8 +150,46 @@ fun BadgesScreen(
                     },
                 )
 
+                Spacer(Modifier.height(30.dp))
 
-                if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(text = "Badges Obtained", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        color = Color.DarkGray,
+                    )
+
+                    Text(
+                        text = badgeList.value.filter { badgeTitleEditText.value.lowercase() in it.badgeName.lowercase() }
+                            .count().toString() + " elements",
+                        fontSize = 15.sp,
+                        color = Color.Gray
+                    )
+
+                    /*Icon(imageVector = Icons.Default.KeyboardArrowUp,
+                        contentDescription = null,
+                        Modifier.clickable {  })*/
+
+                }
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 2.dp),
+                    color = Color.DarkGray
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+
+
+
+            if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
                     var list = badgeList.value
                         .filter { badgeTitleEditText.value in it.badgeName }
                         .sortedBy { it.date }
@@ -211,6 +267,10 @@ fun BadgesScreen(
                     )
 
                     Button(
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PrimaryColor
+                        ),
                         onClick = {
                             navController.navigate(Routes.MySkills.route)
                         },

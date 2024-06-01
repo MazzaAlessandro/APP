@@ -16,7 +16,7 @@ import java.util.Date
 data class SkillModel(
     var id: String = "",
     var creatorEmail: String = "",
-    var titleSkill: String = " ",
+    var titleSkill: String = "",
     var skillDescription: String = "",
     var dateTime: String = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
     var isPublic: Boolean = false,

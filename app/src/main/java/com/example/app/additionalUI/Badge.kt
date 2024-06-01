@@ -103,7 +103,7 @@ fun BadgeBanner(
     onClick: () -> Unit
 ){
     var iconSize: Dp = 60.dp
-    var fontSize = 15
+    var fontSize = 20
 
     if (size == BannerSize.SMALL){
         iconSize = 45.dp
@@ -118,10 +118,10 @@ fun BadgeBanner(
     Box(modifier = Modifier
         .fillMaxWidth()
         .testTag("Banner")
-        .padding(5.dp, 2.dp)
+        .padding(10.dp, 7.dp)
         .clip(shape = RoundedCornerShape(10.dp))
-        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-        .background(Color.Gray.copy(alpha = 0.2f))
+        .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+        .background(Color.LightGray.copy(alpha = 0.2f))
         .clickable {
             onClick()
         },
@@ -139,14 +139,16 @@ fun BadgeBanner(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = skillName,
+                    color = Color.DarkGray,
                     fontSize = fontSize.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
 
                 Text(text = description,
-                    fontSize = (fontSize + 1).sp,
-                    lineHeight = (fontSize + 1).sp,
+                    color = Color.DarkGray,
+                    fontSize = (fontSize - 5).sp,
+                    lineHeight = (fontSize - 5).sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis)
 
@@ -230,7 +232,7 @@ fun BadgeCard(
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.6f)
                     .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface),
             ) {
                 IconButton(
@@ -262,7 +264,7 @@ fun BadgeCard(
                                 Color(0XFFF0F0F0),
                                 RoundedCornerShape(10)
                             ) // Use the color of the background in your image
-                            .border(1.dp, Color.Black, RoundedCornerShape(10))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -309,7 +311,7 @@ fun BadgeCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
@@ -323,7 +325,7 @@ fun BadgeCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -341,7 +343,7 @@ fun BadgeCard(
                                 modifier = Modifier.padding(15.dp),
                                 fontSize = 16.sp,
                                 textAlign = TextAlign.Center,
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
                         }
                     }
@@ -359,7 +361,7 @@ fun BadgeCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
@@ -373,7 +375,7 @@ fun BadgeCard(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -386,7 +388,7 @@ fun BadgeCard(
                                     Color(0XFFF0F0F0),
                                     RoundedCornerShape(10)
                                 ) // Use the color of the background in your image
-                                .border(1.dp, Color.Black, RoundedCornerShape(10))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
                                 .padding(horizontal = 40.dp, vertical = 17.dp),
 
                             verticalArrangement = Arrangement.SpaceAround,
