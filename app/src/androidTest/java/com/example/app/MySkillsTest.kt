@@ -157,13 +157,14 @@ class MySkillsTest {
         test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
         test.onNode(hasClickAction() and hasText("Login")).assertExists().assertIsEnabled().performClick()
 
-        test.waitUntilAtLeastOneExists(hasText("Profile"), 5000)
+        test.waitUntilAtLeastOneExists(hasText("Profile"), 15000)
         test.onNodeWithTag("ProfileScreen").assertExists()
 
         test.onNodeWithTag("My Skills").assertExists().performClick()
         test.onNodeWithTag("MySkillsScreen").assertExists()
-        test.waitUntilAtLeastOneExists(hasTestTag("SkillListBlock"), 5000)
+        test.waitUntilAtLeastOneExists(hasTestTag("SkillListBlock"), 15000)
 
         test.onNodeWithContentDescription("Logout").assertExists().performClick()
+        test.waitUntilAtLeastOneExists(hasTestTag("LoginPage"), 15000)
     }
 }

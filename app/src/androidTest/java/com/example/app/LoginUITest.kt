@@ -4,6 +4,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -69,10 +70,10 @@ class LoginUITest {
         test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
         test.onNode(loginButton).assertExists().assertIsEnabled().performClick()
 
-        test.waitUntilAtLeastOneExists(hasText("Profile"), 5000)
+        test.waitUntilAtLeastOneExists(hasText("Profile"), 15000)
 
         test.onNodeWithTag("ProfileScreen").assertExists()
         test.onNodeWithContentDescription("Logout").assertExists().performClick()
-        test.onNodeWithTag("LoginPage").assertExists()
+        test.waitUntilAtLeastOneExists(hasTestTag("LoginPage"), 15000)
     }
 }

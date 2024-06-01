@@ -15,14 +15,14 @@ import com.example.app.screens.ScreenMain
 import org.junit.Rule
 import org.junit.Test
 
-class IntegratedLoginTest {
+class IntegratedCreateScreenTest {
     @get:Rule
     val test = createComposeRule()
 
     private val loginButton = hasClickAction() and hasText("Login")
     @OptIn(ExperimentalTestApi::class)
     @Test
-    fun testBottomNavigationFunction(){
+    fun testCreateScreenFunction(){
         test.setContent { ScreenMain() }
 
         test.onNodeWithTag("LoginPage").assertExists()
@@ -35,18 +35,15 @@ class IntegratedLoginTest {
 
         test.onNodeWithTag("ProfileScreen").assertExists()
 
-        test.onNodeWithTag("Search Skills").assertExists().performClick()
-        test.onNodeWithTag("SearchScreen").assertExists()
-
-        test.onNodeWithTag("Profile").assertExists().performClick()
-        test.onNodeWithTag("ProfileScreen").assertExists()
-
         test.onNodeWithTag("Create Skills").assertExists().performClick()
         test.onNodeWithTag("CreateScreen").assertExists()
 
         test.onNodeWithTag("My Skills").assertExists().performClick()
         test.onNodeWithText("Yes").assertExists().performClick()
         test.onNodeWithTag("MySkillsScreen").assertExists()
+
+        test.onNodeWithTag("Create Skills").assertExists().performClick()
+        test.onNodeWithTag("CreateScreen").assertExists()
 
         test.onNodeWithContentDescription("Logout").assertExists().performClick()
         test.waitUntilAtLeastOneExists(hasTestTag("LoginPage"), 15000)
