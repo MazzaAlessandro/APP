@@ -3,18 +3,22 @@ package com.example.app.screens
 import android.content.pm.ActivityInfo
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.app.Routes
+import com.example.app.ui.theme.PrimaryColor
 import com.example.app.util.LockScreenOrientation
 import com.example.app.util.SharedViewModel
 import com.example.app.util.SkillRepository
@@ -97,11 +101,17 @@ fun ScreenMain(){
 
     if (openDialog.value) {
         AlertDialog(
+            shape = RoundedCornerShape(10.dp),
             onDismissRequest = { openDialog.value = false },
             title = { Text("Confirm Navigation") },
             text = { Text("Are you sure you want to navigate away from this page?") },
             confirmButton = {
-                Button(onClick = {
+                Button(
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryColor
+                    ),
+                    onClick = {
                     openDialog.value = false
                     pendingRoute.value?.let {
                         navController.navigate(it) {
@@ -115,7 +125,12 @@ fun ScreenMain(){
                 }
             },
             dismissButton = {
-                Button(onClick = { openDialog.value = false }) {
+                Button(
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryColor
+                    ),
+                    onClick = { openDialog.value = false }) {
                     Text("No")
                 }
             }
