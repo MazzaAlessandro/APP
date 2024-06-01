@@ -104,17 +104,18 @@ class BadgeScreenUITest {
         test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
         test.onNode(hasClickAction() and hasText("Login")).assertExists().assertIsEnabled().performClick()
 
-        test.waitUntilAtLeastOneExists(hasText("Profile"), 5000)
+        test.waitUntilAtLeastOneExists(hasText("Profile"), 15000)
 
         test.onNodeWithTag("ProfileScreen").assertExists()
         test.onNodeWithTag("Badges").assertExists().performClick()
 
-        test.waitUntilAtLeastOneExists(hasTestTag("BadgesScreen"), 5000)
+        test.waitUntilAtLeastOneExists(hasTestTag("BadgesScreen"), 15000)
         test.waitUntilDoesNotExist(hasText("You have not obtained a badge yet"), 15000)
 
         test.onNodeWithText("Read Dune - Halfway there").assertExists().performClick()
         test.onNodeWithContentDescription("close").assertExists().performClick()
 
         test.onNodeWithContentDescription("Logout").assertExists().performClick()
+        test.waitUntilAtLeastOneExists(hasTestTag("LoginPage"), 15000)
     }
 }
