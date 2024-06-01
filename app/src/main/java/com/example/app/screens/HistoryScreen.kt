@@ -21,15 +21,19 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -61,6 +65,9 @@ import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserSkillSubsModel
+import com.example.app.ui.theme.PrimaryColor
+import com.example.app.ui.theme.greenColor
+import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -79,13 +86,12 @@ fun HistBan_Badge(
     onClick: () -> Unit
 ){
 
-    val colorCircle = MaterialTheme.colorScheme.primary
     var iconSize: Dp = 60.dp
     var fontSize = 15
 
     if (size == BannerSize.SMALL){
         iconSize = 45.dp
-        fontSize = 12
+        fontSize = 15
     }
 
     if (size == BannerSize.LARGE){
@@ -95,13 +101,14 @@ fun HistBan_Badge(
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(5.dp, 2.dp)
+        .padding(5.dp, 7.dp)
         .clip(shape = RoundedCornerShape(10.dp))
-        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-        .background(Color.Gray.copy(alpha = 0.2f))
+        .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+        .background(Color.LightGray.copy(alpha = 0.2f))
         .clickable {
             onClick()
-        }.testTag("Banner"),
+        }
+        .testTag("Banner"),
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -112,18 +119,18 @@ fun HistBan_Badge(
                 modifier = Modifier
                     .padding(end = 15.dp)
                     .background(Color.White, RoundedCornerShape(10.dp))
-                    .border(1.dp, colorCircle, RoundedCornerShape(10.dp))
+                    .border(1.dp, PrimaryColor, RoundedCornerShape(10.dp))
                     .padding(horizontal = 5.dp, vertical = 3.dp)
                     .testTag("timeStamp"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Text(
                     text = dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                    color = colorCircle
+                    color = PrimaryColor
                 )
                 Text(
                     text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-                    color = colorCircle
+                    color = PrimaryColor
                 )
             }
 
@@ -131,10 +138,10 @@ fun HistBan_Badge(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Text(text = "Badge Obtained", color = Color.Cyan, fontSize = (fontSize + 3).sp, fontWeight = FontWeight.Bold,
+                Text(text = "Badge Obtained", color = yellowColor, fontSize = (fontSize + 5).sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .background(Color.White, RoundedCornerShape(10.dp))
-                        .border(1.dp, Color.Cyan, RoundedCornerShape(10.dp))
+                        .border(1.dp, yellowColor, RoundedCornerShape(10.dp))
                         .padding(vertical = 2.dp, horizontal = 5.dp)
                 )
 
@@ -145,7 +152,7 @@ fun HistBan_Badge(
                 )
 
 
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     BadgeIcon(badge.badgeColor, iconSize, true)
                     Column(
                         modifier = Modifier
@@ -154,9 +161,9 @@ fun HistBan_Badge(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = badge.badgeName, fontSize = (fontSize+3).sp, fontWeight = FontWeight.Bold)
+                        Text(text = badge.badgeName, fontSize = (fontSize+5).sp, fontWeight = FontWeight.Bold)
 
-                        Text(text = badge.description, fontSize = (fontSize + 1).sp, lineHeight = (fontSize + 1).sp)
+                        Text(text = badge.description, fontSize = (fontSize).sp)
                     }
                 }
             }
@@ -173,13 +180,12 @@ fun HistBan_SkillFin(
     onClick: () -> Unit
 ){
 
-    val colorCircle = MaterialTheme.colorScheme.primary
     var iconSize: Dp = 60.dp
     var fontSize = 15
 
     if (size == BannerSize.SMALL){
         iconSize = 45.dp
-        fontSize = 12
+        fontSize = 15
     }
 
     if (size == BannerSize.LARGE){
@@ -189,13 +195,14 @@ fun HistBan_SkillFin(
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(5.dp, 2.dp)
+        .padding(5.dp, 7.dp)
         .clip(shape = RoundedCornerShape(10.dp))
-        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-        .background(Color.Gray.copy(alpha = 0.2f))
+        .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+        .background(Color.LightGray.copy(alpha = 0.2f))
         .clickable {
             onClick()
-        }.testTag("SkillFinBanner"),
+        }
+        .testTag("SkillFinBanner"),
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -206,18 +213,18 @@ fun HistBan_SkillFin(
                 modifier = Modifier
                     .padding(end = 15.dp)
                     .background(Color.White, RoundedCornerShape(10.dp))
-                    .border(1.dp, colorCircle, RoundedCornerShape(10.dp))
+                    .border(1.dp, PrimaryColor, RoundedCornerShape(10.dp))
                     .padding(horizontal = 5.dp, vertical = 3.dp)
                     .testTag("timeStamp"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Text(
                     text = dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                    color = colorCircle
+                    color = PrimaryColor
                 )
                 Text(
                     text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-                    color = colorCircle
+                    color = PrimaryColor
                 )
             }
 
@@ -228,12 +235,12 @@ fun HistBan_SkillFin(
 
                 Text(
                     text = "Skill Finished",
-                    color = Color.Green,
-                    fontSize = (fontSize + 3).sp,
+                    color = greenColor,
+                    fontSize = (fontSize + 5).sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .background(Color.White, RoundedCornerShape(10.dp))
-                        .border(1.dp, Color.Green, RoundedCornerShape(10.dp))
+                        .border(1.dp, greenColor, RoundedCornerShape(10.dp))
                         .padding(vertical = 2.dp, horizontal = 5.dp)
                 )
 
@@ -243,16 +250,14 @@ fun HistBan_SkillFin(
                         .padding(vertical = 10.dp)
                 )
 
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
 
                     Box(
                         modifier = Modifier
-                            .size(iconSize) // Set the size of the circle
-                            .background(
-                                colorCircle,
-                                shape = CircleShape
-                            ) // Use the color of the circle in your image
-                    )
+                            .size(iconSize)
+                    ){
+                        Icon(imageVector = Icons.Filled.RadioButtonChecked, "SkillLogo",  modifier = Modifier.fillMaxSize(), tint = PrimaryColor)
+                    }
 
                     Column(
                         modifier = Modifier
@@ -261,9 +266,9 @@ fun HistBan_SkillFin(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = skillModel.titleSkill, fontSize = (fontSize+3).sp, fontWeight = FontWeight.Bold)
+                        Text(text = skillModel.titleSkill, fontSize = (fontSize+5).sp, fontWeight = FontWeight.Bold)
 
-                        Text(text = skillModel.skillDescription, fontSize = (fontSize + 1).sp, lineHeight = (fontSize + 1).sp)
+                        Text(text = skillModel.skillDescription, fontSize = (fontSize).sp)
 
                         //Text(modifier = Modifier.padding(top = 5.dp), text = "Skill Creator: " + skillModel.creatorUserName, fontSize = (fontSize -1).sp, lineHeight = (fontSize - 1).sp)
                     }
@@ -282,13 +287,12 @@ fun HistBan_SkillCrea(
     onClick: () -> Unit
 ){
 
-    val colorCircle = MaterialTheme.colorScheme.primary
     var iconSize: Dp = 60.dp
     var fontSize = 15
 
     if (size == BannerSize.SMALL){
         iconSize = 45.dp
-        fontSize = 12
+        fontSize = 15
     }
 
     if (size == BannerSize.LARGE){
@@ -298,10 +302,10 @@ fun HistBan_SkillCrea(
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(5.dp, 2.dp)
+        .padding(5.dp, 7.dp)
         .clip(shape = RoundedCornerShape(10.dp))
-        .border(1.dp, Color.Black, RoundedCornerShape(10.dp))
-        .background(Color.Gray.copy(alpha = 0.2f))
+        .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
+        .background(Color.LightGray.copy(alpha = 0.2f))
         .clickable {
             onClick()
         }
@@ -316,18 +320,18 @@ fun HistBan_SkillCrea(
                 modifier = Modifier
                     .padding(end = 15.dp)
                     .background(Color.White, RoundedCornerShape(10.dp))
-                    .border(1.dp, colorCircle, RoundedCornerShape(10.dp))
+                    .border(1.dp, PrimaryColor, RoundedCornerShape(10.dp))
                     .padding(horizontal = 5.dp, vertical = 3.dp)
                     .testTag("timeStamp"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Text(
                     text = dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                    color = colorCircle
+                    color = PrimaryColor
                 )
                 Text(
                     text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")),
-                    color = colorCircle
+                    color = PrimaryColor
                 )
             }
 
@@ -338,12 +342,12 @@ fun HistBan_SkillCrea(
 
                 Text(
                     text = "Skill Created",
-                    color = Color.Magenta,
-                    fontSize = (fontSize + 3).sp,
+                    color = PrimaryColor,
+                    fontSize = (fontSize+5).sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .background(Color.White, RoundedCornerShape(10.dp))
-                        .border(1.dp, Color.Magenta, RoundedCornerShape(10.dp))
+                        .border(1.dp, PrimaryColor, RoundedCornerShape(10.dp))
                         .padding(vertical = 2.dp, horizontal = 5.dp)
                 )
 
@@ -358,11 +362,9 @@ fun HistBan_SkillCrea(
                     Box(
                         modifier = Modifier
                             .size(iconSize) // Set the size of the circle
-                            .background(
-                                colorCircle,
-                                shape = CircleShape
-                            ) // Use the color of the circle in your image
-                    )
+                    ){
+                        Icon(imageVector = Icons.Filled.RadioButtonChecked, "SkillLogo",  modifier = Modifier.fillMaxSize(), tint = PrimaryColor)
+                    }
 
                     Column(
                         modifier = Modifier
@@ -371,9 +373,9 @@ fun HistBan_SkillCrea(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = skillModel.titleSkill, fontSize = (fontSize+3).sp, fontWeight = FontWeight.Bold)
+                        Text(text = skillModel.titleSkill, fontSize = (fontSize + 5).sp, fontWeight = FontWeight.Bold)
 
-                        Text(text = skillModel.skillDescription, fontSize = (fontSize + 1).sp, lineHeight = (fontSize + 1).sp)
+                        Text(text = skillModel.skillDescription, fontSize = (fontSize).sp)
                     }
                 }
             }
@@ -392,7 +394,7 @@ fun EventCard(eventType: EVEN_TYPE, skillModel: SkillModel, badge: BadgeDataMode
         HistBan_Badge(
             badge,
             dateTime,
-            BannerSize.MEDIUM,
+            BannerSize.SMALL,
         )
         {
             onClick(EVEN_TYPE.BADGEGOTTEN)
@@ -401,7 +403,7 @@ fun EventCard(eventType: EVEN_TYPE, skillModel: SkillModel, badge: BadgeDataMode
         HistBan_SkillCrea(
             skillModel,
             dateTime,
-            BannerSize.MEDIUM,
+            BannerSize.SMALL,
         )
         {
             onClick(EVEN_TYPE.SKILLCREATED)
@@ -412,7 +414,7 @@ fun EventCard(eventType: EVEN_TYPE, skillModel: SkillModel, badge: BadgeDataMode
         HistBan_SkillFin(
             skillModel,
             dateTime,
-            BannerSize.MEDIUM,
+            BannerSize.SMALL,
         )
         {
             onClick(EVEN_TYPE.SKILLFINISHEDFT)
@@ -423,6 +425,7 @@ fun EventCard(eventType: EVEN_TYPE, skillModel: SkillModel, badge: BadgeDataMode
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     navController: NavHostController,
@@ -515,7 +518,15 @@ fun HistoryScreen(
                     .verticalScroll(rememberScrollState())
             ) {
 
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     value = eventTitleEditText.value,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -540,6 +551,39 @@ fun HistoryScreen(
                         )
                     },
                 )
+
+                Spacer(Modifier.height(30.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(text = "History Events", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        color = Color.DarkGray,
+                    )
+
+                    Text(
+                        text = listEvents.value
+                            .count().toString() + " elements",
+                        fontSize = 15.sp,
+                        color = Color.Gray
+                    )
+
+                }
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp, 2.dp),
+                    color = Color.DarkGray
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
 
                 listEvents.value.forEach{ event ->
 
@@ -709,7 +753,7 @@ fun SkillInfoPopUp(
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.75f)
                     .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     .testTag("PopUp")
                 //.verticalScroll(rememberScrollState()),
@@ -734,7 +778,7 @@ fun SkillInfoPopUp(
                 ) {
 
 
-                    val colorCircle = MaterialTheme.colorScheme.primary
+                    val PrimaryColor = PrimaryColor
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -742,7 +786,7 @@ fun SkillInfoPopUp(
                                 Color(0XFFF0F0F0),
                                 RoundedCornerShape(10)
                             ) // Use the color of the background in your image
-                            .border(1.dp, Color.Black, RoundedCornerShape(10))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -751,7 +795,7 @@ fun SkillInfoPopUp(
                         /*Box(
                             modifier = Modifier
                                 .size(50.dp) // Set the size of the circle
-                                .background(colorCircle, shape = CircleShape) // Use the color of the circle in your image
+                                .background(PrimaryColor, shape = CircleShape) // Use the color of the circle in your image
                         )
                         Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier.weight(2f)) {
@@ -764,7 +808,7 @@ fun SkillInfoPopUp(
                             fontSize = 15.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .background(color = colorCircle, RoundedCornerShape(20))
+                                .background(color = PrimaryColor, RoundedCornerShape(20))
                                 .padding(vertical = 4.dp, horizontal = 4.dp)
                                 .weight(1f)
                         )
@@ -783,7 +827,7 @@ fun SkillInfoPopUp(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
@@ -797,7 +841,7 @@ fun SkillInfoPopUp(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -811,7 +855,7 @@ fun SkillInfoPopUp(
                                 text = skill.skillDescription,
                                 modifier = Modifier.padding(15.dp),
                                 fontSize = 12.sp,
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
                         }
                     }
@@ -828,7 +872,7 @@ fun SkillInfoPopUp(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
 
@@ -842,7 +886,7 @@ fun SkillInfoPopUp(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .weight(1f),
-                                color = Color.Black,
+                                color = Color.DarkGray,
                                 thickness = 1.dp
                             )
                         }
@@ -874,7 +918,7 @@ fun SkillInfoPopUp(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .weight(1f),
-                                        color = Color.Black,
+                                        color = Color.DarkGray,
                                         thickness = 1.dp
                                     )
 
@@ -888,7 +932,7 @@ fun SkillInfoPopUp(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .weight(1f),
-                                        color = Color.Black,
+                                        color = Color.DarkGray,
                                         thickness = 1.dp
                                     )
                                 }
