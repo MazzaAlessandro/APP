@@ -133,9 +133,9 @@ class MySkillsTest {
         test.onNodeWithContentDescription("OrderingArrow").assertExists()
 
         test.onNodeWithText("Order by: Custom").performClick()
-        test.onNodeWithText("Date Asc").performClick()
+        test.onNodeWithText("Starting Date Asc").performClick()
         test.onNodeWithText("Order by: Date Asc").assertExists().performClick()
-        test.onNodeWithText("Date Desc").performClick()
+        test.onNodeWithText("Starting Date Desc").performClick()
         test.onNodeWithText("Order by: Date Desc").assertExists()
 
         //check the existence of the BottomNavigationBar
