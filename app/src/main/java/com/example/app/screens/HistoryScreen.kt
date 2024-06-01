@@ -101,7 +101,7 @@ fun HistBan_Badge(
         .background(Color.Gray.copy(alpha = 0.2f))
         .clickable {
             onClick()
-        },
+        }.testTag("Banner"),
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -113,7 +113,8 @@ fun HistBan_Badge(
                     .padding(end = 15.dp)
                     .background(Color.White, RoundedCornerShape(10.dp))
                     .border(1.dp, colorCircle, RoundedCornerShape(10.dp))
-                    .padding(horizontal = 5.dp, vertical = 3.dp),
+                    .padding(horizontal = 5.dp, vertical = 3.dp)
+                    .testTag("timeStamp"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Text(
@@ -194,7 +195,7 @@ fun HistBan_SkillFin(
         .background(Color.Gray.copy(alpha = 0.2f))
         .clickable {
             onClick()
-        },
+        }.testTag("SkillFinBanner"),
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -206,7 +207,8 @@ fun HistBan_SkillFin(
                     .padding(end = 15.dp)
                     .background(Color.White, RoundedCornerShape(10.dp))
                     .border(1.dp, colorCircle, RoundedCornerShape(10.dp))
-                    .padding(horizontal = 5.dp, vertical = 3.dp),
+                    .padding(horizontal = 5.dp, vertical = 3.dp)
+                    .testTag("timeStamp"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Text(
@@ -225,7 +227,7 @@ fun HistBan_SkillFin(
             ) {
 
                 Text(
-                    text = "Skill Finished:",
+                    text = "Skill Finished",
                     color = Color.Green,
                     fontSize = (fontSize + 3).sp,
                     fontWeight = FontWeight.Bold,
@@ -302,7 +304,8 @@ fun HistBan_SkillCrea(
         .background(Color.Gray.copy(alpha = 0.2f))
         .clickable {
             onClick()
-        },
+        }
+        .testTag("SkillCreatedBanner"),
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -314,7 +317,8 @@ fun HistBan_SkillCrea(
                     .padding(end = 15.dp)
                     .background(Color.White, RoundedCornerShape(10.dp))
                     .border(1.dp, colorCircle, RoundedCornerShape(10.dp))
-                    .padding(horizontal = 5.dp, vertical = 3.dp),
+                    .padding(horizontal = 5.dp, vertical = 3.dp)
+                    .testTag("timeStamp"),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Text(
@@ -458,38 +462,39 @@ fun HistoryScreen(
         mutableStateOf(ThreeGroup(EVEN_TYPE.BADGEGOTTEN, ZonedDateTime.now(), ""))
     }
 
-    LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
-        sharedViewModel.retrieveUserSkillSub(
-            sharedViewModel.getCurrentUserMail(),
-            currentContext
-        ){currUserSkillSub ->
-            userSkillSub.value = currUserSkillSub
+    if(sharedViewModel.getCurrentUserMail()!=""){
+        LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
+            sharedViewModel.retrieveUserSkillSub(
+                sharedViewModel.getCurrentUserMail(),
+                currentContext
+            ){currUserSkillSub ->
+                userSkillSub.value = currUserSkillSub
 
-            sharedViewModel.retrieveSkillsFromList(
-                currentContext,
-                userSkillSub.value.createdSkillsId
-            ){
-                listCreatedSkills.value = it
                 sharedViewModel.retrieveSkillsFromList(
                     currentContext,
-                    userSkillSub.value.finishedSkills
+                    userSkillSub.value.createdSkillsId
                 ){
-                    listFinishedSkills.value = it
-                    sharedViewModel.retrieveAllBadges(
-                        userSkillSub.value.badgesObtained,
+                    listCreatedSkills.value = it
+                    sharedViewModel.retrieveSkillsFromList(
                         currentContext,
+                        userSkillSub.value.finishedSkills
                     ){
-                        listObtainedBadges.value = it
+                        listFinishedSkills.value = it
+                        sharedViewModel.retrieveAllBadges(
+                            userSkillSub.value.badgesObtained,
+                            currentContext,
+                        ){
+                            listObtainedBadges.value = it
 
-                        listEvents.value = ComputeList(currUserSkillSub, listCreatedSkills.value, eventTitleEditText.value)
+                            listEvents.value = ComputeList(currUserSkillSub, listCreatedSkills.value, eventTitleEditText.value)
+                        }
                     }
                 }
+
+
             }
-
-
         }
     }
-
 
     Scaffold(
         topBar = { AppToolBar(title = "History", navController, sharedViewModel, true, Routes.Profile.route) },
@@ -514,7 +519,8 @@ fun HistoryScreen(
                     value = eventTitleEditText.value,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
+                        .padding(10.dp)
+                        .testTag("BadgeSearch"),
                     onValueChange = {
                         eventTitleEditText.value = it
 
@@ -705,6 +711,7 @@ fun SkillInfoPopUp(
                     .clip(shape = RoundedCornerShape(25.dp))
                     .border(1.dp, Color.Black, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface)
+                    .testTag("PopUp")
                 //.verticalScroll(rememberScrollState()),
             ) {
                 IconButton(
