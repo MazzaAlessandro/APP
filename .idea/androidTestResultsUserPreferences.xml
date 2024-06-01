@@ -24,6 +24,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_7_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung SM-G998B" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -128,6 +129,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_7_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung SM-G998B" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -401,6 +403,8 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_7_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung SM-G998B" value="120" />
+                  <entry key="samsung SM-X900" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -414,6 +418,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_7_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung SM-X900" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
@@ -518,6 +523,7 @@
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_7_API_30" value="120" />
                   <entry key="Tests" value="360" />
+                  <entry key="samsung SM-G998B" value="120" />
                 </map>
               </option>
             </AndroidTestResultsTableState>

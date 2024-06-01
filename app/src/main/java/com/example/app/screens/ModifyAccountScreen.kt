@@ -19,17 +19,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -37,6 +41,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -44,6 +49,7 @@ import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.bottomNavigation.AppToolBar
 import com.example.app.models.UserDataModel
+import com.example.app.ui.theme.PrimaryColor
 import com.example.app.util.SharedViewModel
 import com.example.app.util.WindowInfo
 import com.example.app.util.relative
@@ -85,7 +91,6 @@ fun ModifyAccountScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .testTag("ModifyAccountScreen"),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val username = remember { mutableStateOf(TextFieldValue()) }
@@ -94,7 +99,11 @@ fun ModifyAccountScreen(
             val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
             val pfpUri = remember { MutableStateFlow(sharedViewModel.getCurrentUserPfpUri()) }
 
-            Text(text = "Update account info", style = TextStyle(fontSize = 40.sp))
+            Spacer(modifier = Modifier.height(30.dp))
+            
+            Text(text = "Update account info", style = TextStyle(fontSize = 50.sp), textAlign = TextAlign.Center, color = Color.DarkGray)
+
+            Spacer(modifier = Modifier.height(relative(15.dp)))
 
             ProfileImage(
                 sharedViewModel.getCurrentUserPfpUri(),
@@ -107,7 +116,15 @@ fun ModifyAccountScreen(
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18)),
@@ -127,7 +144,15 @@ fun ModifyAccountScreen(
                 )
             }
             else{
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     label = { Text(text = "Username") },
                     value = username.value,
                     onValueChange = { username.value = it },
@@ -147,7 +172,15 @@ fun ModifyAccountScreen(
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18)),
@@ -171,7 +204,15 @@ fun ModifyAccountScreen(
                 )
             }
             else{
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     label = { Text(text = "New Password") },
                     value = password.value,
                     visualTransformation = PasswordVisualTransformation(),
@@ -195,7 +236,15 @@ fun ModifyAccountScreen(
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18)),
@@ -219,7 +268,15 @@ fun ModifyAccountScreen(
                 )
             }
             else{
-                TextField(
+                OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
+                    shape = RoundedCornerShape(10.dp),
                     label = { Text(text = "Confirm Password") },
                     value = passwordCheck.value,
                     visualTransformation = PasswordVisualTransformation(),
@@ -282,7 +339,8 @@ fun ModifyAccountScreen(
                                 && username.value.text.isNotBlank()
                                 && passwordCheck.value.text.isNotBlank()
                                 && !updating.value,
-                        shape = RoundedCornerShape(50.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
@@ -325,7 +383,8 @@ fun ModifyAccountScreen(
                                 && username.value.text.isNotBlank()
                                 && passwordCheck.value.text.isNotBlank()
                                 && !updating.value,
-                        shape = RoundedCornerShape(50.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)

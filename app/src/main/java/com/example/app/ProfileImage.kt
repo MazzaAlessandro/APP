@@ -16,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -60,6 +62,7 @@ fun ProfileImage(
     {
             Image(painter = painter,
                 contentDescription = "profilePic",
+                colorFilter = if(imageUri.value.isEmpty()) ColorFilter.tint(Color.DarkGray) else ColorFilter.tint(Color.Transparent, BlendMode.Color),
                 modifier = Modifier
                     .wrapContentSize()
                     .background(MaterialTheme.colorScheme.background)

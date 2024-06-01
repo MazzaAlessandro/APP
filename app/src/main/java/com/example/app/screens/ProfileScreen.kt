@@ -188,7 +188,7 @@ fun ProfileScreen(navController: NavHostController,
                         Divider(
                             modifier = Modifier
                                 .padding(5.dp, 0.dp),
-                            color = Color.Black,
+                            color = Color.DarkGray,
                             thickness = 1.dp
                         )
 
@@ -202,7 +202,7 @@ fun ProfileScreen(navController: NavHostController,
                                 ) {
                                     Text(
                                         text = it.statName,
-                                        color = Color.Black
+                                        color = Color.DarkGray
                                     )
 
                                     Divider(
@@ -215,7 +215,7 @@ fun ProfileScreen(navController: NavHostController,
 
                                     Text(
                                         text = it.statValue.toString(),
-                                        color = Color.Black
+                                        color = Color.DarkGray
                                     )
                                 }
                             }
@@ -227,7 +227,7 @@ fun ProfileScreen(navController: NavHostController,
                 Divider(
                     modifier = Modifier
                         .padding(5.dp, 0.dp),
-                    color = Color.Black,
+                    color = Color.DarkGray,
                     thickness = 1.dp
                 )
 
@@ -275,7 +275,7 @@ fun ProfileScreen(navController: NavHostController,
                     }
 
                     Divider(
-                        color = Color.Black,
+                        color = Color.DarkGray,
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(1.dp),
@@ -359,7 +359,7 @@ fun ProfileScreen(navController: NavHostController,
                 Divider(
                     modifier = Modifier
                         .padding(10.dp, 0.dp),
-                    color = Color.Black,
+                    color = Color.DarkGray,
                     thickness = 1.dp
                 )
 
@@ -407,7 +407,7 @@ fun ProfileScreen(navController: NavHostController,
                 Divider(
                     modifier = Modifier
                         .padding(10.dp, 0.dp),
-                    color = Color.Black,
+                    color = Color.DarkGray,
                     thickness = 1.dp
                 )
 
@@ -464,7 +464,7 @@ fun ProfileScreen(navController: NavHostController,
                 Divider(
                     modifier = Modifier
                         .padding(10.dp, 0.dp),
-                    color = Color.Black,
+                    color = Color.DarkGray,
                     thickness = 1.dp
                 )
 
@@ -484,7 +484,7 @@ fun ProfileScreen(navController: NavHostController,
                         ) {
                             Text(
                                 text = it.statName,
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
 
                             Divider(
@@ -497,7 +497,7 @@ fun ProfileScreen(navController: NavHostController,
 
                             Text(
                                 text = it.statValue.toString(),
-                                color = Color.Black
+                                color = Color.DarkGray
                             )
                         }
                     }

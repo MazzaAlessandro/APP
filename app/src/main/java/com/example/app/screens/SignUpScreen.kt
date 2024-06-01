@@ -24,11 +24,14 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +53,7 @@ import com.example.app.ProfileImage
 import com.example.app.Routes
 import com.example.app.models.UserDataModel
 import com.example.app.models.UserSkillSubsModel
+import com.example.app.ui.theme.PrimaryColor
 import com.example.app.util.SharedViewModel
 import com.example.app.util.WindowInfo
 import com.example.app.util.relative
@@ -57,6 +61,7 @@ import com.example.app.util.rememberWindowInfo
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavHostController,
                  sharedViewModel: SharedViewModel
@@ -91,7 +96,7 @@ fun SignUpScreen(navController: NavHostController,
             val passwordCheck = remember { mutableStateOf(TextFieldValue()) }
             val pfpUri = remember { MutableStateFlow("") }
 
-            Text(text = "Registration", style = TextStyle(fontSize = 50.sp))
+            Text(text = "Registration", color = Color.DarkGray, style = TextStyle(fontSize = 50.sp))
 
             Spacer(modifier = Modifier.height(relative(20.dp)))
 
@@ -103,6 +108,13 @@ fun SignUpScreen(navController: NavHostController,
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -120,6 +132,13 @@ fun SignUpScreen(navController: NavHostController,
             }
             else{
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier.testTag("username"),
                     label = { Text(text = "Username") },
                     value = username.value,
@@ -137,6 +156,13 @@ fun SignUpScreen(navController: NavHostController,
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -153,6 +179,13 @@ fun SignUpScreen(navController: NavHostController,
             }
             else{
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier.testTag("email"),
                     label = { Text(text = "Email") },
                     value = mail.value,
@@ -169,6 +202,13 @@ fun SignUpScreen(navController: NavHostController,
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -185,6 +225,13 @@ fun SignUpScreen(navController: NavHostController,
                     enabled = !authenticating.value)
             }else{
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier.testTag("password"),
                     label = { Text(text = "Password") },
                     value = password.value,
@@ -203,6 +250,13 @@ fun SignUpScreen(navController: NavHostController,
 
             if (windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded) {
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier
                         .width(windowInfo.screenWidth.div(2))
                         .height(windowInfo.screenHeight.div(18))
@@ -220,6 +274,13 @@ fun SignUpScreen(navController: NavHostController,
                 )
             }else{
                 OutlinedTextField(
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = PrimaryColor,
+                        focusedLabelColor = PrimaryColor,
+                        focusedLeadingIconColor = PrimaryColor,
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.DarkGray
+                    ),
                     modifier = Modifier.testTag("confirmPassword"),
                     label = { Text(text = "Confirm Password") },
                     value = passwordCheck.value,
@@ -242,6 +303,7 @@ fun SignUpScreen(navController: NavHostController,
                     .width(windowInfo.screenWidth.div(2))
                     .height(windowInfo.screenHeight.div(18))) {
                     Button(
+                        colors = ButtonDefaults.buttonColors(PrimaryColor),
                         onClick = {
                             //checks if password and password check match.
                             //if yes, takes checks if username isn't already used
@@ -304,6 +366,7 @@ fun SignUpScreen(navController: NavHostController,
             }else{
                 Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                     Button(
+                        colors = ButtonDefaults.buttonColors(PrimaryColor),
                         onClick = {
                             //checks if password and password check match.
                             //if yes, takes checks if username isn't already used
