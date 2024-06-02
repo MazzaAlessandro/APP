@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,9 +53,11 @@ import com.example.app.models.BadgeDataModel
 import com.example.app.models.SkillModel
 import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
+import com.example.app.ui.theme.PrimaryColor
 import com.example.app.util.SharedViewModel
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 //This is the round icon of a Badge that can be used on its own
 @Composable
@@ -232,7 +235,7 @@ fun BadgeCard(
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.6f)
                     .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
+                    .border(1.dp, Color.Gray, RoundedCornerShape(25.dp))
                     .background(MaterialTheme.colorScheme.surface),
             ) {
                 IconButton(
@@ -241,7 +244,8 @@ fun BadgeCard(
                     },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .zIndex(11F),
+                        .zIndex(11F)
+                        .padding(top = 15.dp, end = 15.dp),
                 ) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "close")
                 }
@@ -252,19 +256,19 @@ fun BadgeCard(
                         .padding(0.dp, 0.dp, 0.dp, 10.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    //verticalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.Center
                 ) {
 
 
-                    val colorCircle = MaterialTheme.colorScheme.primary
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .padding(15.dp)
                             .background(
-                                Color(0XFFF0F0F0),
+                                Color.LightGray.copy(0.2f),
                                 RoundedCornerShape(10)
                             ) // Use the color of the background in your image
-                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
+                            .border(1.dp, Color.Gray, RoundedCornerShape(10))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -278,12 +282,12 @@ fun BadgeCard(
                     )
                     Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier
-                            .weight(2f)
                             .padding(horizontal = 10.dp),
                             horizontalAlignment = Alignment.Start) {
-                            Text(badge.badgeName, fontWeight = FontWeight.Bold, fontSize = 30.sp, textAlign = TextAlign.Start)
-                            
-                            Spacer(modifier = Modifier.height(5.dp))
+
+                            Text(badge.badgeName, fontWeight = FontWeight.Bold, color = Color.DarkGray, fontSize = 30.sp, textAlign = TextAlign.Start, lineHeight = 30.sp)
+
+                            Spacer(modifier = Modifier.height(10.dp))
 
                             Text(
                                 text = "Creator: " + skillInfo.value.creatorUserName,
@@ -291,50 +295,45 @@ fun BadgeCard(
                                 fontSize = 16.sp,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
-                                    .background(color = colorCircle, RoundedCornerShape(20))
-                                    .padding(vertical = 3.dp, horizontal = 4.dp)
+                                    .background(color = PrimaryColor, RoundedCornerShape(20))
+                                    .padding(vertical = 5.dp, horizontal = 10.dp)
                             )
                         }
                     }
 
                     
                     Column(modifier = Modifier
-                        .padding(top = 10.dp)) {
-
+                        ) {
+                        
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+
+                            Text(text = "Badge Description", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 15.dp, vertical = 4.dp),
                                 color = Color.DarkGray,
-                                thickness = 1.dp
                             )
 
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = "Badge Description",
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.DarkGray,
-                                thickness = 1.dp
-                            )
                         }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp, 2.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(15.dp, 0.dp)
-                                .background(Color(0xFFF0F0F0), RoundedCornerShape(10)),
+                                .background(Color.LightGray.copy(alpha = 0.2f),RoundedCornerShape(10))
+                                .border(1.dp, Color.Gray, RoundedCornerShape(10.dp)),
                             contentAlignment = Alignment.Center
 
                         ) {
@@ -351,62 +350,62 @@ fun BadgeCard(
                     //DETAILS ON SUCCESS
 
                     Column{
+                        Spacer(Modifier.height(10.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+
+                            Text(text = "Success Details", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 15.dp, vertical = 4.dp),
                                 color = Color.DarkGray,
-                                thickness = 1.dp
                             )
 
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = "Success Details",
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.DarkGray,
-                                thickness = 1.dp
-                            )
                         }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(15.dp, 2.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
 
                         Column(
                             modifier = Modifier
-                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                                .padding(horizontal = 15.dp, vertical = 0.dp)
                                 .fillMaxWidth()
                                 .background(
                                     Color(0XFFF0F0F0),
                                     RoundedCornerShape(10)
                                 ) // Use the color of the background in your image
-                                .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
-                                .padding(horizontal = 40.dp, vertical = 17.dp),
+                                .border(1.dp, Color.Gray, RoundedCornerShape(10))
+                                .padding(horizontal = 15.dp, vertical = 17.dp),
 
                             verticalArrangement = Arrangement.SpaceAround,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Row {
+                            Row(verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center,
+                                ) {
                                 Text(
                                     text = "Obtained on: ",
+                                    color = Color.DarkGray,
                                     textAlign = TextAlign.Start,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
-                                    text = dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                    text = dateTime.format(DateTimeFormatter.ofPattern("d 'of' MMMM yyyy", Locale.ENGLISH)),
                                     modifier = Modifier
                                         .weight(1.0f)
                                         .fillMaxWidth(),
                                     textAlign = TextAlign.End,
+                                    color = Color.DarkGray,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -416,10 +415,12 @@ fun BadgeCard(
                                 Text(
                                     text = "At time: ",
                                     textAlign = TextAlign.Start,
+                                    color = Color.DarkGray,
                                     fontSize = 18.sp,
                                 )
                                 Text(
-                                    text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss")).lowercase(),
+                                    text = dateTime.format(DateTimeFormatter.ofPattern("HH:mm ")).lowercase(),
+                                    color = Color.DarkGray,
                                     modifier = Modifier
                                         .weight(1.0f)
                                         .fillMaxWidth(),
@@ -431,10 +432,23 @@ fun BadgeCard(
 
                     }
 
-                    Button(onClick = onCloseClick) {
-                        Text(text = "Close")
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, start = 10.dp, end = 10.dp),
+                        contentAlignment = Alignment.Center) {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                            onClick = onCloseClick,
+                            shape = RoundedCornerShape(10.dp),
+                        ) {
+                            Text(
+                                text = "Close", fontSize = 20.sp, modifier = Modifier
+                                    .fillMaxWidth(0.5f)
+                                    .padding(vertical = 3.dp), textAlign = TextAlign.Center
+                            )
+
+                        }
                     }
-                    
                 }
             }
         }
