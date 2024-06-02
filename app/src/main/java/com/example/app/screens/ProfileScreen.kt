@@ -24,7 +24,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,9 +61,6 @@ import com.example.app.models.SkillProgressionModel
 import com.example.app.models.UserDataModel
 import com.example.app.models.UserSkillSubsModel
 import com.example.app.ui.theme.PrimaryColor
-import com.example.app.ui.theme.greenColor
-import com.example.app.ui.theme.redColor
-import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
 import com.example.app.util.WindowInfo
 import com.example.app.util.relative
@@ -92,7 +88,8 @@ fun SkillCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-                .clickable { onClick() },
+                .clickable { onClick() }
+                .testTag("SkillCard"),
 
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -168,7 +165,8 @@ fun SkillCardEmpty(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
-                .clickable { onClick() },
+                .clickable { onClick() }
+                .testTag("EmptySkillCard"),
 
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -530,7 +528,7 @@ fun ProfileScreen(navController: NavHostController,
                                 modifier = Modifier
                                     .padding(10.dp),
                                     pieDataPoints = pieData,
-                                relative(250.dp),
+                                relative(200.dp),
                                 50f
                             )
 
@@ -785,7 +783,8 @@ fun ProfileScreen(navController: NavHostController,
                 Column(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .padding(10.dp, 0.dp, 10.dp, 10.dp),
+                        .padding(10.dp, 0.dp, 10.dp, 10.dp)
+                        .testTag("LastSkillSection"),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
