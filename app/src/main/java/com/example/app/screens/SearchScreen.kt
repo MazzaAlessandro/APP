@@ -162,14 +162,14 @@ fun SectionElementBlock(
                 fontWeight = FontWeight.Bold,
                 color = textColor,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 20.dp)
+                modifier = Modifier.padding(start = 15.dp).weight(2.0f)
             )
 
             Text(
                 text = isDoneText,
                 color = textColor,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 20.dp)
+                modifier = Modifier.padding(horizontal = 15.dp).weight(1.0f)
             )
         }
     }
@@ -1140,13 +1140,14 @@ fun SkillInfoPopUp_UNSTARTED(
                                 color = Color.DarkGray,
                             )
                         }
+
                         Text(
                             skill.skillSectionsList.count().toString() + " section" + if (skill.skillSectionsList.count() > 1) "s" else "",
                             color = Color.White,
                             fontSize = 15.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .background(color = PrimaryColor, RoundedCornerShape(20))
+                                .background(color = PrimaryColor, RoundedCornerShape(10.dp))
                                 .padding(vertical = 4.dp, horizontal = 4.dp)
                                 .weight(1f)
                         )
