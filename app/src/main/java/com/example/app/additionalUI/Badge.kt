@@ -304,7 +304,7 @@ fun BadgeCard(
                     
                     Column(modifier = Modifier
                         ) {
-                        
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

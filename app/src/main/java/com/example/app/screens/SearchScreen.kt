@@ -115,20 +115,14 @@ fun SectionElementBlock(
     onChangeSection:(SkillSectionModel) -> Unit
 ) {
 
-    val initialColor: Color = Color(180, 180, 255)
-    val endingColor: Color = Color(200, 255, 200)
+    val currentColor: Color = PrimaryColor
+    val otherColor: Color = Color.LightGray.copy(alpha = 0.2f)
 
+    val color = if(amount != 0) currentColor else otherColor
+    val textColor = if(amount != 0) Color.White else Color.DarkGray
+    val borderColor = if(amount != 0) PrimaryColor else Color.Gray
 
-
-    val colorNum = amount.toFloat() / (required)
-
-    var colorRed = initialColor.red + (endingColor.red - initialColor.red) * colorNum
-    var colorGreen = initialColor.green + (endingColor.green - initialColor.green) * colorNum
-    var colorBlue: Float = initialColor.blue + (endingColor.blue - initialColor.blue) * colorNum
-
-    val color = Color(colorRed, colorGreen , colorBlue)
-
-    val isDoneText = if(amount == required) "Done" else amount.toString() + "/" + required.toString()
+    val isDoneText = if(amount == required) "Done" else if(amount != 0 && required != -1) "In Progress" else "Not Started"
 
     Box(
         modifier = Modifier
@@ -145,7 +139,7 @@ fun SectionElementBlock(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color, RoundedCornerShape(10))
-                    .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
+                    .border(1.dp, borderColor, RoundedCornerShape(10))
                     .then(
                         if (isResetable) {
                             Modifier.clickable {
@@ -166,14 +160,15 @@ fun SectionElementBlock(
                 text = "Section " + index.toString() + ": " + section.titleSection,
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.DarkGray,
+                color = textColor,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1.0f)
+                modifier = Modifier.padding(start = 20.dp)
             )
 
             Text(
                 text = isDoneText,
-                color = Color.DarkGray,
+                color = textColor,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
         }
@@ -550,8 +545,8 @@ fun SkillInfoPopUp_STARTED(
                 Modifier
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.75f)
-                    .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
+                    .clip(shape = RoundedCornerShape(10.dp))
+                    .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surface)
                 //.verticalScroll(rememberScrollState()),
             ) {
@@ -561,7 +556,8 @@ fun SkillInfoPopUp_STARTED(
                     },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .zIndex(11F),
+                        .zIndex(11F)
+                        .padding(top = 10.dp, end = 10.dp),
                 ) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "close")
                 }
@@ -569,7 +565,7 @@ fun SkillInfoPopUp_STARTED(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(0.dp, 0.dp, 0.dp, 15.dp)
+                        .padding(15.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.spacedBy(100.dp)
@@ -580,10 +576,10 @@ fun SkillInfoPopUp_STARTED(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                Color(0XFFF0F0F0),
-                                RoundedCornerShape(10)
+                                Color.LightGray.copy(alpha = 0.2f),
+                                RoundedCornerShape(10.dp)
                             ) // Use the color of the background in your image
-                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
+                            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -596,8 +592,12 @@ fun SkillInfoPopUp_STARTED(
                         )
                         Spacer(Modifier.width(25.dp))*/ // Space between the circle and the text
                         Column(modifier = Modifier.weight(2f)) {
-                            Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 30.sp)
-                            Text(text = "Creator: " + skill.creatorUserName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text(skill.titleSkill, fontWeight = FontWeight.Bold, fontSize = 30.sp,
+                                color = Color.DarkGray,
+                            )
+                            Text(text = "Creator: " + skill.creatorUserName, fontWeight = FontWeight.Bold, fontSize = 15.sp,
+                                color = Color.DarkGray,
+                            )
                         }
                         Text(
                             skill.skillSectionsList.count().toString() + " section" + if (skill.skillSectionsList.count() > 1) "s" else "",
@@ -614,39 +614,40 @@ fun SkillInfoPopUp_STARTED(
                     Column(modifier = Modifier
                         .fillMaxWidth(),
                         ) {
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+
+                            Text(text = "Skill Description", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 0.dp, vertical = 4.dp),
                                 color = Color.DarkGray,
-                                thickness = 1.dp
                             )
 
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = "Skill Description",
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.DarkGray,
-                                thickness = 1.dp
-                            )
                         }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 0.dp, end = 0.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp)
-                                .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
+                                .background(
+                                    Color.LightGray.copy(alpha = 0.2f),
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
                         ) {
                             Text(
                                 text = skill.skillDescription,
@@ -657,36 +658,35 @@ fun SkillInfoPopUp_STARTED(
                         }
                     }
 
+
                     Column(modifier = Modifier
                         .fillMaxWidth(),) {
+
+                        Spacer(modifier = Modifier.height(40.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+
+                            Text(text = "Sections", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 0.dp, vertical = 4.dp),
                                 color = Color.DarkGray,
-                                thickness = 1.dp
                             )
 
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = "Sections",
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.DarkGray,
-                                thickness = 1.dp
-                            )
                         }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
                         //SECTION ELEMENT
 
                         sectionsList.value.forEachIndexed { index, section ->
@@ -761,7 +761,7 @@ fun SkillInfoPopUp_STARTED(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(15.dp, 0.dp),
+                                        .padding(5.dp, 0.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Divider(
@@ -806,15 +806,20 @@ fun SkillInfoPopUp_STARTED(
                                         verticalAlignment = Alignment.CenterVertically) {
                                         IconButton(
                                             modifier = Modifier
-                                                .padding(horizontal = 2.dp)
                                                 .background(
-                                                    Color(255, 200, 200),
-                                                    RoundedCornerShape(15.dp)
+                                                    PrimaryColor,
+                                                    RoundedCornerShape(
+                                                        topStart = 10.dp,
+                                                        bottomStart = 10.dp
+                                                    )
                                                 )
                                                 .border(
                                                     1.dp,
-                                                    Color.DarkGray,
-                                                    RoundedCornerShape(15.dp)
+                                                    PrimaryColor,
+                                                    RoundedCornerShape(
+                                                        topStart = 10.dp,
+                                                        bottomStart = 10.dp
+                                                    )
                                                 )
                                                 .size(40.dp)
                                                 ,
@@ -837,14 +842,16 @@ fun SkillInfoPopUp_STARTED(
                                             }
                                             })
                                         {
-                                                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "")
+                                                Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "", tint = Color.White)
                                         }
 
 
                                         Box(modifier = Modifier.weight(1.0f)){
-                                            CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false, false, false){}
+                                            CustomProgressIndicator(task.taskDescription, am, req, 40.dp, false, false, true){}
                                         }
                                     }
+                                    
+                                    Spacer(modifier = Modifier.height(5.dp))
 
 
                                 }
@@ -874,22 +881,7 @@ fun SkillInfoPopUp_STARTED(
                     }
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            Modifier
-                                .weight(1.0f)
-                                .padding(horizontal = 0.dp),
-                            contentAlignment = Alignment.Center
-                        ){
-                            Text(
-                                "In Progress",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .background(color = greenColor, RoundedCornerShape(20))
-                                    .padding(vertical = 4.dp, horizontal = 4.dp)
-                            )
-                        }
+
 
                         Box(
                             Modifier
@@ -898,7 +890,10 @@ fun SkillInfoPopUp_STARTED(
                             contentAlignment = Alignment.Center
                         ){
 
-                            Button(onClick = {
+                            Button(
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                                onClick = {
                                 var updatedCompleteStructureModel = completeStructure.value
 
 
@@ -913,15 +908,12 @@ fun SkillInfoPopUp_STARTED(
 
                             }) {
 
-                                val initialColor: Color = Color(180, 180, 255)
-
                                 Text(
                                     "Restart",
-                                    color = Color.White,
-                                    fontSize = 16.sp,
-                                    textAlign = TextAlign.Center,
+                                    fontSize = 18.sp,
                                     modifier = Modifier
-                                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                                        .padding(vertical = 0.dp),
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -934,24 +926,62 @@ fun SkillInfoPopUp_STARTED(
                         ){
 
                             Button(
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
                                 onClick = {
-                                onStopSkillProgression(skillProgression)
-                            }) {
+                                    onStopSkillProgression(skillProgression)
+                                }) {
                                 Text(
                                     "Stop Skill",
-                                    color =  Color.White,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .padding(vertical = 4.dp, horizontal = 4.dp)
+                                    fontSize = 18.sp, modifier = Modifier
+                                        .padding(vertical = 0.dp), textAlign = TextAlign.Center
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(30.dp))
 
-                    if(skill.isPublic && sharedViewModel.isMySkill(skill)){
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    if(skill.creatorEmail == sharedViewModel.getCurrentUserMail()){
+                        var isPublicText = if(skill.isPublic) "Public" else "Private"
+                        var buttonText = if(skill.isPublic) "Un-publish" else "Publish"
+                        var colorText = if (skill.isPublic) PrimaryColor else Color.Gray
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Text(text = "Skill Status", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 0.dp, vertical = 4.dp),
+                                color = Color.DarkGray,
+                            )
+
+                            Text(
+                                modifier = Modifier
+                                    .border(1.dp, colorText, RoundedCornerShape(10.dp))
+                                    .padding(20.dp, 5.dp),
+                                text = isPublicText,
+                                fontSize = 15.sp,
+                                color = colorText
+                            )
+
+                        }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
+
+
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
 
@@ -961,136 +991,30 @@ fun SkillInfoPopUp_STARTED(
                                     .padding(horizontal = 0.dp),
                                 contentAlignment = Alignment.Center
                             ){
-                                Text(
-                                    "Public",
-                                    color = Color.White,
-                                    fontSize = 16.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .background(color = greenColor, RoundedCornerShape(20))
-                                        .padding(vertical = 4.dp, horizontal = 4.dp)
-                                )
-                            }
-
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-
-                                Button(onClick = {
-                                    onUnpublishSkill(skill)
-
-                                }) {
-
-                                    val initialColor: Color = Color(255, 180, 180)
-
-                                    Text(
-                                        "Un-publish",
-                                        color = Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
-                                }
-                            }
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
 
                                 Button(
+
+                                    shape = RoundedCornerShape(10.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+
                                     onClick = {
-                                        onDeleteSkill(skill)
+                                        if(skill.isPublic){
+                                            onUnpublishSkill(skill)
+                                        }else{
+                                            onPublishSkill(skill)
+                                        }
                                     }) {
-                                    Text(
-                                        "Delete Skill",
-                                        color =  Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
+
+                                    Text(text = buttonText, fontSize = 18.sp, modifier = Modifier
+                                        .fillMaxWidth(0.35f)
+                                        .padding(vertical = 0.dp), textAlign = TextAlign.Center)
+
                                 }
                             }
                         }
+
                     }
 
-                    else if(!skill.isPublic && sharedViewModel.isMySkill(skill)){
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-                                Text(
-                                    "Private",
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .background(color = redColor, RoundedCornerShape(20))
-                                        .padding(vertical = 4.dp, horizontal = 4.dp)
-                                )
-                            }
-
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-
-                                Button(onClick = {
-                                    onPublishSkill(skill)
-                                }) {
-
-                                    val initialColor: Color = Color(255, 180, 180)
-
-                                    Text(
-                                        "Publish",
-                                        color = Color.White,
-                                        fontSize = 16.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
-                                }
-                            }
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-
-                                Button(
-                                    onClick = {
-                                        onDeleteSkill(skill)
-                                    }) {
-                                    Text(
-                                        "Delete Skill",
-                                        color =  Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
 
                 }
             }
@@ -1144,7 +1068,7 @@ fun SkillInfoPopUp_UNSTARTED(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Gray.copy(alpha = 0.7f))
+            .background(Color.LightGray.copy(alpha = 0.7f))
             .zIndex(10F)
             .clickable { },
         contentAlignment = Alignment.Center
@@ -1163,8 +1087,8 @@ fun SkillInfoPopUp_UNSTARTED(
                 Modifier
                     .fillMaxWidth(0.9f)
                     .fillMaxHeight(0.75f)
-                    .clip(shape = RoundedCornerShape(25.dp))
-                    .border(1.dp, Color.DarkGray, RoundedCornerShape(25.dp))
+                    .clip(shape = RoundedCornerShape(10.dp))
+                    .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     //.verticalScroll(rememberScrollState()),
             ) {
@@ -1174,14 +1098,15 @@ fun SkillInfoPopUp_UNSTARTED(
                     },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .zIndex(11F),
+                        .zIndex(11F)
+                        .padding(top = 10.dp, end = 10.dp),
                 ) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "close")
                 }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(0.dp, 0.dp, 0.dp, 20.dp)
+                        .padding(15.dp)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     //verticalArrangement = Arrangement.SpaceBetween
@@ -1192,10 +1117,10 @@ fun SkillInfoPopUp_UNSTARTED(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                Color(0XFFF0F0F0),
-                                RoundedCornerShape(10)
+                                Color.LightGray.copy(alpha = 0.2f),
+                                RoundedCornerShape(10.dp)
                             ) // Use the color of the background in your image
-                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10))
+                            .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
                             .padding(horizontal = 20.dp, vertical = 17.dp),
 
                         verticalAlignment = Alignment.CenterVertically,
@@ -1234,40 +1159,42 @@ fun SkillInfoPopUp_UNSTARTED(
 
                     Column(modifier = Modifier
                         .fillMaxWidth(),) {
+
+                        Spacer(modifier = Modifier.height(10.dp))
+                        
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+
+                            Text(text = "Skill Description", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 0.dp, vertical = 4.dp),
                                 color = Color.DarkGray,
-                                thickness = 1.dp
                             )
 
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = "Skill Description",
-                                color = Color.DarkGray,
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.DarkGray,
-                                thickness = 1.dp
-                            )
                         }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 0.dp, end = 0.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
+
+
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp)
-                                .background(Color(0xFFF0F0F0), RoundedCornerShape(10))
+                                .background(
+                                    Color.LightGray.copy(alpha = 0.2f),
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
                         ) {
                             Text(
                                 text = skill.skillDescription,
@@ -1280,35 +1207,32 @@ fun SkillInfoPopUp_UNSTARTED(
 
                     Column(modifier = Modifier
                         .fillMaxWidth(),) {
+
+                        Spacer(modifier = Modifier.height(40.dp))
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
+
+                            Text(text = "Sections", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 0.dp, vertical = 4.dp),
                                 color = Color.DarkGray,
-                                thickness = 1.dp
                             )
 
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                color = Color.DarkGray,
-                                text = "Sections",
-                                fontSize = 18.sp
-                            )
-
-                            Divider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                color = Color.DarkGray,
-                                thickness = 1.dp
-                            )
                         }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(15.dp))
+
                         //SECTION ELEMENT
 
                         sectionsList.value.forEachIndexed { index, section ->
@@ -1320,14 +1244,27 @@ fun SkillInfoPopUp_UNSTARTED(
 
                             val required = if(total == 0) 1 else total
 
-                            SectionElementBlock(section, index,  false, 0, required)
-                            {}
+                            if(index == 0){
+                                SectionElementBlock(
+                                    section = section,
+                                    index = index,
+                                    isResetable = false,
+                                    amount = 1,
+                                    required = -1
+                                ) {
+
+                                }
+                            }else{
+                                SectionElementBlock(section, index,  false, 0, required)
+                                {}
+                            }
+
 
                             // THE TASKS
 
                             Column(modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),) {
+                                .padding(5.dp, 0.dp),) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth(),
@@ -1392,27 +1329,68 @@ fun SkillInfoPopUp_UNSTARTED(
 
                     if (!isRegistered) {
                         Button(
-                            //modifier = Modifier.align(Alignment.BottomCenter),
+
+                            shape = RoundedCornerShape(10.dp),
                             onClick = { onRegisterSkill() },
-                            colors = ButtonDefaults.buttonColors(containerColor = yellowColor)
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
                         ) {
-                            Text(text = "REGISTER SKILL")
+                            Text(text = "Register Skill", fontSize = 18.sp, modifier = Modifier
+                                .fillMaxWidth(0.4f)
+                                .padding(vertical = 3.dp), textAlign = TextAlign.Center)
                         }
                     } else {
                         Button(
-                            //modifier = Modifier.align(Alignment.BottomCenter),
+                            shape = RoundedCornerShape(10.dp),
                             onClick = { onAddProgression() },
-                            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
                         ) {
-                            Text(text = "START SKILL")
-                        }
+                            Text(text = "Start Skill", fontSize = 18.sp, modifier = Modifier
+                                .fillMaxWidth(0.4f)
+                                .padding(vertical = 3.dp), textAlign = TextAlign.Center)                        }
                     }
-
-
 
                     Spacer(modifier = Modifier.height(30.dp))
 
-                    if(skill.isPublic && sharedViewModel.isMySkill(skill)){
+                    if(sharedViewModel.isMySkill(skill)){
+
+                        var isPublicText = if(skill.isPublic) "Public" else "Private"
+                        var buttonText = if(skill.isPublic) "Un-publish" else "Publish"
+                        var colorText = if (skill.isPublic) PrimaryColor else Color.Gray
+
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp, 0.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Text(text = "Skill Status", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 0.dp, vertical = 4.dp),
+                                color = Color.DarkGray,
+                            )
+
+                            Text(
+                                modifier = Modifier
+                                    .border(1.dp, colorText, RoundedCornerShape(10.dp))
+                                    .padding(20.dp, 5.dp),
+                                text = isPublicText,
+                                fontSize = 15.sp,
+                                color = colorText
+                            )
+
+                        }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp),
+                            color = Color.DarkGray
+                        )
+
+                        Spacer(modifier = Modifier.height(15.dp))
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
 
@@ -1422,135 +1400,28 @@ fun SkillInfoPopUp_UNSTARTED(
                                     .padding(horizontal = 0.dp),
                                 contentAlignment = Alignment.Center
                             ){
-                                Text(
-                                    "Public",
-                                    color = Color.White,
-                                    fontSize = 16.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .background(color = greenColor, RoundedCornerShape(20))
-                                        .padding(vertical = 4.dp, horizontal = 4.dp)
-                                )
-                            }
-
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-
-                                Button(onClick = {
-                                    onUnpublishSkill(skill)
-
-                                }) {
-
-                                    val initialColor: Color = Color(255, 180, 180)
-
-                                    Text(
-                                        "Un-publish",
-                                        color = Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
-                                }
-                            }
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
 
                                 Button(
+
+                                    shape = RoundedCornerShape(10.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+
                                     onClick = {
-                                        onDeleteSkill(skill)
-                                    }) {
-                                    Text(
-                                        "Delete Skill",
-                                        color =  Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
+                                        if(skill.isPublic){
+                                            onUnpublishSkill(skill)
+                                        }else{
+                                            onPublishSkill(skill)
+                                        }
+                                }) {
+
+                                    Text(text = buttonText, fontSize = 18.sp, modifier = Modifier
+                                        .fillMaxWidth(0.35f)
+                                        .padding(vertical = 0.dp), textAlign = TextAlign.Center)
+
                                 }
                             }
                         }
-                    }
 
-                    else if(!skill.isPublic && sharedViewModel.isMySkill(skill)){
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-                                Text(
-                                    "Private",
-                                    color = Color.White,
-                                    fontSize = 12.sp,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .background(color = redColor, RoundedCornerShape(20))
-                                        .padding(vertical = 4.dp, horizontal = 4.dp)
-                                )
-                            }
-
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-
-                                Button(onClick = {
-                                    onPublishSkill(skill)
-                                }) {
-
-                                    val initialColor: Color = Color(255, 180, 180)
-
-                                    Text(
-                                        "Publish",
-                                        color = Color.White,
-                                        fontSize = 16.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
-                                }
-                            }
-
-                            Box(
-                                Modifier
-                                    .weight(1.0f)
-                                    .padding(horizontal = 0.dp),
-                                contentAlignment = Alignment.Center
-                            ){
-
-                                Button(
-                                    onClick = {
-                                        onDeleteSkill(skill)
-                                    }) {
-                                    Text(
-                                        "Delete Skill",
-                                        color =  Color.White,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier
-                                            .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
             }

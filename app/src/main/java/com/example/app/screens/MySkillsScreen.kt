@@ -370,7 +370,7 @@ fun CustomProgressIndicator(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(2.dp)
+            .padding(vertical = 5.dp)
             .height(height)
             .then(
                 if (isLongPressable) {
@@ -386,19 +386,42 @@ fun CustomProgressIndicator(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White, RoundedCornerShape(15))
-                    .border(1.dp, Color.DarkGray, RoundedCornerShape(15))
+                    .then(
+                        if (isLongPressable){
+                            Modifier
+                                .background(Color.White, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                        }else{
+                            Modifier
+                                .background(Color.White, RoundedCornerShape(10.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
+                        }
+                    )
+                    .padding(vertical = 5.dp)
+
             )
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .background(color, RoundedCornerShape(15))
-                    .border(1.dp, Color.DarkGray, RoundedCornerShape(15))
+                    .then(
+                        if (isLongPressable){
+                            Modifier
+                                .background(color, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                        }else{
+                            Modifier
+                                .background(color, RoundedCornerShape(10.dp))
+                                .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
+                        }
+                    )
                     .fillMaxWidth(amount.toFloat() / required.toFloat())
+                    .padding(vertical = 5.dp)
+
             )
         }
 
