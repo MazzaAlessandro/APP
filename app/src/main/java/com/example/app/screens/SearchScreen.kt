@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -802,10 +803,13 @@ fun SkillInfoPopUp_STARTED(
 
                                     Row(modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(15.dp, 0.dp),
+                                        .padding(15.dp, 0.dp)
+                                        .height(IntrinsicSize.Max),
                                         verticalAlignment = Alignment.CenterVertically) {
                                         IconButton(
                                             modifier = Modifier
+                                                .fillMaxHeight()
+                                                .padding(vertical = 5.dp)
                                                 .background(
                                                     PrimaryColor,
                                                     RoundedCornerShape(
@@ -820,9 +824,7 @@ fun SkillInfoPopUp_STARTED(
                                                         topStart = 10.dp,
                                                         bottomStart = 10.dp
                                                     )
-                                                )
-                                                .size(40.dp)
-                                                ,
+                                                ),
                                             onClick = {
                                             if(indexOfCurrent == indexOfProg){
                                                 var updatedCompleteStructureModel = completeStructure.value

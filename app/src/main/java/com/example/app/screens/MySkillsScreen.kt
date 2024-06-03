@@ -1,7 +1,6 @@
 package com.example.app.screens
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -70,7 +70,6 @@ import com.example.app.models.SkillSectionModel
 import com.example.app.models.SkillTaskModel
 import com.example.app.models.UserSkillSubsModel
 import com.example.app.ui.theme.PrimaryColor
-import com.example.app.ui.theme.greenColor
 import com.example.app.util.SharedViewModel
 import com.example.app.util.relative
 import java.time.ZonedDateTime
@@ -371,19 +370,75 @@ fun CustomProgressIndicator(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp)
-            .height(height)
+            .height(IntrinsicSize.Min)
             .then(
                 if (isLongPressable) {
-                    Modifier.clickable { onClickTask() }
+                    Modifier.background(Color.White, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                        .clickable { onClickTask() }
                 } else if (isClickable) {
-                    Modifier.clickable { onClickTask() }
+                    Modifier.background(Color.White, RoundedCornerShape(10.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
+                        .clickable { onClickTask() }
                 } else {
-                    Modifier
+                    Modifier.background(Color.White, RoundedCornerShape(10.dp))
+                        .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
                 }
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.CenterStart
     ) {
         Box(
+            modifier = Modifier
+                .fillMaxWidth(amount.toFloat() / required.toFloat())
+                .then(
+                    if (isLongPressable){
+                        Modifier
+                            .background(color, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                        //.border(1.dp, Color.DarkGray, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                    }else{
+                        Modifier
+                            .background(color, RoundedCornerShape(10.dp))
+                        //.border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
+                    }
+                )
+                //.border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
+                /*.then(
+                    if (isLongPressable){
+                        Modifier
+                            .background(color, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp))
+                    }else{
+                        Modifier
+                            .background(color, RoundedCornerShape(10.dp))
+                            .border(1.dp, Color.DarkGray, RoundedCornerShape(10.dp))
+                    }
+                )
+                .fillMaxWidth(amount.toFloat() / required.toFloat())
+                .fillMaxHeight()*/
+                .padding(0.dp, 1.dp)
+                .fillMaxHeight()
+
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(0.dp, 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = description,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.weight(1.0f).padding(start = 40.dp)
+            )
+
+            Text(
+                text = isDoneText,
+                color = Color.DarkGray,
+                modifier = Modifier.padding(horizontal = 20.dp)
+            )
+
+        }
+        /*Box(
             modifier = Modifier
                 .fillMaxSize()
 
@@ -423,27 +478,7 @@ fun CustomProgressIndicator(
                     .padding(vertical = 5.dp)
 
             )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = description,
-                color = Color.DarkGray,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.weight(1.0f).padding(start = 40.dp)
-            )
-
-            Text(
-                text = isDoneText,
-                color = Color.DarkGray,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-
-        }
-
+        }*/
     }
 }
 
