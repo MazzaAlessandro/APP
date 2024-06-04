@@ -50,7 +50,7 @@ class SearchScreenUITest {
         }
 
         test.onNodeWithText("Section 1: Section 1").assertExists()
-        test.onNodeWithText("4/15").assertExists()
+        test.onNodeWithText("In Progress").assertExists()
     }
 
     @Test
@@ -184,7 +184,6 @@ class SearchScreenUITest {
         test.onNodeWithText("This is a description").assertExists()
         test.onNodeWithText("Sections").assertExists()
 
-        test.onNodeWithText("In Progress").assertExists()
         test.onNodeWithText("Restart").assertExists()
         test.onNodeWithText("Stop Skill").assertExists()
     }
@@ -218,7 +217,7 @@ class SearchScreenUITest {
         test.onNodeWithText("This is a description").assertExists()
         test.onNodeWithText("Sections").assertExists()
 
-        test.onNodeWithText("REGISTER SKILL").assertExists()
+        test.onNodeWithText("Register Skill").assertExists()
     }
 
     @Test
@@ -250,7 +249,7 @@ class SearchScreenUITest {
         test.onNodeWithText("This is a description").assertExists()
         test.onNodeWithText("Sections").assertExists()
 
-        test.onNodeWithText("START SKILL").assertExists()
+        test.onNodeWithText("Start Skill").assertExists()
     }
 
     @Test
@@ -312,7 +311,7 @@ class SearchScreenUITest {
 
         test.onNode(hasTestTag("SkillSearchBlock Basic cooking")).performClick()
 
-        test.onNodeWithText("REGISTER SKILL").assertExists()
+        test.onNodeWithText("Register Skill").assertExists()
         test.onNodeWithContentDescription("close").assertExists().performClick()
 
         test.onNodeWithContentDescription("Logout").assertExists().performClick()
