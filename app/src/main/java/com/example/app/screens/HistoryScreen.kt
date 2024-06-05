@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +48,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,6 +70,8 @@ import com.example.app.ui.theme.PrimaryColor
 import com.example.app.ui.theme.greenColor
 import com.example.app.ui.theme.yellowColor
 import com.example.app.util.SharedViewModel
+import com.example.app.util.WindowInfo
+import com.example.app.util.rememberWindowInfo
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -102,7 +104,7 @@ fun HistBan_Badge(
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(5.dp, 7.dp)
+        .padding(7.dp, 7.dp)
         .clip(shape = RoundedCornerShape(10.dp))
         .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
         .background(Color.LightGray.copy(alpha = 0.2f))
@@ -162,9 +164,16 @@ fun HistBan_Badge(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = badge.badgeName, fontSize = (fontSize+5).sp, fontWeight = FontWeight.Bold)
+                        Text(text = badge.badgeName,
+                            fontSize = (fontSize+5).sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
 
-                        Text(text = badge.description, fontSize = (fontSize).sp)
+                        Text(text = badge.description,
+                            fontSize = (fontSize).sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -196,7 +205,7 @@ fun HistBan_SkillFin(
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(5.dp, 7.dp)
+        .padding(7.dp, 7.dp)
         .clip(shape = RoundedCornerShape(10.dp))
         .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
         .background(Color.LightGray.copy(alpha = 0.2f))
@@ -267,9 +276,16 @@ fun HistBan_SkillFin(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = skillModel.titleSkill, fontSize = (fontSize+5).sp, fontWeight = FontWeight.Bold)
+                        Text(text = skillModel.titleSkill,
+                            fontSize = (fontSize+5).sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
 
-                        Text(text = skillModel.skillDescription, fontSize = (fontSize).sp)
+                        Text(text = skillModel.skillDescription,
+                            fontSize = (fontSize).sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
 
                         //Text(modifier = Modifier.padding(top = 5.dp), text = "Skill Creator: " + skillModel.creatorUserName, fontSize = (fontSize -1).sp, lineHeight = (fontSize - 1).sp)
                     }
@@ -303,7 +319,7 @@ fun HistBan_SkillCrea(
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .padding(5.dp, 7.dp)
+        .padding(7.dp, 7.dp)
         .clip(shape = RoundedCornerShape(10.dp))
         .border(1.dp, Color.Gray, RoundedCornerShape(10.dp))
         .background(Color.LightGray.copy(alpha = 0.2f))
@@ -374,9 +390,16 @@ fun HistBan_SkillCrea(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = skillModel.titleSkill, fontSize = (fontSize + 5).sp, fontWeight = FontWeight.Bold)
+                        Text(text = skillModel.titleSkill,
+                            fontSize = (fontSize + 5).sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
 
-                        Text(text = skillModel.skillDescription, fontSize = (fontSize).sp)
+                        Text(text = skillModel.skillDescription,
+                            fontSize = (fontSize).sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -433,6 +456,8 @@ fun HistoryScreen(
     sharedViewModel: SharedViewModel
 ){
     val currentContext = LocalContext.current
+
+    val windowInfo = rememberWindowInfo()
 
     val userSkillSub: MutableState<UserSkillSubsModel> = remember {
         mutableStateOf(UserSkillSubsModel())
@@ -543,7 +568,7 @@ fun HistoryScreen(
                         )
 
                                     },
-                    label = { Text(text = "Search a event by name") },
+                    label = { Text(text = "Search an event by name") },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     leadingIcon = {
                         Icon(
@@ -585,50 +610,158 @@ fun HistoryScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
+                if(windowInfo.screenWidthInfo == WindowInfo.WindowType.Expanded){
+                    var list = listEvents.value
 
-                listEvents.value.forEach{ event ->
+                    var listA = ArrayList<ThreeGroup>()
+                    var listB = ArrayList<ThreeGroup>()
 
-                    if(event.type == EVEN_TYPE.BADGEGOTTEN){
-                        val badge = listObtainedBadges.value.find { it.skillId + it.sectionId == event.stringId }!!
+                    if(list.isNotEmpty()){
+                        for(i in 0 until list.size){
+                            if(i%2==0)
+                                listB.add(list[i])
+                            else
+                                listA.add(list[i])
 
-                        if(eventTitleEditText.value in badge.badgeName){
-                            EventCard(EVEN_TYPE.BADGEGOTTEN, SkillModel(), badge, event.time)
-                            {
-                                selectedThreeGroup.value = event
-                                isPopUpActive.value = true
+                        }
+                        //listA = list.subList(0, list.size / 2)
+                        //listB = list.subList(list.size / 2, list.size)
+
+                        Row(){
+                            Column(
+                                Modifier
+                                    .width(windowInfo.screenWidth.div(2))
+                                    .weight(1f)){
+                                listB.map{event->
+                                    if(event.type == EVEN_TYPE.BADGEGOTTEN){
+                                        val badge = listObtainedBadges.value.find { it.skillId + it.sectionId == event.stringId }!!
+
+                                        if(eventTitleEditText.value in badge.badgeName){
+                                            EventCard(EVEN_TYPE.BADGEGOTTEN, SkillModel(), badge, event.time)
+                                            {
+                                                selectedThreeGroup.value = event
+                                                isPopUpActive.value = true
+                                            }
+                                        }
+
+
+                                    }
+                                    else if(event.type == EVEN_TYPE.SKILLCREATED){
+                                        val skill = listCreatedSkills.value.find { it.id == event.stringId }!!
+
+                                        if(eventTitleEditText.value in skill.titleSkill){
+                                            EventCard(EVEN_TYPE.SKILLCREATED, skill, BadgeDataModel(), event.time )
+                                            {
+                                                selectedThreeGroup.value = event
+                                                isPopUpActive.value = true
+                                            }
+                                        }
+
+                                    }
+                                    else if(event.type == EVEN_TYPE.SKILLFINISHEDFT){
+                                        val skill = listFinishedSkills.value.find { it.id == event.stringId }!!
+
+                                        if(eventTitleEditText.value in skill.titleSkill){
+                                            EventCard(EVEN_TYPE.SKILLFINISHEDFT, skill, BadgeDataModel(), event.time )
+                                            {
+                                                selectedThreeGroup.value = event
+                                                isPopUpActive.value = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Column(
+                                Modifier
+                                    .width(windowInfo.screenWidth.div(2))
+                                    .weight(1f)){
+                                listA.map{event->
+                                    if(event.type == EVEN_TYPE.BADGEGOTTEN){
+                                        val badge = listObtainedBadges.value.find { it.skillId + it.sectionId == event.stringId }!!
+
+                                        if(eventTitleEditText.value in badge.badgeName){
+                                            EventCard(EVEN_TYPE.BADGEGOTTEN, SkillModel(), badge, event.time)
+                                            {
+                                                selectedThreeGroup.value = event
+                                                isPopUpActive.value = true
+                                            }
+                                        }
+
+
+                                    }
+                                    else if(event.type == EVEN_TYPE.SKILLCREATED){
+                                        val skill = listCreatedSkills.value.find { it.id == event.stringId }!!
+
+                                        if(eventTitleEditText.value in skill.titleSkill){
+                                            EventCard(EVEN_TYPE.SKILLCREATED, skill, BadgeDataModel(), event.time )
+                                            {
+                                                selectedThreeGroup.value = event
+                                                isPopUpActive.value = true
+                                            }
+                                        }
+
+                                    }
+                                    else if(event.type == EVEN_TYPE.SKILLFINISHEDFT){
+                                        val skill = listFinishedSkills.value.find { it.id == event.stringId }!!
+
+                                        if(eventTitleEditText.value in skill.titleSkill){
+                                            EventCard(EVEN_TYPE.SKILLFINISHEDFT, skill, BadgeDataModel(), event.time )
+                                            {
+                                                selectedThreeGroup.value = event
+                                                isPopUpActive.value = true
+                                            }
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    listEvents.value.forEach{ event ->
+
+                        if(event.type == EVEN_TYPE.BADGEGOTTEN){
+                            val badge = listObtainedBadges.value.find { it.skillId + it.sectionId == event.stringId }!!
+
+                            if(eventTitleEditText.value in badge.badgeName){
+                                EventCard(EVEN_TYPE.BADGEGOTTEN, SkillModel(), badge, event.time)
+                                {
+                                    selectedThreeGroup.value = event
+                                    isPopUpActive.value = true
+                                }
+                            }
+
+
+                        }
+                        else if(event.type == EVEN_TYPE.SKILLCREATED){
+                            val skill = listCreatedSkills.value.find { it.id == event.stringId }!!
+
+                            if(eventTitleEditText.value in skill.titleSkill){
+                                EventCard(EVEN_TYPE.SKILLCREATED, skill, BadgeDataModel(), event.time )
+                                {
+                                    selectedThreeGroup.value = event
+                                    isPopUpActive.value = true
+                                }
+                            }
+
+                        }
+                        else if(event.type == EVEN_TYPE.SKILLFINISHEDFT){
+                            val skill = listFinishedSkills.value.find { it.id == event.stringId }!!
+
+                            if(eventTitleEditText.value in skill.titleSkill){
+                                EventCard(EVEN_TYPE.SKILLFINISHEDFT, skill, BadgeDataModel(), event.time )
+                                {
+                                    selectedThreeGroup.value = event
+                                    isPopUpActive.value = true
+                                }
                             }
                         }
 
-
                     }
-                    else if(event.type == EVEN_TYPE.SKILLCREATED){
-                        val skill = listCreatedSkills.value.find { it.id == event.stringId }!!
-
-                        if(eventTitleEditText.value in skill.titleSkill){
-                            EventCard(EVEN_TYPE.SKILLCREATED, skill, BadgeDataModel(), event.time )
-                            {
-                                selectedThreeGroup.value = event
-                                isPopUpActive.value = true
-                            }
-                        }
-
-                    }
-                    else if(event.type == EVEN_TYPE.SKILLFINISHEDFT){
-                        val skill = listFinishedSkills.value.find { it.id == event.stringId }!!
-
-                        if(eventTitleEditText.value in skill.titleSkill){
-                            EventCard(EVEN_TYPE.SKILLFINISHEDFT, skill, BadgeDataModel(), event.time )
-                            {
-                                selectedThreeGroup.value = event
-                                isPopUpActive.value = true
-                            }
-                        }
-                    }
-
                 }
             }
-
-
         }
 
         if (isPopUpActive.value){
