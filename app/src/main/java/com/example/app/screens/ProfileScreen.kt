@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -238,44 +239,16 @@ fun ProfileScreen(navController: NavHostController,
 
     if(sharedViewModel.getCurrentUserMail()!=""){
         LaunchedEffect(userData) {
-            sharedViewModel.retrieveUserData(
-                sharedViewModel.getCurrentUserMail(),
-                context
-            ){
-                userData = it
-
-                sharedViewModel.retrieveUserSkillSub(
-                    mail,
-                    context
-                ){
-                    userSkillSubsModel.value = it
-
-                    sharedViewModel.retrieveAllBadges(
-                        it.badgesObtained,
-                        context
-                    ){
-                        badges.value = it
-                    }
-
-                    sharedViewModel.retrieveUserSkillProgressionList(
-                        mail,
-                        context
-                    ){
-                        skillProgressionList.value = it.toMutableList()
-
-                        if(!it.isEmpty()){
-                            val id = skillProgressionList.value.minBy { ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME) }
-
-                            sharedViewModel.retrieveSkill(id.skillId, context){
-                                lastSkillStarted.value = it
-                                lastTimeStarted.value = ZonedDateTime.parse(skillProgressionList.value.map { it.dateTime }.min(), DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                            }
-                        }
-                    }
-
-                }
-
-            }
+            sharedViewModel.LoadProfileScreen(
+                context,
+                userData,
+                mail,
+                userSkillSubsModel,
+                badges,
+                skillProgressionList,
+                lastSkillStarted,
+                lastTimeStarted
+            )
         }
     }
 

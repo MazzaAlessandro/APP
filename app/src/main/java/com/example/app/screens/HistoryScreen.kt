@@ -1,5 +1,6 @@
 package com.example.app.screens
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -493,35 +494,15 @@ fun HistoryScreen(
 
     if(sharedViewModel.getCurrentUserMail()!=""){
         LaunchedEffect(sharedViewModel.getCurrentUserMail()) {
-            sharedViewModel.retrieveUserSkillSub(
-                sharedViewModel.getCurrentUserMail(),
-                currentContext
-            ){currUserSkillSub ->
-                userSkillSub.value = currUserSkillSub
-
-                sharedViewModel.retrieveSkillsFromList(
-                    currentContext,
-                    userSkillSub.value.createdSkillsId
-                ){
-                    listCreatedSkills.value = it
-                    sharedViewModel.retrieveSkillsFromList(
-                        currentContext,
-                        userSkillSub.value.finishedSkills
-                    ){
-                        listFinishedSkills.value = it
-                        sharedViewModel.retrieveAllBadges(
-                            userSkillSub.value.badgesObtained,
-                            currentContext,
-                        ){
-                            listObtainedBadges.value = it
-
-                            listEvents.value = ComputeList(currUserSkillSub, listCreatedSkills.value, eventTitleEditText.value)
-                        }
-                    }
-                }
-
-
-            }
+            sharedViewModel.LoadHistory(
+                currentContext,
+                userSkillSub,
+                listCreatedSkills,
+                listFinishedSkills,
+                listObtainedBadges,
+                listEvents,
+                eventTitleEditText
+            )
         }
     }
 
@@ -561,7 +542,7 @@ fun HistoryScreen(
                     onValueChange = {
                         eventTitleEditText.value = it
 
-                        listEvents.value = ComputeList(
+                        listEvents.value = sharedViewModel.ComputeList(
                             userSkillSub.value,
                             listCreatedSkills.value,
                             it
@@ -796,37 +777,7 @@ fun HistoryScreen(
 }
 
 
-fun ComputeList(userSkillSubsModel: UserSkillSubsModel, listCreatedSkills: List<SkillModel>, subString: String): List<ThreeGroup>{
 
-    var listCreatedEvents = userSkillSubsModel.createdSkillsId.filter {str -> subString in listCreatedSkills.find { it.id == str }!!.titleSkill }.map { skillId ->
-        ThreeGroup(
-            EVEN_TYPE.SKILLCREATED,
-            ZonedDateTime.parse(listCreatedSkills.find { it.id == skillId }!!.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-            skillId
-        )
-    }
-
-    var listBadgesEvent = userSkillSubsModel.badgesObtained.mapIndexed{ index, badgeId ->
-        ThreeGroup(
-            EVEN_TYPE.BADGEGOTTEN,
-            ZonedDateTime.parse(userSkillSubsModel.timeBadgeObtained.get(index), DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-            badgeId
-        )
-    }
-
-    var listSkillsFinishedFT = userSkillSubsModel.finishedSkills.mapIndexed{ index, skillId ->
-        ThreeGroup(
-            EVEN_TYPE.SKILLFINISHEDFT,
-            ZonedDateTime.parse(userSkillSubsModel.timeFinishedFirstTime.get(index), DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-            skillId
-        )
-    }
-
-    var result: List<ThreeGroup> = listCreatedEvents + listBadgesEvent + listSkillsFinishedFT;
-    result = result.sortedByDescending { it.time }
-
-    return result
-}
 
 @Composable
 fun SkillInfoPopUp(

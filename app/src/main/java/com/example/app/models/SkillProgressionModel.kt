@@ -6,7 +6,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 @Parcelize
-data class  SkillProgressionModel (
+data class SkillProgressionModel (
     var userMail:String = "",
     var skillId: String = "",
     var currentSectionId: String = "",

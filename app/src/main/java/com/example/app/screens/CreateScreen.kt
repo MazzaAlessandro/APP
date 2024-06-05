@@ -769,66 +769,7 @@ fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeN
 }
 
 
-fun GenerateNewSkillID(): String{
-    val db = FirebaseFirestore.getInstance()
-    val newSkillRef = db.collection("skill").document()
-    return newSkillRef.id
-}
 
-@RequiresApi(Build.VERSION_CODES.O)
-fun SaveEverything(refId: String, sharedViewModel: SharedViewModel, context: Context, user: UserDataModel, skill: SkillModel, sections: List<SkillSectionModel>, tasks: Map<String, List<SkillTaskModel>>, badgeList: Map<String, BadgeDataModel>){
-
-    val db = FirebaseFirestore.getInstance()
-    val skillRef = db.collection("skill").document(refId)
-    skillRef.set(skill.copy(creatorEmail = sharedViewModel.getCurrentUserMail(),
-        skillDescription = skill.skillDescription.trim(),
-        titleSkill = skill.titleSkill.trim(),
-        dateTime = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME),
-        creatorUserName = user.username,
-        skillSectionsList = sections.map{
-        it.id
-    }))
-
-    badgeList.forEach{entry ->
-
-        val section = sections.find { it.id == entry.key }
-
-        val badgeEditted = entry.value.copy(
-            badgeName = skill.titleSkill.trim() + " - " + section!!.titleSection.trim(),
-            description = section!!.descriptionSection.trim()
-        )
-
-        sharedViewModel.saveBadgeData(badgeEditted, context)
-
-    }
-
-    sections.forEach{
-
-        val taskList = (tasks[it.id]?.toMutableList() ?: mutableListOf()).map{
-            it.id
-        }
-
-        val badgeID = badgeList.getOrDefault(it.id, BadgeDataModel())
-        val hasBadge = badgeID.sectionId == it.id
-
-        sharedViewModel.saveSkillSection(it.copy(skillTasksList = taskList, titleSection = it.titleSection.trim(), descriptionSection = it.descriptionSection.trim(), badgeID = badgeID.skillId + badgeID.sectionId, hasBadge = hasBadge), context)
-    }
-
-    tasks.values.flatten().forEach{
-        sharedViewModel.saveSkillTask(it.copy(taskDescription = it.taskDescription.trim()), context)
-    }
-
-
-    sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), context){
-
-        Toast.makeText(context, it.createdSkillsId.count().toString(), Toast.LENGTH_SHORT).show()
-
-        val createdSkillsIdList = it.createdSkillsId + skill.id
-        val createdBadgesIdList = it.createdBadges + badgeList.values.filter { it != BadgeDataModel() }.map { it.skillId + it.sectionId }
-        sharedViewModel.updateUserSub(it.copy(createdSkillsId = createdSkillsIdList, createdBadges = createdBadgesIdList), context)
-    }
-
-}
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -842,7 +783,7 @@ fun CreateScreen(
 ){
 
     val skillID by remember {
-        mutableStateOf(GenerateNewSkillID())
+        mutableStateOf(sharedViewModel.GenerateNewSkillID())
     }
 
     val currentUser: MutableState<UserDataModel> = remember {
@@ -1138,7 +1079,7 @@ fun CreateScreen(
                             return@Button
                         }
 
-                        SaveEverything(skillID, sharedViewModel, context, currentUser.value, skill.value, skillSections.value, skillTasks.value, badges.value)
+                        sharedViewModel.SaveEverything(skillID, sharedViewModel, context, currentUser.value, skill.value, skillSections.value, skillTasks.value, badges.value)
 
                         navController.navigate("Search")
                     },

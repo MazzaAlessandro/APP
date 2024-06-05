@@ -834,7 +834,7 @@ fun SkillInfoPopUp_STARTED(
 
                                                 newTasks.put(task, Pair(baseValue, task.requiredAmount))
 
-                                                var updatedProgression = ComputeListTaskSub1(currentContext, task, updatedCompleteStructureModel.skillProgression)
+                                                var updatedProgression = sharedViewModel.ComputeListTaskSub1(currentContext, task, updatedCompleteStructureModel.skillProgression)
 
                                                 updatedCompleteStructureModel = updatedCompleteStructureModel.copy(skillTasks = newTasks, skillProgression = updatedProgression)
 
@@ -1434,34 +1434,6 @@ fun SkillInfoPopUp_UNSTARTED(
 }
 
 
-fun StopSkillProgressionSS(
-    sharedViewModel: SharedViewModel,
-    skillProgression: SkillProgressionModel,
-    skillModelsStarted: MutableState<List<SkillModel>>,
-    onlineFetchedSkills: MutableState<List<SkillModel>>,
-    skillProgressions: MutableState<List<SkillProgressionModel>>,
-    isSkillSelected: MutableState<SelectedSkillState>,
-    currentUserSkillSubs: MutableState<UserSkillSubsModel>,
-    context: Context,
-){
-    sharedViewModel.removeSkillProgression(skillProgression, context)
-
-    skillModelsStarted.value = skillModelsStarted.value.filter { it.id != skillProgression.skillId }
-
-    onlineFetchedSkills.value = onlineFetchedSkills.value.filter { it.id != skillProgression.skillId }
-
-    skillProgressions.value -= skillProgression
-
-    isSkillSelected.value = SelectedSkillState.NOT_SELECTED
-
-    var updatedStartedSkills = skillModelsStarted.value.map { it.id }
-    var updatedCustomOrdering = currentUserSkillSubs.value.customOrdering.toMutableList()
-    updatedCustomOrdering.remove(skillProgression.skillId)
-
-    currentUserSkillSubs.value = currentUserSkillSubs.value.copy(startedSkillsIDs = updatedStartedSkills, customOrdering = updatedCustomOrdering)
-
-    sharedViewModel.saveUserSub(currentUserSkillSubs.value, context)
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1540,56 +1512,14 @@ fun SearchScreen(
 
     if(sharedViewModel.getCurrentUserMail()!="") {
         LaunchedEffect(currentUserSkillSubs.value) {
-            sharedViewModel.retrieveUserSkillProgressionList(
-                sharedViewModel.getCurrentUserMail(),
+            sharedViewModel.LoadSearchScreen(
                 currentContext,
-            ) {
-                skillProgressions.value = it.sortedByDescending {
-                    ZonedDateTime.parse(it.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                }
-
-                sharedViewModel.retrieveSkillsFromList(
-                    currentContext,
-                    it.map { it.skillId }
-                ) {
-                    skillModelsStarted.value =
-                        it.sortedBy { skillProgressions.value.map { it.skillId }.indexOf(it.id) }
-                }
-
-            }
-
-            sharedViewModel.retrieveUserSkillSub(
-                sharedViewModel.getCurrentUserMail(),
-                currentContext,
-            ) {
-                currentUserSkillSubs.value = it
-
-
-
-                sharedViewModel.retrieveSkillsFromList(
-                    currentContext,
-                    currentUserSkillSubs.value.registeredSkillsIDs
-                ) {
-                    skillModelsRegistered.value = it.sortedByDescending {
-                        ZonedDateTime.parse(
-                            it.dateTime,
-                            DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                        )
-                    }
-                }
-
-                sharedViewModel.retrieveSkillsFromList(
-                    currentContext,
-                    currentUserSkillSubs.value.createdSkillsId
-                ) {
-                    skillModelsCreated.value = it.sortedByDescending {
-                        ZonedDateTime.parse(
-                            it.dateTime,
-                            DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                        )
-                    }
-                }
-            }
+                skillProgressions,
+                skillModelsStarted,
+                currentUserSkillSubs,
+                skillModelsRegistered,
+                skillModelsCreated
+            )
         }
 
         LaunchedEffect(loadPublic.value) {
@@ -2323,7 +2253,7 @@ fun SearchScreen(
 
                 },
                 {skillProgression ->
-                    StopSkillProgressionSS(
+                    sharedViewModel.StopSkillProgressionSS(
                         sharedViewModel,
                         skillProgression,
                         skillModelsStarted,
@@ -2373,3 +2303,5 @@ fun SearchScreen(
         navController.navigate(Routes.Profile.route)
     }
 }
+
+

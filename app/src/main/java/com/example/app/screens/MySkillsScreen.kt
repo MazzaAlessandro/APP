@@ -482,241 +482,11 @@ fun CustomProgressIndicator(
     }
 }
 
-fun ComputeListTaskAdd1(
-    context: Context,
-    index: Int,
-    task: SkillTaskModel,
-    listCompleteStructures: MutableList<SkillCompleteStructureModel>
-): MutableList<SkillCompleteStructureModel> {
-    var updatedList = listCompleteStructures
-    var updatedStructure = updatedList.get(index)
-
-    val basedNumber = updatedStructure.skillTasks[task]!!.first
-    var updatedMap = updatedStructure.skillTasks.toMutableMap()
-
-    updatedMap.set(task, Pair(minOf(basedNumber + 1, task.requiredAmount), task.requiredAmount))
-
-    var updatedProgression = updatedStructure.skillProgression
-    var updatedProgMap = updatedProgression.mapNonCompletedTasks.toMutableMap()
-
-    if (basedNumber + 1 >= task.requiredAmount) {
-        updatedProgMap.remove(task.id)
-    } else {
-        updatedProgMap.set(task.id, minOf(basedNumber + 1, task.requiredAmount))
-    }
-
-    if (updatedStructure.skill.skillSectionsList.indexOf(updatedStructure.skillProgression.currentSectionId) == updatedStructure.skill.skillSectionsList.size - 1 && updatedProgMap.isEmpty()) {
-        updatedProgression = updatedProgression.copy(isFinished = true)
-    }
-
-    updatedProgression = updatedProgression.copy(mapNonCompletedTasks = updatedProgMap)
-    updatedStructure =
-        updatedStructure.copy(skillProgression = updatedProgression, skillTasks = updatedMap)
-
-    updatedList.set(index, updatedStructure)
-
-    return updatedList
-}
-
-fun ComputeListTaskSub1(
-    context: Context,
-    task: SkillTaskModel,
-    skillProgressionModel: SkillProgressionModel
-): SkillProgressionModel {
-    var result = skillProgressionModel
-
-    var updatedMap = result.mapNonCompletedTasks.toMutableMap()
-
-    var newAmount = 0
-
-    if (task.id in result.mapNonCompletedTasks.keys) {
-        newAmount = max((result.mapNonCompletedTasks.get(task.id) ?: 0) - 1, 0)
-    } else {
-        newAmount = task.requiredAmount - 1
-    }
-
-    updatedMap[task.id] = newAmount
-
-    result = result.copy(mapNonCompletedTasks = updatedMap.toMap(), isFinished = false)
-
-    return result
-}
 
 
-fun ComputeSkipSection(
-    index: Int,
-    listCompleteStructures: MutableList<SkillCompleteStructureModel>
-): Boolean {
-
-    var updatedList = listCompleteStructures
-    var updatedStructure = updatedList.get(index)
-
-    val indexOfSection =
-        updatedStructure.skill.skillSectionsList.indexOf(updatedStructure.skillProgression.currentSectionId)
-
-    val mustSkipSection: Boolean = updatedStructure.skillTasks.all {
-        it.value.first == it.value.second
-    } && (indexOfSection != updatedStructure.skill.skillSectionsList.size - 1)
 
 
-    return mustSkipSection
-}
 
-fun FinishSkill(
-    sharedViewModel: SharedViewModel,
-    listCompleteStructures: MutableState<List<SkillCompleteStructureModel>>,
-    userSkillSub: MutableState<UserSkillSubsModel>,
-    currentStructureIndex: MutableState<Int>,
-    badgeObtained: MutableState<BadgeDataModel>,
-    isBadgePopUpOpen: MutableState<Boolean>,
-    currentContext: Context
-) {
-    var updatedList = listCompleteStructures.value.toMutableList()
-    var updatedStructure = updatedList.get(currentStructureIndex.value)
-
-
-    var updatedProgression = updatedStructure.skillProgression
-
-    val indexOfSection =
-        updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
-
-    updatedProgression = updatedProgression.copy(isFinished = true)
-
-    val it = userSkillSub.value
-
-    val skillSection =
-        listCompleteStructures.value.get(currentStructureIndex.value).skillSection
-
-    var updatedBadges = it.badgesObtained
-    var updatedTimeBadge = it.timeBadgeObtained
-    var updatedFinishedSkills = it.finishedSkills
-    var updatedTimesFinishSkills = it.timeFinishedFirstTime
-    var updatedStartedSkills = it.startedSkillsIDs
-    var updatedCustomOrder = it.customOrdering
-
-    if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
-        updatedBadges = updatedBadges + skillSection.badgeID
-        updatedTimeBadge = updatedTimeBadge + ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-
-        sharedViewModel.retrieveBadge(
-            skillId = listCompleteStructures.value.get(currentStructureIndex.value).skill.id,
-            sectionId = skillSection.id,
-            currentContext,
-        ){
-            badgeObtained.value = it
-            isBadgePopUpOpen.value = true
-        }
-    }
-
-    if (updatedStructure.skill.id !in updatedFinishedSkills) {
-        updatedFinishedSkills += updatedStructure.skill.id
-        updatedTimesFinishSkills += ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-    }
-
-    if (updatedStructure.skill.id in updatedStartedSkills) {
-        updatedStartedSkills -= updatedStructure.skill.id
-    }
-
-    if (updatedStructure.skill.id in updatedCustomOrder) {
-        updatedCustomOrder -= updatedStructure.skill.id
-    }
-
-    userSkillSub.value = it.copy(
-        badgesObtained = updatedBadges,
-        timeBadgeObtained = updatedTimeBadge,
-        finishedSkills = updatedFinishedSkills,
-        timeFinishedFirstTime = updatedTimesFinishSkills,
-        startedSkillsIDs = updatedStartedSkills,
-        customOrdering = updatedCustomOrder,
-    )
-
-    sharedViewModel.saveUserSub(
-        userSkillSub.value,
-        context = currentContext
-    )
-
-    val skillProgressionModel =
-        listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
-
-    sharedViewModel.removeSkillProgression(skillProgressionModel, currentContext)
-    listCompleteStructures.value -= listCompleteStructures.value.get(currentStructureIndex.value)
-
-}
-
-
-fun StopSkillProgressionMS(
-    sharedViewModel: SharedViewModel,
-    listCompleteStructures: MutableState<List<SkillCompleteStructureModel>>,
-    userSkillSub: MutableState<UserSkillSubsModel>,
-    currentStructureIndex: MutableState<Int>,
-    currentContext: Context
-) {
-    var updatedList = listCompleteStructures.value.toMutableList()
-    var updatedStructure = updatedList.get(currentStructureIndex.value)
-
-
-    var updatedProgression = updatedStructure.skillProgression
-
-    val indexOfSection =
-        updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
-
-    val it = userSkillSub.value
-
-    val skillSection =
-        listCompleteStructures.value.get(currentStructureIndex.value).skillSection
-
-    var updatedStartedSkills = it.startedSkillsIDs
-    var updatedCustomOrder = it.customOrdering
-
-    if (updatedStructure.skill.id in updatedStartedSkills) {
-        updatedStartedSkills -= updatedStructure.skill.id
-    }
-
-    if (updatedStructure.skill.id in updatedCustomOrder) {
-        updatedCustomOrder -= updatedStructure.skill.id
-    }
-
-    userSkillSub.value = it.copy(
-        startedSkillsIDs = updatedStartedSkills,
-        customOrdering = updatedCustomOrder,
-    )
-
-    sharedViewModel.saveUserSub(
-        userSkillSub.value,
-        context = currentContext
-    )
-
-    val skillProgressionModel =
-        listCompleteStructures.value.get(currentStructureIndex.value).skillProgression
-
-    sharedViewModel.removeSkillProgression(skillProgressionModel, currentContext)
-    listCompleteStructures.value -= listCompleteStructures.value.get(currentStructureIndex.value)
-
-}
-
-fun RecomputeList(listCompleteStructures: List<SkillCompleteStructureModel>, sortingType: SortingType, customOrdering: List<String>): List<SkillCompleteStructureModel>{
-     val result = listCompleteStructures.sortedWith(Comparator { a, b ->
-        when(sortingType) {
-            SortingType.Custom -> {
-                val indexA = customOrdering.indexOf(a.skill.id)
-                val indexB = customOrdering.indexOf(b.skill.id)
-                indexA.compareTo(indexB)
-            }
-            SortingType.DateAsc -> {
-                val dateA = ZonedDateTime.parse(a.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                val dateB = ZonedDateTime.parse(b.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                dateA.compareTo(dateB)
-            }
-            SortingType.DateDesc -> {
-                val dateA = ZonedDateTime.parse(a.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                val dateB = ZonedDateTime.parse(b.skillProgression.dateTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-                dateB.compareTo(dateA)  // Reverse the comparison for descending order
-            }
-        }
-    })
-
-    return result
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -847,7 +617,7 @@ fun MySkillsScreen(
                                         listCompleteStructures.value += structure
                                     }
 
-                                    listCompleteStructures.value = RecomputeList(
+                                    listCompleteStructures.value = sharedViewModel.RecomputeList(
                                         listCompleteStructures.value,
                                         sortingType.value,
                                         userSkillSub.value.customOrdering
@@ -869,86 +639,15 @@ fun MySkillsScreen(
             }
 
 
-            var updatedList = listCompleteStructures.value.toMutableList()
-            var updatedStructure = updatedList.get(currentStructureIndex.value)
-
-
-            var updatedProgression = updatedStructure.skillProgression
-
-            val indexOfSection =
-                updatedStructure.skill.skillSectionsList.indexOf(updatedProgression.currentSectionId)
-
-            val skillSection =
-                listCompleteStructures.value.get(currentStructureIndex.value).skillSection
-
-            val skill = listCompleteStructures.value.get(currentStructureIndex.value).skill.id
-
-
-            //FIRST WE ADD THE BADGE
-            sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), currentContext) {
-
-                var updatedBadges = it.badgesObtained
-                var updatedTimeBadge = it.timeBadgeObtained
-
-                if (skillSection.hasBadge && !(skillSection.badgeID in updatedBadges)) {
-                    updatedBadges = updatedBadges + skillSection.badgeID
-                    updatedTimeBadge += ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-
-                    sharedViewModel.retrieveBadge(
-                        skillId = skill,
-                        sectionId = skillSection.id,
-                        currentContext,
-                    ){
-                        badgeObtained.value = it
-                        isBadgePopUpOpen.value = true
-                    }
-
-                }
-                userSkillSub.value = it.copy(badgesObtained = updatedBadges, timeBadgeObtained = updatedTimeBadge)
-
-                sharedViewModel.saveUserSub(
-                    userSkillSub.value,
-                    context = currentContext
-                )
-
-            }
-
-            //SECOND WE UPDATE THE STRUCT
-            updatedProgression.currentSectionId =
-                updatedStructure.skill.skillSectionsList.get(indexOfSection + 1)
-
-            sharedViewModel.retrieveSkillSection(
-                updatedProgression.skillId,
-                updatedProgression.currentSectionId,
+            sharedViewModel.LoadMySkills(
+                listCompleteStructures,
+                currentStructureIndex,
                 currentContext,
-            ) { data ->
-                updatedStructure.skillSection = data
-
-                sharedViewModel.retrieveAllSkillTasks(
-                    updatedStructure.skill.id,
-                    updatedStructure.skillSection.id,
-                    updatedStructure.skillSection.skillTasksList,
-                    currentContext
-                ) { listTasks ->
-
-                    updatedStructure = updatedStructure.copy(skillTasks = listTasks.associate {
-                        Pair(it, Pair(0, it.requiredAmount))
-                    })
-
-                    updatedProgression =
-                        updatedProgression.copy(mapNonCompletedTasks = listTasks.associate {
-                            Pair(it.id, 0)
-                        })
-
-                    sharedViewModel.saveSkillProgression(updatedProgression, currentContext)
-
-                    updatedStructure = updatedStructure.copy(skillProgression = updatedProgression)
-                    updatedList.set(currentStructureIndex.value, updatedStructure)
-                    listCompleteStructures.value = updatedList
-
-                    canSkipSection.value = true
-                }
-            }
+                badgeObtained,
+                isBadgePopUpOpen,
+                userSkillSub,
+                canSkipSection
+            )
 
 
         }
@@ -1015,18 +714,18 @@ fun MySkillsScreen(
                             DropdownMenuItem(text = { Text(text = "Custom") }, onClick = {
                                 sortingMenuExp.value = false
                                 sortingType.value = SortingType.Custom
-                                listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                                listCompleteStructures.value = sharedViewModel.RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
                             })
 
                             DropdownMenuItem(text = { Text(text = "Starting Date Asc") }, onClick = {
                                 sortingMenuExp.value = false
                                 sortingType.value = SortingType.DateAsc
-                                listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                                listCompleteStructures.value = sharedViewModel.RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
                             })
                             DropdownMenuItem(text = { Text(text = "Starting Date Desc") }, onClick = {
                                 sortingMenuExp.value = false
                                 sortingType.value = SortingType.DateDesc
-                                listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                                listCompleteStructures.value = sharedViewModel.RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
                             })
                         }
                     }
@@ -1042,14 +741,14 @@ fun MySkillsScreen(
                 sharedViewModel,
                 { index, task ->
 
-                    val updatedList = ComputeListTaskAdd1(
+                    val updatedList = sharedViewModel.ComputeListTaskAdd1(
                         currentContext,
                         index,
                         task,
                         listCompleteStructures.value.toMutableList()
                     )
 
-                    val mustSkipSection = ComputeSkipSection(index, updatedList) && canSkipSection.value
+                    val mustSkipSection = sharedViewModel.ComputeSkipSection(index, updatedList) && canSkipSection.value
                     if (mustSkipSection) {
                         currentStructureIndex.value = index
 
@@ -1070,7 +769,7 @@ fun MySkillsScreen(
                     currentStructureIndex.value = index
                     isStartRun.value = false
 
-                    FinishSkill(
+                    sharedViewModel.FinishSkill(
                         sharedViewModel,
                         listCompleteStructures,
                         userSkillSub,
@@ -1101,7 +800,7 @@ fun MySkillsScreen(
                     userSkillSub.value = userSkillSub.value.copy(customOrdering = updatedList.toList())
                     sharedViewModel.updateUserSub(userSkillSub.value, currentContext)
 
-                    listCompleteStructures.value = RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
+                    listCompleteStructures.value = sharedViewModel.RecomputeList(listCompleteStructures.value, sortingType.value, userSkillSub.value.customOrdering)
                 },
                 { badge ->
                     /*
@@ -1207,7 +906,7 @@ fun MySkillsScreen(
                     isStartRun.value = false
                     isPopUpOpen.value = false
 
-                    StopSkillProgressionMS(
+                    sharedViewModel.StopSkillProgressionMS(
                         sharedViewModel,
                         listCompleteStructures,
                         userSkillSub,
