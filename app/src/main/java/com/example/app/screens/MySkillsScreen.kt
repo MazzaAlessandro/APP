@@ -94,7 +94,7 @@ fun SkillTitleBlock(skillCompleteStructureModel: SkillCompleteStructureModel, ba
 
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BadgeIcon(badge = badge.badgeColor, size = relative(65.dp), filled = badge.skillId != "")
+        BadgeIcon(badge = badge.badgeColor, size = relative(65.dp), filled = skillCompleteStructureModel.skillSection.hasBadge)
         Spacer(Modifier.width(10.dp)) // Space between the circle and the text
         Column(modifier = Modifier.weight(1f)) {
             Text(
