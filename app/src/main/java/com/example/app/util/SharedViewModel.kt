@@ -654,8 +654,6 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
 
         sharedViewModel.retrieveUserSkillSub(sharedViewModel.getCurrentUserMail(), context){
 
-            Toast.makeText(context, it.createdSkillsId.count().toString(), Toast.LENGTH_SHORT).show()
-
             val createdSkillsIdList = it.createdSkillsId + skill.id
             val createdBadgesIdList = it.createdBadges + badgeList.values.filter { it != BadgeDataModel() }.map { it.skillId + it.sectionId }
             sharedViewModel.updateUserSub(it.copy(createdSkillsId = createdSkillsIdList, createdBadges = createdBadgesIdList), context)

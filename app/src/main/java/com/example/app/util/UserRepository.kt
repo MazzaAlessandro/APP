@@ -41,7 +41,6 @@ class UserRepository{
 
             fireStoreRef.set(userData)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: Exception){
@@ -61,7 +60,6 @@ class UserRepository{
         try{
             fireStoreRef.set(userData)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: Exception){
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
@@ -86,7 +84,6 @@ class UserRepository{
                         data(userData)
                         currentUserData.value = userData
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -113,7 +110,6 @@ class UserRepository{
                         data(userSkillSub)
                         currentUserSub.value = userSkillSub
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -134,7 +130,6 @@ class UserRepository{
 
             fireStoreRef.set(userSub)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: Exception){
@@ -153,7 +148,6 @@ class UserRepository{
         try{
             fireStoreRef.set(userSub)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: Exception){
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()

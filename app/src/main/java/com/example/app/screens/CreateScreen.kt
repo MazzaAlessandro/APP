@@ -744,7 +744,6 @@ fun BadgePopUp(sharedViewModel: SharedViewModel, badge: BadgeDataModel, onBadgeN
                         Text(text = "ADD +")
                     }
 
-                    Toast.makeText(context, listBadges.value.count().toString(), Toast.LENGTH_SHORT).show()
                     listBadges.value.forEach{
                         
                         BadgeBanner(

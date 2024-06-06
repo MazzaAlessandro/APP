@@ -66,7 +66,6 @@ class SkillRepository {
                         data(skillModelData)
                         currentSkill.value = skillModelData
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception) {
@@ -104,7 +103,6 @@ class SkillRepository {
                         data(currentSkillListLoc)
                         currentSkillList.value = currentSkillListLoc
                     } else {
-                        Toast.makeText(context, "Data not HIHI found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -144,7 +142,6 @@ class SkillRepository {
                         data(currentSkillListLoc)
                         currentSkillList.value = currentSkillListLoc
                     } else {
-                        Toast.makeText(context, "Data not HAHA found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -172,7 +169,6 @@ class SkillRepository {
                         data(sectionModelData)
                         currentSection.value = sectionModelData
                     } else {
-                        Toast.makeText(context, "Data not found SKILLSECT", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception) {
@@ -211,7 +207,6 @@ class SkillRepository {
                         data(currentSkillSectionList)
                         currentSectionList.value = currentSkillSectionList
                     } else {
-                        Toast.makeText(context, "Data not SECT LIST found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -237,7 +232,6 @@ class SkillRepository {
                         data(taskModelData)
                         currentTask.value = taskModelData
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception) {
@@ -264,7 +258,6 @@ class SkillRepository {
                         data(skillProgressionData)
                         currentSkillProgression.value = skillProgressionData
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -293,7 +286,6 @@ class SkillRepository {
                         data(badge)
                         currentBadge.value = badge
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -327,7 +319,6 @@ class SkillRepository {
 
                         data(badgeList)
                     } else {
-                        Toast.makeText(context, "Data not SECT LIST found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -365,7 +356,6 @@ class SkillRepository {
                         data(currentSkillListProg)
                         currentSkillListProgression.value = currentSkillListProg
                     } else {
-                        Toast.makeText(context, "Data not HAHA found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -409,7 +399,6 @@ class SkillRepository {
                         data(currentSkillTaskListF)
                         currentSkillTaskList.value = currentSkillTaskListF
                     } else {
-                        Toast.makeText(context, "Data not found", Toast.LENGTH_SHORT).show()
                     }
                 }
         } catch (e: Exception){
@@ -430,7 +419,6 @@ class SkillRepository {
 
             fireStoreRef.set(skillData)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: Exception){
@@ -451,7 +439,6 @@ class SkillRepository {
 
             fireStoreRef.set(badge)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: Exception){
@@ -472,7 +459,6 @@ class SkillRepository {
 
             fireStoreRef.set(skillSectionData)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: Exception){
@@ -493,7 +479,6 @@ class SkillRepository {
 
             fireStoreRef.set(skillTaskData)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: Exception){
@@ -514,7 +499,6 @@ class SkillRepository {
 
             fireStoreRef.set(skillProgression)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: Exception){
@@ -536,7 +520,6 @@ class SkillRepository {
         try{
             fireStoreRef.set(skillProgressionData)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: Exception){
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
@@ -595,7 +578,6 @@ class SkillRepository {
         try{
             fireStoreRef.set(skill.copy(isPublic = false))
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: Exception){
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
@@ -613,7 +595,6 @@ class SkillRepository {
         try{
             fireStoreRef.set(skill.copy(isPublic = true))
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Successfully saved data!", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: Exception){
             Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
