@@ -985,13 +985,13 @@ fun BadgeCompletedPopUp(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text("CONGRATULATIONS!", fontSize = 30.sp, fontWeight = FontWeight.Bold,
+                    Text("CONGRATULATIONS!", fontSize = 25.sp, fontWeight = FontWeight.Bold,
                         color = Color.DarkGray,
                     )
 
                     BadgeIcon(badge = badge.badgeColor, size = relative(150.dp))
 
-                    Text("You just obtained a", fontSize = 24.sp,
+                    Text("You've just obtained a", fontSize = 20.sp,
                         color = Color.DarkGray,
                     )
 
@@ -1003,7 +1003,7 @@ fun BadgeCompletedPopUp(
                     if(badge.badgeColor == BadgeColor.GOLD)
                         color = "GOLD MEDAL"
 
-                    Text(text = color, fontSize = 27.sp,
+                    Text(text = color, fontSize = 20.sp,
                         color = Color.DarkGray,
                     )
 
@@ -1011,7 +1011,7 @@ fun BadgeCompletedPopUp(
                         color = Color.DarkGray,
                     )
 
-                    Text(badge.description, fontSize = 20.sp,
+                    Text(badge.description, fontSize = 18.sp, modifier = Modifier.padding(10.dp),
                         color = Color.DarkGray,
                     )
                 }

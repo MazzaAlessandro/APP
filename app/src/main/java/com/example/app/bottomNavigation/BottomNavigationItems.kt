@@ -14,8 +14,8 @@ import com.example.app.Routes
 
 sealed class BottomNavItem(var title:String, var selectedIcon:ImageVector, var unselectedIcon:ImageVector, var screen_route:String){
 
-    object Search : BottomNavItem("Search Skills", Icons.Filled.Search, Icons.Outlined.Search, Routes.Search.route)
+    object Search : BottomNavItem("Search", Icons.Filled.Search, Icons.Outlined.Search, Routes.Search.route)
     object Profile : BottomNavItem("Profile", Icons.Filled.AccountCircle, Icons.Outlined.AccountCircle, Routes.Profile.route)
-    object Create : BottomNavItem("Create Skills", Icons.Filled.Edit, Icons.Outlined.Edit, Routes.Create.route)
-    object MySkills : BottomNavItem("My Skills", Icons.Filled.List, Icons.Outlined.List, Routes.MySkills.route)
+    object Create : BottomNavItem("Create", Icons.Filled.Edit, Icons.Outlined.Edit, Routes.Create.route)
+    object MySkills : BottomNavItem("MySkills", Icons.Filled.List, Icons.Outlined.List, Routes.MySkills.route)
 }
