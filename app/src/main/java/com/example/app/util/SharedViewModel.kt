@@ -854,7 +854,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
 
     fun LoadProfileScreen(
         context: Context,
-        userData: UserDataModel,
+        userData: MutableState<UserDataModel>,
         mail: String,
         userSkillSubsModel: MutableState<UserSkillSubsModel>,
         badges: MutableState<List<BadgeDataModel>>,
@@ -867,7 +867,7 @@ class SharedViewModel(private val userRepository: UserRepository, private val sk
             getCurrentUserMail(),
             context
         ) {
-            userData1 = it
+            userData.value = it
 
             retrieveUserSkillSub(
                 mail,

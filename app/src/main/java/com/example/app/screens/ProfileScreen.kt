@@ -213,7 +213,7 @@ fun ProfileScreen(navController: NavHostController,
 
     //val userId = FirebaseAuth.getInstance().currentUser?.uid
     val mail = sharedViewModel.getCurrentUserMail()
-    var userData by remember(mail){
+    var userData: MutableState<UserDataModel> = remember(mail){
         mutableStateOf(UserDataModel())
     }
 
@@ -285,7 +285,7 @@ fun ProfileScreen(navController: NavHostController,
 
                     Box(modifier = Modifier.weight(1.0f), contentAlignment = Alignment.Center){
                         ProfileImage(
-                            userData.pfpUri, false, relative(150.dp)){
+                            userData.value.pfpUri, false, relative(150.dp)){
                         }
 
                     }
@@ -299,7 +299,7 @@ fun ProfileScreen(navController: NavHostController,
                         horizontalAlignment = Alignment.CenterHorizontally){
 
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center){
-                            Text(text = userData.username, fontWeight = FontWeight.W600, color = Color.DarkGray, fontSize = 60.sp)
+                            Text(text = userData.value.username, fontWeight = FontWeight.W600, color = Color.DarkGray, fontSize = 25.sp)
 
                             IconButton(
                                 modifier = Modifier.padding(start = 20.dp),
@@ -314,50 +314,7 @@ fun ProfileScreen(navController: NavHostController,
                             }
                         }
                         
-                        Spacer(modifier = Modifier.height(10.dp))
-/*
-                        Column(verticalArrangement = Arrangement.spacedBy(relative(size = 4.dp))){
-                            Column {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(10.dp, 0.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-
-                                    Text(text = "Last Skill Started", fontSize = 25.sp, modifier = Modifier.padding(horizontal = 0.dp, vertical = 4.dp),
-                                        color = Color.DarkGray,
-                                    )
-
-                                }
-
-                                Divider(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 0.dp, end = 10.dp),
-                                    color = Color.DarkGray
-                                )
-                            }
-
-
-                            if(lastSkillStarted.value.id != ""){
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.weight(1.0f)
-                                ) {
-                                    SkillCard(lastSkillStarted.value, {})
-                                }
-                            }else{
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.weight(1.0f)
-                                ) {
-                                    SkillCardEmpty({navController.navigate(Routes.Search.route)})
-                                }
-                            }
-
-                        }*/
+                        //Spacer(modifier = Modifier.height(10.dp))
 
                     }
                 }
@@ -587,10 +544,10 @@ fun ProfileScreen(navController: NavHostController,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ProfileImage(
-                        userData.pfpUri, false, relative(90.dp)){
+                        userData.value.pfpUri, false, relative(90.dp)){
                     }
 
-                    Text(text = userData.username, fontWeight = FontWeight.W600, color = Color.DarkGray, style = TextStyle(fontSize = 35.sp))
+                    Text(text = userData.value.username, fontWeight = FontWeight.W600, color = Color.DarkGray, style = TextStyle(fontSize = 35.sp))
 
                     IconButton(
                         onClick = { navController.navigate(Routes.Update.route) }
