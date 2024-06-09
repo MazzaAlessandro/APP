@@ -35,14 +35,14 @@ class IntegratedCreateScreenTest {
 
         test.onNodeWithTag("ProfileScreen").assertExists()
 
-        test.onNodeWithTag("Create Skills").assertExists().performClick()
+        test.onNodeWithTag("Create").assertExists().performClick()
         test.onNodeWithTag("CreateScreen").assertExists()
 
-        test.onNodeWithTag("My Skills").assertExists().performClick()
+        test.onNodeWithTag("MySkills").assertExists().performClick()
         test.onNodeWithText("Yes").assertExists().performClick()
         test.onNodeWithTag("MySkillsScreen").assertExists()
 
-        test.onNodeWithTag("Create Skills").assertExists().performClick()
+        test.onNodeWithTag("Create").assertExists().performClick()
         test.onNodeWithTag("CreateScreen").assertExists()
 
         test.onNodeWithContentDescription("Logout").assertExists().performClick()

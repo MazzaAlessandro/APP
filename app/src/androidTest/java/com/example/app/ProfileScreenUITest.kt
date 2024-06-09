@@ -79,10 +79,10 @@ class ProfileScreenUITest {
 
         //check the existence of the BottomNavigationBar
         test.onNodeWithTag("BottomNavigationBar").assertExists()
-        test.onNodeWithTag("Search Skills").assertExists()
+        test.onNodeWithTag("Search").assertExists()
         test.onNodeWithTag("Profile").assertExists()
-        test.onNodeWithTag("Create Skills").assertExists()
-        test.onNodeWithTag("My Skills").assertExists()
+        test.onNodeWithTag("Create").assertExists()
+        test.onNodeWithTag("MySkills").assertExists()
 
         test.onNodeWithContentDescription("profilePic").assertExists()
         test.onNodeWithContentDescription("Edit").assertExists()
@@ -106,7 +106,7 @@ class ProfileScreenUITest {
 
         test.onNodeWithTag("LoginPage").assertExists()
 
-        test.onNodeWithTag("mailTextField").assertExists().performTextInput("abba@mail.com")
+        test.onNodeWithTag("mailTextField").assertExists().performTextInput("p@mail.com")
         test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
         test.onNode(hasClickAction() and hasText("Login")).assertExists().assertIsEnabled().performClick()
 

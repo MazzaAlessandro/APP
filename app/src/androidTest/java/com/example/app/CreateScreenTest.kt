@@ -136,9 +136,9 @@ class CreateScreenTest {
 
         //check the existence of the BottomNavigationBar
         test.onNodeWithTag("BottomNavigationBar").assertExists()
-        test.onNodeWithTag("Search Skills").assertExists()
+        test.onNodeWithTag("Search").assertExists()
         test.onNodeWithTag("Profile").assertExists()
-        test.onNodeWithTag("Create Skills").assertExists()
-        test.onNodeWithTag("My Skills").assertExists()
+        test.onNodeWithTag("Create").assertExists()
+        test.onNodeWithTag("MySkills").assertExists()
     }
 }

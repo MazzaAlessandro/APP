@@ -195,7 +195,7 @@ class HistoryScreenTest {
 
         test.onNodeWithTag("LoginPage").assertExists()
 
-        test.onNodeWithTag("mailTextField").assertExists().performTextInput("abba@mail.com")
+        test.onNodeWithTag("mailTextField").assertExists().performTextInput("p@mail.com")
         test.onNodeWithTag("passwordTextField").assertExists().performTextInput("111111")
         test.onNode(hasClickAction() and hasText("Login")).assertExists().assertIsEnabled().performClick()
 
@@ -205,7 +205,7 @@ class HistoryScreenTest {
         test.onNodeWithTag("pieChart").assertExists().performClick()
         test.waitUntilAtLeastOneExists(hasTestTag("HistoryScreen"), 15000)
 
-        test.waitUntilAtLeastOneExists(hasText("Skill Created"), 15000)
+        test.waitUntilAtLeastOneExists(hasText("Badge Obtained"), 15000)
 
         test.onNodeWithTag("AppToolBar").assertExists()
         test.onNodeWithText("History").assertExists()
@@ -213,9 +213,9 @@ class HistoryScreenTest {
         test.onNodeWithContentDescription("Logout").assertExists()
 
         test.onNodeWithTag("HistoryScreen").assertExists()
-        test.onNodeWithTag("BadgeSearch").assertExists().performTextInput("Leg")
+        test.onNodeWithTag("BadgeSearch").assertExists().performTextInput("Abs")
 
-        test.onNodeWithText("Get stronger legs with simple exercises").performClick()
+        test.onNodeWithText("Abs workout").performClick()
         test.onNodeWithTag("PopUp").assertExists()
         test.onNodeWithContentDescription("close").performClick()
         test.onNodeWithTag("PopUp").assertDoesNotExist()

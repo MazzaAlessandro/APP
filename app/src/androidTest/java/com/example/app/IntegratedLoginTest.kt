@@ -35,16 +35,16 @@ class IntegratedLoginTest {
 
         test.onNodeWithTag("ProfileScreen").assertExists()
 
-        test.onNodeWithTag("Search Skills").assertExists().performClick()
+        test.onNodeWithTag("Search").assertExists().performClick()
         test.onNodeWithTag("SearchScreen").assertExists()
 
         test.onNodeWithTag("Profile").assertExists().performClick()
         test.onNodeWithTag("ProfileScreen").assertExists()
 
-        test.onNodeWithTag("Create Skills").assertExists().performClick()
+        test.onNodeWithTag("Create").assertExists().performClick()
         test.onNodeWithTag("CreateScreen").assertExists()
 
-        test.onNodeWithTag("My Skills").assertExists().performClick()
+        test.onNodeWithTag("MySkills").assertExists().performClick()
         test.onNodeWithText("Yes").assertExists().performClick()
         test.onNodeWithTag("MySkillsScreen").assertExists()
 
